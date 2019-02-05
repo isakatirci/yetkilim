@@ -1,0 +1,208 @@
+﻿<div id="e-commerce-products" class="page-layout carded full-width">
+
+    <div class="top-bg bg-primary"></div>
+
+    <!-- CONTENT -->
+    <div class="page-content-wrapper">
+
+        <!-- HEADER -->
+        <div class="page-header light-fg row no-gutters align-items-center justify-content-between">
+
+            <!-- APP TITLE -->
+            <div class="col-12 col-sm">
+
+                <div class="logo row no-gutters justify-content-center align-items-start justify-content-sm-start">
+                    <div class="logo-icon mr-3 mt-1">
+                        <i class="icon-cube-outline s-6"></i>
+                    </div>
+                    <div class="logo-text">
+                        <div class="h4">Firmalar</div>
+                        @*<div class="">Firma Sayısı: @ViewData["FirmCount"]</div>*@
+                    </div>
+                </div>
+
+            </div>
+            <!-- / APP TITLE -->
+            <!-- SEARCH -->
+            <div class="col search-wrapper px-2">
+
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-icon">
+                            <i class="icon icon-magnify"></i>
+                        </button>
+                    </span>
+                    <input id="products-search-input" type="text" class="form-control" placeholder="En az 3 karakter girerek arama yapabilirsiniz" aria-label="Search" />
+                </div>
+
+            </div>
+            <!-- / SEARCH -->
+
+            <div class="col-auto">
+                <a href="@Url.Action("Create")" class="btn btn-light">YENİ FİRMA EKLE</a>
+            </div>
+
+        </div>
+        <!-- / HEADER -->
+
+        <div class="page-content-card">
+
+            <table id="company-list-table" class="table dataTable">
+                <thead>
+                    <tr>
+                        <th>
+                            <div class="table-header">
+                                <span class="column-title">ID</span>
+                            </div>
+                        </th>
+
+                        <th>
+                            <div class="table-header">
+                                <span class="column-title">Firma Adı</span>
+                            </div>
+                        </th>
+                        <th>
+                            <div class="table-header">
+                                <span class="column-title">Adres</span>
+                            </div>
+                        </th>
+                        <th>
+                            <div class="table-header">
+                                <span class="column-title">Eklenme Tarihi</span>
+                            </div>
+                        </th>
+                        <th>
+                            <div class="table-header">
+                                <span class="column-title">İşlemler</span>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    <!-- / CONTENT -->
+</div>
+
+<script>
+
+
+    $(document).ready(function() {
+        $("#company-list-table").DataTable({
+            dom: 'rt<"dataTables_footer"ip>',
+            lengthMenu    : [10, 20, 30, 50, 100],
+            pageLength    : 10,
+            scrollY       : 'auto',
+            scrollX       : false,
+            responsive    : true,
+            autoWidth     : false,
+            scrollCollapse: true,
+            //"processing": true, // for show progress bar
+            "serverSide": true, // for process server side
+            //"filter": true, // this is for disable filter (search box)
+            "orderMulti": false, // for disable multiple column at once
+            "ajax": {
+                "url": "@Url.Action("LoadCompanyData", "Company")",
+                "type": "POST",
+                "datatype": "json"
+            },
+            "columnDefs":
+            [
+                {
+                    "targets": [0],
+                    "visible": false,
+                    "searchable": false
+                },
+                {
+                    "targets": 4,
+                    "orderable": false
+                },
+                {
+                    "targets": 3,
+                    render:function(data){
+                        return moment(data).format('Do MMMM YYYY');
+                    }
+                }
+            ],
+            "columns": [
+                { "data": "id", "name": "Id", "autoWidth": true },
+                { "data": "name", "name": "Name", "autoWidth": true },
+                { "data": "address", "name": "Address", "autoWidth": true },
+                { "data": "createdDate", "name": "CreatedDate", "autoWidth": true },
+                {
+                    "render": function(data, type, full, meta) {
+                        return '<a class="btn btn-info" href="@Url.Action("Update", "Company")/' +
+                            full.id +
+                            '">Düzenle</a>' +
+                            "<a href='#' class='btn btn-danger' onclick=DeleteData('" +
+                            full.id +
+                            "'); >Sil</a>";
+                    }
+                },
+                //{
+                //    data: null,
+                //    render: function(data, type, row) {
+                //        return "<a href='#' class='btn btn-danger' onclick=DeleteData('" + row.Id + "'); >Delete</a>";
+                //    }
+                //}
+            ],
+            initComplete  : function () {
+                var api = this.api(),
+                    searchBox = $('#products-search-input');
+
+                // Bind an external input as a table wide search box
+                if ( searchBox.length > 0 )
+                {
+                    searchBox.bind('input', function (e) {
+                        // If the length is 3 or more characters, or the user pressed ENTER, search
+                        if (this.value.length >= 3 || e.keyCode == 13) {
+                            // Call the API search function
+                            api.search(event.target.value).draw();
+                        }
+                        // Ensure we clear the search if they backspace far enough
+                        if (this.value == "") {
+                            api.search(event.target.value).draw();
+                        }
+                        return;
+
+                    });
+                }
+            },
+        });
+
+
+    });
+
+
+    function DeleteData(id)
+    {
+        if (confirm("Kaydı silmek istediğinize emin misiniz?"))
+        {
+            Delete(id);
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+    function Delete(Id)
+    {
+        var url = "@Url.Action("Delete","Company")";
+
+        $.post(url, { Id: Id }, function (res)
+        {
+            if (res.isSuccess === true)
+            {
+                oTable = $('#company-list-table').DataTable();
+                oTable.draw();
+            }
+            else
+            {
+                alert("Hata oluştu! : " + res.formMessage);
+            }
+        });
+    }
+
+</script>

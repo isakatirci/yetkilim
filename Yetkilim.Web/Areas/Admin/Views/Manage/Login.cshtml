@@ -1,0 +1,130 @@
+﻿@model AdminLoginViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <title>Login</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="~/admin/assets/favicon.ico" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700italic,700,900,900italic" rel="stylesheet">
+    <!-- STYLESHEETS -->
+    <style type="text/css">
+        [fuse-cloak],
+        .fuse-cloak {
+            display: none !important;
+        }
+    </style>
+    <!-- Icons.css -->
+    <link type="text/css" rel="stylesheet" href="~/admin/assets/icons/fuse-icon-font/style.css">
+    <!-- Animate.css -->
+    <link type="text/css" rel="stylesheet" href="~/admin/assets/lib/animate.css/animate.min.css">
+    <!-- PNotify -->
+    <link type="text/css" rel="stylesheet" href="~/admin/assets/lib/pnotify/dist/PNotifyBrightTheme.css">
+    <!-- Nvd3 - D3 Charts -->
+    <link type="text/css" rel="stylesheet" href="~/admin/assets/lib/nvd3/build/nv.d3.min.css" />
+    <!-- Perfect Scrollbar -->
+    <link type="text/css" rel="stylesheet" href="~/admin/assets/lib/perfect-scrollbar/css/perfect-scrollbar.css" />
+    <!-- Fuse Html -->
+    <link type="text/css" rel="stylesheet" href="~/admin/assets/fuse-html/fuse-html.min.css" />
+    <!-- Select2 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <!-- Main CSS -->
+    <link type="text/css" rel="stylesheet" href="~/admin/assets/css/main.css">
+    <!-- / STYLESHEETS -->
+    <!-- JAVASCRIPT -->
+    <!-- jQuery -->
+    <script type="text/javascript" src="~/admin/assets/lib/jquery/dist/jquery.min.js"></script>
+    <!-- Mobile Detect -->
+    <script type="text/javascript" src="~/admin/assets/lib/mobile-detect/mobile-detect.min.js"></script>
+    <!-- Perfect Scrollbar -->
+    <script type="text/javascript" src="~/admin/assets/lib/perfect-scrollbar/dist/perfect-scrollbar.min.js"></script>
+    <!-- Popper.js -->
+    <script type="text/javascript" src="~/admin/assets/lib/popper.js/dist/umd/popper.min.js"></script>
+    <!-- Bootstrap -->
+    <script type="text/javascript" src="~/admin/assets/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- Nvd3 - D3 Charts -->
+    <script type="text/javascript" src="~/admin/assets/lib/d3/d3.min.js"></script>
+    <script type="text/javascript" src="~/admin/assets/lib/nvd3/build/nv.d3.min.js"></script>
+    <!-- Data tables -->
+    <script type="text/javascript" src="~/admin/assets/lib/datatables.net/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="~/admin/assets/lib/datatables-responsive/js/dataTables.responsive.js"></script>
+    <!-- PNotify -->
+    <script type="text/javascript" src="~/admin/assets/lib/pnotify/dist/iife/PNotify.js"></script>
+    <script type="text/javascript" src="~/admin/assets/lib/pnotify/dist/iife/PNotifyStyleMaterial.js"></script>
+    <script type="text/javascript" src="~/admin/assets/lib/pnotify/dist/iife/PNotifyButtons.js"></script>
+    <script type="text/javascript" src="~/admin/assets/lib/pnotify/dist/iife/PNotifyCallbacks.js"></script>
+    <script type="text/javascript" src="~/admin/assets/lib/pnotify/dist/iife/PNotifyMobile.js"></script>
+    <script type="text/javascript" src="~/admin/assets/lib/pnotify/dist/iife/PNotifyHistory.js"></script>
+    <script type="text/javascript" src="~/admin/assets/lib/pnotify/dist/iife/PNotifyDesktop.js"></script>
+    <script type="text/javascript" src="~/admin/assets/lib/pnotify/dist/iife/PNotifyConfirm.js"></script>
+    <script type="text/javascript" src="~/admin/assets/lib/pnotify/dist/iife/PNotifyReference.js"></script>
+    <!-- Fuse Html -->
+    <script type="text/javascript" src="~/admin/assets/fuse-html/fuse-html.min.js"></script>
+    <!-- MomentJS-->
+    <script type="text/javascript" src="~/admin/assets/lib/moment/min/moment.min.js"></script>
+    <script type="text/javascript" src="~/admin/assets/lib/moment/min/locale-tr.js"></script>
+    <script type="text/javascript">
+        moment.locale('tr');
+    </script>
+    <!-- Select2 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <!-- Main JS -->
+    <script type="text/javascript" src="~/admin/assets/js/main.js"></script>
+    <!-- / JAVASCRIPT -->
+</head>
+<body class="layout layout-vertical layout-left-navigation layout-above-toolbar layout-above-footer">
+    <main>
+        <div id="wrapper">
+            <div class="content-wrapper">
+                <div class="content custom-scrollbar">
+                    <div id="login" class="p-8">
+                        <div class="form-wrapper md-elevation-8 p-8">
+                            <div class="logo bg-secondary">
+                                <span>Y</span>
+                            </div>
+                            <div class="title mt-4 mb-8">Hesabınıza giriş yapın</div>
+
+                            <form method="post" name="loginForm" asp-action="Login" asp-controller="Manage" novalidate>
+                                @if (string.IsNullOrWhiteSpace(Model.FormMessage) == false)
+                                {
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">×</span>
+                                        </button>
+                                        @Model.FormMessage
+                                    </div>
+                                }
+                                <div class="form-group mb-4">
+                                    <input type="email" class="form-control" id="loginFormInputEmail" name="Email" aria-describedby="emailHelp" placeholder=" " value="@Model.Email"  required/>
+                                    <label for="loginFormInputEmail">E-posta adresi</label>
+                                </div>
+                                <div class="form-group mb-4">
+                                    <input type="password" class="form-control" id="loginFormInputPassword" name="Password" placeholder="Password" value="@Model.Password" required />
+                                    <label for="loginFormInputPassword">Password</label>
+                                </div>
+                                <div class="remember-forgot-password row no-gutters align-items-center justify-content-between pt-4">
+                                    <div class="form-check remember-me mb-4">
+                                        <label class="form-check-label">
+                                            <input type="checkbox" class="form-check-input" aria-label="Beni Hatırla" />
+                                            <span class="checkbox-icon"></span>
+                                            <span class="form-check-description">Beni Hatırla</span>
+                                        </label>
+                                    </div>
+                                    <a href="#" class="forgot-password text-secondary mb-4">Şifremi Unuttum?</a>
+                                </div>
+                                <button type="submit" class="submit-button btn btn-block btn-secondary my-4 mx-auto" aria-label="LOG IN">
+                                    GİRİŞ YAP
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

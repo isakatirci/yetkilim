@@ -1,0 +1,79 @@
+﻿@using System.Globalization
+@model ProfileViewModel
+<div class="content-container no-padding-top">
+
+    <div class="home-widget header-account animated fadeInRight">
+
+        <div class="container">
+            <div class="row">
+                <div class="col s12">
+
+                    <div class="profile-widget">
+                        <div class="thumb">
+                            <img src="~/assets/images/no-img.jpg" alt="">
+                        </div>
+                        <div class="profile-caption">
+                            <h4 class="name">@Model.FullName</h4>
+                            <div class="profile-nav">
+                                <div class="item">
+                                    <span class="val">0</span>
+                                    <span class="val-desc">puan</span>
+                                </div>
+                            </div>
+                            @*<p class="profile-desc">Lorem ipsum dolor sit amet amet amet dolor ipsum</p>*@
+                        </div>
+                    </div>
+
+                </div><!-- .col s12 -->
+            </div><!-- .row -->
+        </div><!-- .container -->
+
+    </div><!-- .home-widget header-account animated fadeInRight -->
+
+    <div class="container">
+        <div class="row no-mb">
+            <div class="col s12">
+
+                <div class="animated fadeInUp">
+
+                    <!-- Sales statistic card -->
+                    <div class="home-widget">
+                        <div class="widget-title">
+                            Genel Bilgiler
+                        </div>
+
+                        <div class="home-cards">
+                            <div class="card-item cyan">
+                                <span class="numbers">
+                                    <span class="count">@Model.FeedbackCount</span>
+                                </span>
+                                <span class="desc">toplam değerlendirme</span>
+                                <div class="icon">
+                                    <span class="ti-pencil-alt"></span>
+                                </div>
+                            </div>
+                            <div class="card-item orange">
+                                <span class="numbers">
+                                    <span class="count">0</span>
+                                </span>
+                                <span class="desc">kazanılan promosyon (yakında)</span>
+                                <div class="icon">
+                                    <span class="ti-wallet"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div><!-- .home-widget -->
+
+                    <button class="btn block red" onclick="javascript:window.location='@Url.Action("Edit")';">Profilimi Düzenle</button>
+                    @if (Model.IsExternal == false)
+                    {
+                        <button class="btn block red mt-4" onclick="javascript:window.location='@Url.Action("ChangePassword")';">Şifremi Değiştir</button>
+                    }
+                </div><!-- .animated fadeInUp -->
+
+            </div><!-- .col s12 -->
+        </div><!-- .row -->
+    </div><!-- .container -->
+
+</div><!-- .content-container -->

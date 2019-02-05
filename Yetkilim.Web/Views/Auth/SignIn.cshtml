@@ -1,0 +1,119 @@
+﻿@model LoginViewModel
+
+<div class="container">
+    <div class="row no-mb">
+        <div class="col s12">
+            <div class="content-container">
+                <!-- Page title -->
+                <div class="page-title animated fadeInRight">
+                    Giriş Yap
+                </div><!-- .page-title -->
+                <div class="login-box">
+                    @if (string.IsNullOrWhiteSpace(Model.FormMessage) == false)
+                    {
+                        <div class="alert is-danger x-hidden-focus mb-4">
+                            <p class="alert-title"><i class="fa fa-exclamation"></i> Mesaj</p>
+                            <p>@Model.FormMessage</p>
+                        </div>
+                    }
+                    <form id="loginForm" method="post" action="@Url.Action("SignIn")">
+                        <input type="hidden" asp-for="IsFeedbackRedirect" />
+                        <input type="hidden" asp-for="ReturnUrl" />
+
+                        <div class="input-field">
+                            <span class="ti-email prefix"></span>
+                            <input id="email" name="Email" value="@Model.Email" type="email" placeholder="E-posta adresinizi giriniz" class="validate" required>
+                            <label for="email">E-Posta</label>
+                            <span asp-validation-for="Email"></span>
+                        </div>
+                        <div class="input-field">
+                            <span class="ti-lock prefix"></span>
+                            <input id="password" name="Password" type="password" placeholder="Şifrenizi giriniz" class="validate" required>
+                            <label for="password">Şifre</label>
+                            <span asp-validation-for="Password"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="check">
+                                <input asp-for="IsRemember" type="checkbox" />
+                                <span>Beni hatırla</span>
+                            </label>
+                        </div>
+                        <button class="btn block">GİRİŞ YAP</button>
+                        @if (Model.IsFeedbackRedirect)
+                        {
+                            <div class="social-login socmed mt-3">
+                                <a class="btn block facebook" asp-action="SignIn" asp-route-provider="Facebook" asp-route-returnUrl="@Model.ReturnUrl"><i class="icon fa fa-facebook"></i> FACEBOOK İLE GİRİŞ YAP</a>
+                                @*<a class="btn block instagram" href="#!"><i class="icon fa fa-instagram"></i> INSTAGRAM İLE GİRİŞ YAP</a>*@
+                            </div>
+                        }
+                        <p class="additional-text">
+                            @*Forgot your pas6sword? <a href="#!">click here.</a><br>*@
+                            Hesabın mı yok? <a href="@Url.Action("SignUp")">Hemen kayıt olmak için tıkla!</a>
+                        </p>
+                    </form>
+
+                    <div class="social-login socmed mt-3">
+                        @if (Model.IsFeedbackRedirect)
+                        {
+                            <span class="caption text-center mb-2">YA DA</span>
+                            <a href="@Model.ReturnUrl" class="btn block grey">GİRİŞ YAPMADAN DEVAM ET</a>
+                        }
+                        else
+                        {
+                            <span class="caption text-center mb-2">YA DA</span>
+                            <a class="btn block facebook" asp-action="SignIn" asp-route-provider="Facebook" asp-route-returnUrl="@Model.ReturnUrl"><i class="icon fa fa-facebook"></i> FACEBOOK İLE GİRİŞ YAP</a>
+
+                            @*<a class="btn block instagram" href="#!"><i class="icon fa fa-instagram"></i> INSTAGRAM İLE GİRİŞ YAP</a>*@
+                        }
+                    </div>
+                </div><!-- .login-box -->
+                <!-- End Login box -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles{
+
+    <style>
+        .social-login {
+            margin-bottom: 20px;
+        }
+
+            .social-login .caption {
+                color: #999;
+                display: block;
+            }
+
+            .social-login a {
+                display: inline-block;
+                background-color: #ccc;
+                color: #fff;
+                border-radius: 5px;
+                padding: 3px 12px 6px;
+                width: 100%;
+                margin-top: 10px;
+            }
+
+                .social-login a .icon {
+                    float: left;
+                    margin-right: 7px;
+                }
+
+                .social-login a.facebook {
+                    background-color: #3b5998 !important;
+                }
+
+                .social-login a.instagram {
+                    background-color: #E4405F !important;
+                }
+
+                .social-login a.twitter {
+                    background-color: #55acee !important;
+                }
+
+                .social-login a.linkedin {
+                    background-color: #0077b5 !important;
+                }
+    </style>
+}

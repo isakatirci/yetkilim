@@ -1,0 +1,129 @@
+﻿@using Yetkilim.Domain.DTO
+@using Yetkilim.Global
+@model Yetkilim.Web.Areas.Admin.Models.PlaceFormModel
+<div class="col-12">
+    <div class="example">
+        <div class="description">
+            <div class="description-text">
+                <h5>Mekan Bilgileri</h5>
+            </div>
+        </div>
+
+        <div class="source-preview-wrapper">
+            <div class="preview">
+                <div class="preview-elements">
+                    @if (string.IsNullOrWhiteSpace(Model.FormMessage) == false)
+                    {
+                        <div class="alert @(Model.IsSuccess ? "alert-success": "alert-danger") alert-dismissible fade show" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                            @Model.FormMessage
+                            @if (Model.IsSuccess)
+                            {
+                                <a class="alert-link" href="@Url.Action("Index")">Firma listesine dön.</a>
+                            }
+                        </div>
+                    }
+                    <div class="container">
+                        <form method="post" enctype="multipart/form-data" action="@ViewData["Action"]">
+                            <div class="form-group row">
+                                <label for="selectFirm" class="col-sm-2 col-form-label">Firma</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control" id="selectFirm" name="CompanyId" required="required">
+                                        @foreach (var company in Model.Companies ?? Enumerable.Empty<CompanyInfoDTO>())
+                                        {
+                                            <option id="@company.Id">@company.Name</option>
+                                        }
+                                    </select>
+                                </div>
+                                <span asp-validation-for="CompanyId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group row">
+                                <label for="txtFirmName" class="col-sm-2 col-form-label">Mekan Adı</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="txtFirmName" name="Name" value="@Model.Name" placeholder="Firma Adı">
+                                </div>
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                            <div class="form-group row">
+                                <label for="txtAddress" class="col-sm-2 col-form-label">Adres</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control" id="txtAddress" name="Address" rows="3" placeholder="Adres">@Model.Address</textarea>
+                                </div>
+                                <span asp-validation-for="Address" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="txtLat" class="col-sm-2 col-form-label">Koordinat X</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="txtLat" name="Latitude" value="@Model.Latitude" placeholder="Koordinat X (Ör: 41.1234)">
+                                </div>
+                                <span asp-validation-for="Latitude" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="txtLon" class="col-sm-2 col-form-label">Koordinat Y</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="txtLon" name="Longitude" value="@Model.Longitude" placeholder="Koordinat Y (Ör: 24.1234)">
+                                </div>
+                                <span asp-validation-for="Longitude" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-sm-10">
+                                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .custom-file-label {
+        padding: inherit !important;
+    }
+</style>
+<script>
+    $(document).ready(function() {
+        var searchTerm = null;
+        // Remote data example
+        var remoteDataConfig = {
+            placeholder: "Firma ara...",
+            minimumInputLength: 3,
+            ajax: {
+                url: '@Url.Action("QuickSearchCompany", "Company")',
+                cache: true,
+                dataType: 'json',
+                data: function(params) {
+                    return {
+                        q: params.term, // search term
+                        ps: 20
+                    };
+                },
+
+                processResults: function(data, params) {
+                    return {
+                        results: $.map(data.items,
+                            function(obj) {
+                                return {
+                                    id: obj.id,
+                                    text: obj.name
+                                };
+                            })
+                    };
+                }
+            }
+        };
+
+        $("#selectFirm").select2(remoteDataConfig);
+
+
+    });
+
+</script>

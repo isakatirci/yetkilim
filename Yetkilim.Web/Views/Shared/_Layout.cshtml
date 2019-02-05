@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Yetkilim.Web</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="HandheldFriendly" content="True">
+    <meta http-equiv="x-ua-compatible" content="IE=edge">
+
+    <link rel="apple-touch-icon" sizes="57x57" href="~/assets/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="~/assets/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="~/assets/favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="~/assets/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="~/assets/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="~/assets/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="~/assets/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="~/assets/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="~/assets/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="~/assets/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="~/assets/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="~/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="~/assets/favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="~/assets/favicon/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+    <!-- Data tables -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.18/r-2.2.2/datatables.min.css"/>
+
+    <link rel="stylesheet" type="text/css" href="~/assets/css/style.css">
+   
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <div id="main">
+        <partial name="_Sidebar" />
+        <div id="page" class="fixed-navbar">
+            <partial name="_Navbar" />
+
+            @RenderBody()
+
+            <partial name="_Footer" />
+            <!-- Back to top Link -->
+            <div id="to-top" class="main-bg">
+                <span class="ti-arrow-up"></span>
+            </div>
+        </div>
+    </div>
+    <script src="~/assets/plugins/jQuery/jquery-3.3.1.min.js"></script>
+    <script src="~/assets/plugins/formbuilder/form-render.min.js"></script>
+    <script src="~/assets/plugins/materialize/js/materialize.min.js"></script>
+    <script src="~/assets/plugins/slick/js/slick.min.js"></script>
+    <script src="~/assets/plugins/swipebox/js/jquery.swipebox.js"></script>
+    <script src="~/assets/plugins/MixItUp/jquery.mixitup.min.js"></script>
+    <script src="~/assets/plugins/counter-up-master/jquery.counterup.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.18/r-2.2.2/datatables.min.js"></script>
+    <script src="~/assets/js/custom.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

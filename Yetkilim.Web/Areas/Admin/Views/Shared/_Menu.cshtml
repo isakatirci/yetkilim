@@ -1,0 +1,85 @@
+﻿<aside id="aside" class="aside aside-left" data-fuse-bar="aside" data-fuse-bar-media-step="md" data-fuse-bar-position="left">
+    <div class="aside-content bg-primary-700 text-auto">
+        <div class="aside-toolbar">
+            <div class="logo">
+                <span class="logo-icon">Y</span>
+                <span class="logo-text">YETKİLİM</span>
+            </div>
+            <button id="toggle-fold-aside-button" type="button" class="btn btn-icon d-none d-lg-block" data-fuse-aside-toggle-fold>
+                <i class="icon icon-backburger"></i>
+            </button>
+        </div>
+        <ul class="nav flex-column custom-scrollbar" id="sidenav" data-children=".nav-item">
+            <li class="subheader">
+                <span>YÖNETİM PANELİ</span>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link ripple " href="@Url.Action("Index","Manage")">
+                    <i class="icon s-4 icon-tile-four"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link ripple " href="apps-mail.html" data-url="apps-dashboards-server.html">
+                    <i class="icon s-4 icon-email"></i>
+                    <span>Değerlendirmeler</span>
+                </a>
+            </li>
+            <li class="nav-item" role="tab" id="heading-charts">
+                <a class="nav-link ripple with-arrow collapsed" data-toggle="collapse" data-target="#collapse-charts" href="#" aria-expanded="false" aria-controls="collapse-charts">
+                    <i class="icon s-4 icon-poll"></i>
+                    <span>Raporlar</span>
+                </a>
+                <ul id="collapse-charts" class='collapse ' role="tabpanel" aria-labelledby="heading-charts" data-children=".nav-item">
+                    <li class="nav-item">
+                        <a class="nav-link ripple " href="components-charts-nvd3.html" data-url="apps-dashboards-server.html">
+                            <span>Memnuniyet Raporu</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link ripple " href="components-snackbar.html" data-url="apps-dashboards-server.html">
+                    <i class="icon s-4 icon-page-layout-footer"></i>
+                    <span>Promosyonlar</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link ripple " href="@Url.Action("SignOut","Auth")" data-url="apps-dashboards-server.html">
+                    <i class="icon s-4 icon-power"></i>
+                    <span>Promosyonlar</span>
+                </a>
+            </li>
+            <li class="subheader">
+                <span>FİRMA YÖNETİM</span>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link ripple " href="pages-profile.html" data-url="apps-dashboards-server.html">
+                    <i class="icon s-4 icon-account"></i>
+                    <span>Kullanıcılar</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link ripple " href="pages-profile.html" data-url="apps-dashboards-server.html">
+                    <i class="icon s-4 icon-layers"></i>
+                    <span>Şubeler</span>
+                </a>
+            </li>
+            <li class="subheader">
+                <span>SUPER ADMIN</span>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link ripple " href="@Url.Action("Index", "Company")">
+                    <i class="icon s-4 icon-store"></i>
+                    <span>Firmalar</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link ripple " href="@Url.Action("Index", "Place")">
+                    <i class="icon s-4 icon-bullseye"></i>
+                    <span>Mekanlar</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</aside>

@@ -1,0 +1,82 @@
+﻿@model RegisterViewModel
+<div class="container">
+    <div class="row no-mb">
+        <div class="col s12">
+            <div class="content-container">
+                <!-- Page title -->
+                <div class="page-title animated fadeInRight">
+                    Kayıt Ol
+                </div><!-- .page-title -->
+
+                @if (Model.IsSuccess)
+                {
+                    <div class="alert is-primary x-hidden-focus">
+                        <p class="alert-title"><i class="fa fa-exclamation"></i> Mesaj</p>
+                        <p>@Model.FormMessage</p>
+                        <a href="@Url.Action("SignIn")">Giriş yap</a>
+                    </div>
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(Model.FormMessage) == false)
+                    {
+                        <div class="alert is-danger mb-4 x-hidden-focus">
+                            <p class="alert-title"><i class="fa fa-exclamation"></i> Mesaj</p>
+                            <p>@Model.FormMessage</p>
+                        </div>
+                    }
+                    <div class="login-box">
+                        <form id="registerForm" method="post" action="@Url.Action("SignUp")">
+                            <div class="input-field">
+                                <span class="ti-user prefix"></span>
+                                <input id="fullName" name="FullName" value="@Model.FullName" type="text" placeholder="Ad Soyad" class="validate" required>
+                                <label for="fullName">Ad Soyad</label>
+                                <span asp-validation-for="FullName"></span>
+                            </div>
+                            <div class="input-field">
+                                <span class="ti-email prefix"></span>
+                                <input id="email" name="Email" value="@Model.Email" type="email" placeholder="E-Posta adresi" class="validate" required>
+                                <label for="email">E-Posta</label>
+                                <span asp-validation-for="Email"></span>
+                            </div>
+                            <div class="input-field">
+                                <span class="ti-mobile prefix"></span>
+                                <input id="phone" name="Phone" value="@Model.Phone" type="tel" placeholder="Telefon" class="validate">
+                                <label for="phone">Telefon</label>
+                                <span asp-validation-for="Phone"></span>
+                            </div>
+                            <div class="input-field">
+                                <span class="ti-lock prefix"></span>
+                                <input id="password" name="Password" value="@Model.Password" type="password" placeholder="Şifre" class="validate" required>
+                                <label for="password">Şifre</label>
+                                <span asp-validation-for="Password"></span>
+                            </div>
+                            <div class="input-field">
+                                <span class="ti-lock prefix"></span>
+                                <input id="rePassword" name="RePassword" value="@Model.RePassword" type="password" placeholder="Şifre tekrarı" class="validate" required>
+                                <label for="rePassword">Şifre tekrarı</label>
+                                <span asp-validation-for="RePassword"></span>
+                            </div>
+                            <button class="btn block">Kayıt Ol</button>
+                            <p class="additional-text">Zaten hesabın var mı? <a href="@Url.Action("SignIn")">Giriş yapmak için tıkla!</a></p>
+                            <p class="additional-text text-center">
+                                Kayıt ol butonuna basarak <a href="/uyelik-sozlesmesi" class="highlight" target="_blank">Üyelik Sözleşmesi</a>’ni, <a href="/kisisel-verilerin-korunmasi" class="highlight" target="_blank">Bilgilendirme ve Rıza Metni</a>’ni, <a href="/gizlilik-politikasi" class="highlight" target="_blank">Gizlilik ve Çerez Politikası</a>’nı okuduğunuzu ve kabul ettiğinizi onaylıyorsunuz.
+                            </p>
+                        </form>
+                    </div>
+                    <!-- .login-box -->
+                    <!-- End Login box -->
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $.ready(function () {
+
+
+        })
+    </script>
+}

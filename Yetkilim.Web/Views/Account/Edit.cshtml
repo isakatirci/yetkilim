@@ -1,0 +1,63 @@
+﻿@model ProfileEditViewModel
+<div class="container">
+    <div class="row no-mb">
+        <div class="col s12">
+
+            <!-- Content container -->
+            <div class="content-container">
+                <!-- Page title -->
+                <div class="page-title animated fadeInRight">
+                    Profil Düzenle
+                </div><!-- .page-title -->
+
+                <div class="entry-content feature_forms animated fadeInUp">
+                    @if (string.IsNullOrWhiteSpace(Model.FormMessage) == false)
+                    {
+                        <div class="alert @(Model.IsSuccess ? "is-primary":"is-danger") mb-4 x-hidden-focus">
+                            <p class="alert-title"><i class="fa fa-exclamation"></i> Mesaj</p>
+                            <p>@Model.FormMessage</p>
+                        </div>
+                    }
+                    <form method="post" asp-action="Edit" asp-controller="Account">
+                        <div class="row">
+                            <div class="input-field col s12 no-mb">
+                                <input id="fullName" name="FullName" value="@Model.FullName" type="text" class="validate no-mb" required>
+                                <label for="fullName">Ad Soyad</label>
+                                <span asp-validation-for="FullName"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12 no-mb">
+                                <input id="email" name="Email" value="@Model.Email" type="email" class="validate no-mb" required>
+                                <label for="email">E-Posta</label>
+                                <span asp-validation-for="Email"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12 no-mb">
+                                <input id="phone" name="Phone" value="@Model.Phone" type="tel" class="validate no-mb">
+                                <label for="phone">Telefon</label>
+                                <span asp-validation-for="Phone"></span>
+                            </div>
+                        </div>
+
+                        @if (Model.IsExternal == false)
+                        {
+                            <div class="row">
+                                <div class="input-field col s12">
+                                    <input id="password" name="Password" type="password" placeholder="Güncel şifrenizi girmeniz gerekmektedir" class="validate no-mb" required>
+                                    <label for="password">Şifre</label>
+                                    @*<span class="helper-text"></span>*@
+                                    <span asp-validation-for="Password"></span>
+                                </div>
+                            </div>
+                        }
+
+                        <button type="submit" id="btnSend" class="btn orange block">KAYDET</button>
+                    </form>
+
+                </div>
+            </div><!-- .content-container -->
+        </div><!-- .col s12 -->
+    </div><!-- .row -->
+</div><!-- .container -->
