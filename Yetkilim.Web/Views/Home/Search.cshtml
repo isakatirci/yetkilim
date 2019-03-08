@@ -1,5 +1,6 @@
 ﻿@model PlaceSearchResultViewModel
 <style>
+
     .searchbar {
         display: none;
         padding: 25px 0 24px 0;
@@ -7,40 +8,49 @@
         -moz-transition: padding ease .3s;
         transition: padding ease .3s;
     }
-   .with-tabs .searchbar {
+
+    .with-tabs .searchbar {
         padding: 27px 0 15px 0;
     }
-   .fly .searchbar {
+
+    .fly .searchbar {
         padding: 14px 0 13px 0;
     }
+
     .searchbar.show {
         display: block;
         position: relative;
     }
+
     .searchbar .input-field {
         margin: 0;
         width: calc(100% - 30px);
         position: relative;
     }
-   
-   
+
+
     .searchbar input[type="text"]::-webkit-input-placeholder {
-        color: rgba(0,0,0,.1)!important;
+        color: rgba(0,0,0,.1) !important;
     }
+
     .searchbar input[type="text"]:-moz-placeholder {
-        color: rgba(0,0,0,.1)!important;
+        color: rgba(0,0,0,.1) !important;
     }
+
     .searchbar input[type="text"]::-moz-placeholder {
-        color: rgba(0,0,0,.1)!important;
+        color: rgba(0,0,0,.1) !important;
     }
+
     .searchbar input[type="text"]:-ms-input-placeholder {
-        color: rgba(0,0,0,.1)!important;
+        color: rgba(0,0,0,.1) !important;
     }
+
     .searchbar .input-field input[type=text]:not(.browser-default):focus:not([readonly]) {
         border-bottom: 0;
         -webkit-box-shadow: 0 0 0 0 rgba(188,231,245,.5);
         box-shadow: 0 0 0 0 rgba(188,231,245,.5);
     }
+
     .searchbar .search-btn {
         font-size: 16px;
         position: absolute;
@@ -54,15 +64,14 @@
         /*color: #FC5D5D;*/
         line-height: 1.7;
     }
-   .with-tabs .searchbar .search-btn {
+
+    .with-tabs .searchbar .search-btn {
         top: 40px;
     }
 </style>
-
 <div class="container">
     <div class="row no-mb">
         <div class="col s12">
-
             <div class="searchbar show">
                 <div class="input-field">
                     <input placeholder="Mekan adı..." id="search_text" type="text" value="@Model.SearchText" class="validate">
@@ -72,7 +81,6 @@
                     <span class="ti-search"></span>
                 </div>
             </div>
-
             <!-- Content container -->
             <div class="content-container no-padding-top">
                 @if (Model.Places != null)
@@ -103,16 +111,16 @@
                                             </a>
                                         </div>
                                         @*<div class="product-rating">
-                                            <i class="fa fa-star active"></i>
-                                            <i class="fa fa-star active"></i>
-                                            <i class="fa fa-star active"></i>
-                                            <i class="fa fa-star"></i>
-                                            <i class="fa fa-star"></i>
-                                        </div>*@
+                                                <i class="fa fa-star active"></i>
+                                                <i class="fa fa-star active"></i>
+                                                <i class="fa fa-star active"></i>
+                                                <i class="fa fa-star"></i>
+                                                <i class="fa fa-star"></i>
+                                            </div>*@
                                         @*<div class="product-price">
-                                            <span class="product-price-before">$ 499.00</span>
-                                            <span class="price-current">$ 472.5</span>
-                                        </div>*@
+                                                <span class="product-price-before">$ 499.00</span>
+                                                <span class="price-current">$ 472.5</span>
+                                            </div>*@
                                         <div class="mt-3">
                                             <a class="btn" asp-route-returnUrl="@Url.Action("Feedback", "Home" , new  {id= place.Id})" asp-route-fr="true" asp-controller="Auth" asp-action="SignIn">DEĞERLENDİR</a>
                                         </div>
@@ -125,7 +133,7 @@
                         <!-- You can also use another pagination style like
                         page number pagination. See another page to view the example
                         -->
-                    @*<a class="load-more" href="#!">Load more</a>*@
+                        @*<a class="load-more" href="#!">Load more</a>*@
                     }
                     else
                     {
@@ -144,7 +152,7 @@
 
                     <div class="row shop-category mt-4">
                         <div class="col s6 m6 l2 location-search">
-                            <a href="#!" class="icon lime">
+                            <a href="#!" class="icon">
                                 <span class="ti-location-pin"></span>
                             </a>
                             <div class="caption truncate">
@@ -152,7 +160,7 @@
                             </div>
                         </div>
                         <div class="col s6 m6 l2">
-                            <a href="#!" class="icon green">
+                            <a href="#!" class="icon">
                                 <span class="ti-camera"></span>
                             </a>
                             <div class="caption">
@@ -161,14 +169,12 @@
                         </div>
                     </div>
                 }
-
             </div><!-- .content-container -->
             <!-- END CONTENT CONTAINER -->
-
         </div><!-- .col s12 -->
     </div><!-- .row -->
 </div><!-- .container -->
-@section Scripts{ 
+@section Scripts{
     <script>
         $("#search_text").keyup(function(event) {
             if (event.keyCode === 13) {

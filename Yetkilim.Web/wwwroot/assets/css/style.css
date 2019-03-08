@@ -1,4 +1,4 @@
-/*
+﻿/*
 	Template Name: Kaylilla
 	Description: Clean & Minimalist Mobile Template
 	Author: Alfisahr
@@ -827,8 +827,8 @@ Collection
 5. Links
 ==============================================================*/
 a {
-	color: #23B0DE;
-	text-decoration:none;
+    color: #ff6600;
+    text-decoration: none;
 }
 
 a:visited {
@@ -916,16 +916,24 @@ textarea.materialize-textarea:focus:not([readonly]) {
 }
 
 .btn, .btn-large, .btn-small, .btn-floating {
-	background-color: #2D9FC4;
+	background-color: #fff;
+    border: #8e8e8e 1px solid;
+    color: black;
 }
 .btn:hover, .btn-large:hover, .btn-small:hover {
-	background-color: #5DBAD9;
+	background-color: #fff;
 }
 .btn:focus, .btn-large:focus, .btn-small:focus, .btn-floating:focus {
-	background-color: #5DBAD9;
+	background-color: #8e8e8e;
 }
+
 .btn, .btn-large, .btn-small, .btn-floating, .btn-large, .btn-small, .btn-flat {
 	font-size: 16px;
+}
+
+/*Giri� Yap butonu ortalama*/
+.loginForm button {
+    line-height: 0;
 }
 
 .btn, .btn-large, .btn-small, .btn-flat {
@@ -1348,7 +1356,7 @@ textarea.materialize-textarea:focus:not([readonly]) {
 	cursor: pointer;
 	z-index: 2;
 	text-decoration: none;
-	color: rgba(0,0,0,.8);
+	color: rgba(0,0,0, 1);
 	font-size: 16px;
 }
 #main-menu ul li a:hover {
@@ -1360,10 +1368,11 @@ textarea.materialize-textarea:focus:not([readonly]) {
 	height: 25px;
 	text-align: center;
 	border-radius: 5px;
-	line-height: 1.6;
-	background-color: #999;
-	color: #fff;
+	line-height: 1; /*1.6 idi*/
+	background-color: #fff;
+	color: #8e8e8e;
 	margin-right: 1rem;
+    font-size: 23px;
 }
 #main-menu > ul > li.active ul li.active a,
 #main-menu > ul > li.active > a {
@@ -1946,13 +1955,14 @@ textarea.materialize-textarea:focus:not([readonly]) {
 .shop-category .icon {
 	display: block;
 	text-align: center;
-	color: #fff;
-	background-color: #ccc;
-	padding: 10px;
+	color: #8e8e8e;
+	background-color: #fff;
+	padding: 10%;
 	line-height: 2;
-	border-radius: 5px;
-	font-size: 30px;
+	border-radius: 7%;
+	font-size: 40px;
 	margin-bottom: 5px;
+    border: #8e8e8e 1px solid;
 }
 .shop-category .caption {
 	text-align: center;
@@ -3187,7 +3197,7 @@ textarea.materialize-textarea:focus:not([readonly]) {
 	text-transform: uppercase;
 	font-weight: 100;
 	cursor: pointer;
-	background:rgba(0,0,0,0.3);
+	background:#ff6600;
 	color: #fff;
 	-moz-transition: all .7s ease-in-out;
 	-o-transition: all .7s ease-in-out;
@@ -3222,10 +3232,9 @@ textarea.materialize-textarea:focus:not([readonly]) {
     max-width: 100%
 }
 
-.alert.is-primary {
-    background: hsla(205, 100%, 94%, 1) !important;
-    background: #e0f2ff !important
-}
+    .alert.is-primary {
+        background: #ff6600e0 !important
+    }
 
 .alert.is-primary .alert-title, .alert.is-primary a:not(.button) {
     color: hsla(206, 100%, 15%, 1);
@@ -3271,4 +3280,32 @@ textarea.materialize-textarea:focus:not([readonly]) {
 
 .site-title a {
     color: #000000;
+}
+
+/* label focus color */
+.input-field input:focus + label {
+    color: #ff6600 !important;
+}
+/* label underline focus color */
+.row .input-field input:focus {
+    border-bottom: 1px solid #ff6600 !important;
+    box-shadow: 0 1px 0 0 #ff6600 !important;
+}
+
+.input-field textarea:focus + label {
+    color: #ff6600 !important;
+}
+/* label underline focus color */
+.row .input-field textarea:focus {
+    border-bottom: 1px solid #ff6600 !important;
+    box-shadow: 0 1px 0 0 #ff6600 !important;
+}
+
+
+.input-field .material-icons {
+    color: #8e8e8e !important;
+}
+
+.input-field .material-icons.active {
+        color: #ff6600 !important;
 }
