@@ -1,0 +1,331 @@
+@model FeedbackViewModel7
+<div class="container">
+    <div class="row no-mb">
+        <div class="col s12">
+            <!-- Event -->
+            <!-- Content container -->
+            <div class="content-container">
+                @if (string.IsNullOrWhiteSpace(Model?.Error) == false)
+                {
+                    <div class="alert is-danger x-hidden-focus">
+                        <p class="alert-title"><i class="fa fa-exclamation"></i> Mesaj</p>
+                        <p>@Model?.Error</p>
+                    </div>
+                }
+                else
+                {
+                    <!-- Page title -->
+                    <div class="page-title animated fadeInRight">
+                        Görüşleriniz Bizim için Çok Değerli!
+                    </div><!-- .page-title -->
+
+                    <div class="entry-content feature_forms animated fadeInUp">
+                        <p>Aldığınız hizmetin kalitesini iyileştirmek için var gücümüzle çalışıyoruz. 
+                            Bu değerlendirmenin, en alt sorumludan en üst sorumluya kadar ulaştığını hatırlatmak isteriz.</p>
+
+                        <input id="formId" type="hidden" value="@Model?.FormId" />
+                        @*<div class="fb-render">
+                            </div>*@
+
+                        
+                        <div class="home-widget pt-3">
+                            <div class="widget-title">
+                                Etkinlik Adı
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s12 no-mb no-mt">
+                                    <input type="text" id="etkinlikAdi" class="no-mb"  required="required"/>
+                                    <span class="helper-text" data-error="Lütfen giriş yapınız"></span>
+                                </div>
+                            </div>
+                        </div>    
+
+                        <div class="home-widget pt-3">
+                            <div class="widget-title">
+                                Personel İlgisi
+                            </div>
+                            <div class="rateInput" id="personelIlgisi"></div>
+                            <span class="helper-text" data-error="Lütfen seçim yapınız"></span>
+                        </div>
+
+                        <div class="home-widget pt-3">
+                            <div class="widget-title">
+                                Mekan Yeterliliği
+                            </div>
+                            <div class="rateInput" id="mekanYeterliligi"></div>
+                            <span class="helper-text" data-error="Lütfen seçim yapınız"></span>
+                        </div>
+
+                        <div class="home-widget pt-3">
+                            <div class="widget-title">
+                                Plana Uyum
+                            </div>
+                            <div class="rateInput" id="planaUyum"></div>
+                            <span class="helper-text" data-error="Lütfen seçim yapınız"></span>
+                        </div>
+
+                        <div class="home-widget pt-3">
+                            <div class="widget-title">
+                                Tavsiye Eder misiniz?
+                            </div>
+                            <div class="rateInput" id="tavsiye"></div>
+                            <span class="helper-text" data-error="Lütfen seçim yapınız"></span>
+                        </div>
+
+
+                        <div class="home-widget" id="textarea">
+                            <div class="widget-title">
+                                İletmek istedikleriniz
+                            </div>
+
+                            <div class="row">
+                                <div class="input-field col s12 no-mb no-mt">
+                                    <textarea id="description" class="materialize-textarea no-mb"></textarea>
+                                    <label for="description">İletmek istedikleriniz</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        @*@if (Model.IsLogged)
+                        {
+                            <div class="switch mb-4">
+                                Bilgilerimin firma ile paylaşılmasına <br />
+                                <label>
+                                    izin vermiyorum
+                                    <input id="chcShare" type="checkbox" checked>
+                                    <span class="lever"></span>
+                                    izin veriyorum
+                                </label>
+                            </div>
+                        }*@
+
+
+                        <a id="btnSend" href="#" class="btn orange block">GÖNDER</a>
+
+                    </div>
+                }
+            </div><!-- .content-container -->
+
+
+        </div><!-- .col s12 -->
+    </div><!-- .row -->
+</div><!-- .container -->
+<style>
+    .fb-radio-group-label {
+        font-weight: 700 !important;
+        font-size: 18px;
+        color: rgba(0, 0, 0, .8);
+    }
+
+    [type="radio"]:not(:checked), [type="radio"]:checked {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none
+    }
+
+        [type="radio"]:not(:checked) + label, [type="radio"]:checked + label {
+            position: relative;
+            padding-left: 35px;
+            cursor: pointer;
+            display: inline-block;
+            height: 25px;
+            line-height: 25px;
+            font-size: 1rem;
+            -webkit-transition: .28s ease;
+            transition: .28s ease;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none
+        }
+
+    [type="radio"] + label:before, [type="radio"] + label:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        margin: 4px;
+        width: 16px;
+        height: 16px;
+        z-index: 0;
+        -webkit-transition: .28s ease;
+        transition: .28s ease
+    }
+
+    [type="radio"]:not(:checked) + label:before, [type="radio"]:not(:checked) + label:after, [type="radio"]:checked + label:before, [type="radio"]:checked + label:after, [type="radio"].with-gap:checked + label:before, [type="radio"].with-gap:checked + label:after {
+        border-radius: 50%
+    }
+
+    [type="radio"]:not(:checked) + label:before, [type="radio"]:not(:checked) + label:after {
+        border: 2px solid #5a5a5a
+    }
+
+    [type="radio"]:not(:checked) + label:after {
+        -webkit-transform: scale(0);
+        transform: scale(0)
+    }
+
+    [type="radio"]:checked + label:before {
+        border: 2px solid transparent
+    }
+
+    [type="radio"]:checked + label:after, [type="radio"].with-gap:checked + label:before, [type="radio"].with-gap:checked + label:after {
+        border: 2px solid #26a69a
+    }
+
+    [type="radio"]:checked + label:after, [type="radio"].with-gap:checked + label:after {
+        background-color: #26a69a
+    }
+
+    [type="radio"]:checked + label:after {
+        -webkit-transform: scale(1.02);
+        transform: scale(1.02)
+    }
+
+    .fb-starRating span {
+        padding-top: 15px;
+    }
+
+    .widget-title, .fb-starRating label {
+        font-weight: 700;
+        font-size: 18px;
+        color: rgba(0,0,0,.8);
+        /*color: #2AB3B5;*/
+        margin: 0 0 15px 0;
+    }
+
+    input.invalid ~ .helper-text {
+        color: transparent;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        pointer-events: none;
+    }
+
+        input.invalid ~ .helper-text:after {
+            content: attr(data-error);
+            color: #F44336;
+        }
+
+    .rateInput.invalid ~ .helper-text {
+        color: transparent;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        pointer-events: none;
+    }
+
+        .rateInput.invalid ~ .helper-text:after {
+            content: attr(data-error);
+            color: #F44336;
+        }
+</style>
+@section Styles{
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.css">
+}
+@section Scripts{
+    @*<script src="~/assets/plugins/formbuilder/control_plugins/starRating.js"></script>*@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js"></script>
+    <script src="~/assets/plugins/fp2/fp2.js"></script>
+
+    <script>
+        var comps = null;
+        jQuery(function ($) {
+
+            var browserFp = null;
+
+            if (window.requestIdleCallback) {
+                requestIdleCallback(function() {
+                    Fingerprint2.get(function(components) {
+                        var values = components.map(function (component) { return component.value })
+                        var murmur = Fingerprint2.x64hash128(values.join(''), 31);
+                        browserFp = murmur;
+                    });
+                });
+            } else {
+                setTimeout(function () {
+                    Fingerprint2.get(function(components) {
+                        console.log(components) // an array of components: {key: ..., value: ...}
+                        comps = components;
+                        browserFp = murmur;
+                    });
+                }, 500);
+            }
+
+            //var renderInstance = $('.fb-render').formRender({
+            //    dataType: 'json',
+            //    formData: '[{"type": "starRating","label": "Temizlik hizmetlerinden memnun kaldınız mı?","name": "starRating-1546114522423"},{"type":"radio-group","label":"Soru 1","description":"soru açıklama","name":"soru1","values":[{"label":"Option 1","value":"secenek1"},{"label":"Option 2","value":"secenek2"},{"label":"Option 3","value":"secenek3"}]}]',
+            //   // formData: '[]',
+            //    render: true
+            //});
+
+            $(".rateInput").rateYo({
+                fullStar:true
+            });
+
+            $("#btnSend").click(function(e) {
+                e.preventDefault();
+                
+                var hasInvalidRate = false;
+                $.each($(".rateInput"), function (idx, rateInput) {
+                    var elm = $(rateInput);
+                    var rate = elm.rateYo("rating");
+                    if (rate < 1) {
+                        elm.addClass("invalid");
+                        hasInvalidRate = true;
+                    }
+                });
+
+                var etkinlikAdi = $("#etkinlikAdi").val();
+
+                if (!etkinlikAdi) {
+                    $("#etkinlikAdi").addClass("invalid");
+                    return;
+                }
+
+                if (hasInvalidRate === true)
+                    return;
+
+                $("#btnSend").attr("disabled", true);
+
+                //var formValue = JSON.stringify(renderInstance.userData);
+                var formId = $("#formId").val();
+                var description = $("#description").val();
+               
+                //var likeRate = $("#likeRate").val();
+
+                var isShare = false;
+
+                if ($("#chcShare").length > 0)
+                    isShare = $("#chcShare").is(':checked');
+
+                var data = {
+                    //FormValue: formValue,
+                    BrowserFp: browserFp,
+                    FormId: formId,
+                    EtkinlikAdi: etkinlikAdi,
+                    Description: description,
+                    EmployeeRate: $("#personelIlgisi").rateYo("rating"),
+                    MekanYeterliligi: $("#mekanYeterliligi").rateYo("rating"),
+                    PlanaUyum: $("#planaUyum").rateYo("rating"),
+                    AdviseRate: $("#tavsiye").rateYo("rating"),
+                    IsUserShare: isShare
+                    //LikeRate: likeRate
+                }
+                console.log(data);
+
+                @*$.post('@Url.Action("Feedback")', data, function(data){
+                    alert("Değerlendirmeniz etkinlik sorumlumuza ve üstündeki tüm sorumlulara iletildi. \n Geri bildiriminiz için teşekkür ederiz! ");
+                    window.location = "/";
+
+                }).fail(function(e, a, b, c) {
+                    alert("İşleminiz gerçekleştirilemedi!");
+                    $("#btnSend").attr("disabled", false);
+                });*@
+            });
+        });
+
+    </script>
+}

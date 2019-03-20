@@ -899,10 +899,13 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="8.0.0" />
+    <PackageReference Include="GeoAPI" Version="1.7.5" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="2.2.3" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.9" />
+	<DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.2.3" />
   </ItemGroup>
 
   <ItemGroup>
