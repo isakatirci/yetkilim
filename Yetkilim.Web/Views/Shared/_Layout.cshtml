@@ -30,8 +30,16 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.18/r-2.2.2/datatables.min.css"/>
 
     <link rel="stylesheet" type="text/css" href="~/assets/css/style.css">
+    <style>
+        div.dataTables_wrapper {
+            width: 1400px;
+            margin: 0 auto;
+        }
+    </style>
    
     @RenderSection("Styles", required: false)
+
+  
 </head>
 <body>
     <div id="main">
@@ -58,5 +66,15 @@
     <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.18/r-2.2.2/datatables.min.js"></script>
     <script src="~/assets/js/custom.js"></script>
     @RenderSection("Scripts", required: false)
+
+    <script>
+         $(document).ready(function() {
+             $("#feedbacktable").DataTable({
+                 "scrollY": 500,
+                 "scrollX": true
+             });
+    });
+    </script>
+
 </body>
 </html>

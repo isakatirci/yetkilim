@@ -910,6 +910,7 @@
 
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
+    <Folder Include="Models\Ef\" />
     <Folder Include="wwwroot\admin\uploads\" />
   </ItemGroup>
 

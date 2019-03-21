@@ -323,14 +323,19 @@
                 }
                 console.log(data);
 
-                @*$.post('@Url.Action("Feedback")', data, function(data){
-                    alert("Değerlendirmeniz şube müdürümüze ve üstündeki tüm sorumlulara iletildi. \n Geri bildiriminiz için teşekkür ederiz! ");
-                    window.location = "/";
+                $.post('@Url.Action(action: "Feedback6")', data, function (response){
+                    if (response) {
+                        console.log(response);
+                        alert("İşlem Başarısız Oldu!");
+                    } else {
+                        alert("Değerlendirmeniz şube müdürümüze ve üstündeki tüm sorumlulara iletildi. \n Geri bildiriminiz için teşekkür ederiz! ");
+                        window.location = "/Feedback/FeedbackIndex?feedbackid=6";
+                    }   
 
                 }).fail(function(e, a, b, c) {
                     alert("İşleminiz gerçekleştirilemedi!");
                     $("#btnSend").attr("disabled", false);
-                });*@
+                });
             });
         });
 

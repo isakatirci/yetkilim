@@ -18,6 +18,15 @@ namespace Yetkilim.Web.Models.Ef
         public virtual DbSet<Companies> Companies { get; set; }
         public virtual DbSet<CompanyTypes> CompanyTypes { get; set; }
         public virtual DbSet<ExternalUser> ExternalUser { get; set; }
+        public virtual DbSet<Feedback> Feedback { get; set; }
+        public virtual DbSet<Feedback0> Feedback0 { get; set; }
+        public virtual DbSet<Feedback1> Feedback1 { get; set; }
+        public virtual DbSet<Feedback2> Feedback2 { get; set; }
+        public virtual DbSet<Feedback3> Feedback3 { get; set; }
+        public virtual DbSet<Feedback4> Feedback4 { get; set; }
+        public virtual DbSet<Feedback5> Feedback5 { get; set; }
+        public virtual DbSet<Feedback6> Feedback6 { get; set; }
+        public virtual DbSet<Feedback7> Feedback7 { get; set; }
         public virtual DbSet<FeedbackDetail> FeedbackDetail { get; set; }
         public virtual DbSet<FeedbackForms> FeedbackForms { get; set; }
         public virtual DbSet<Feedbacks> Feedbacks { get; set; }
@@ -31,7 +40,7 @@ namespace Yetkilim.Web.Models.Ef
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=.;Database=yetkilimDB;Trusted_Connection=True;Integrated Security=true;", x => x.UseNetTopologySuite());
+                optionsBuilder.UseSqlServer("Server=.;Database=yetkilimDB;Trusted_Connection=True;Integrated Security=true", x => x.UseNetTopologySuite());
             }
         }
 
@@ -54,6 +63,48 @@ namespace Yetkilim.Web.Models.Ef
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(200);
+            });
+
+            modelBuilder.Entity<Feedback0>(entity =>
+            {
+                entity.Property(e => e.IsUserShare).HasDefaultValueSql("((0))");
+            });
+
+            modelBuilder.Entity<Feedback1>(entity =>
+            {
+                entity.Property(e => e.IsUserShare).HasDefaultValueSql("((0))");
+            });
+
+            modelBuilder.Entity<Feedback2>(entity =>
+            {
+                entity.Property(e => e.IsUserShare).HasDefaultValueSql("((0))");
+            });
+
+            modelBuilder.Entity<Feedback3>(entity =>
+            {
+                entity.Property(e => e.IsUserShare).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.WccleaningRate).HasColumnName("WCCleaningRate");
+            });
+
+            modelBuilder.Entity<Feedback4>(entity =>
+            {
+                entity.Property(e => e.IsUserShare).HasDefaultValueSql("((0))");
+            });
+
+            modelBuilder.Entity<Feedback5>(entity =>
+            {
+                entity.Property(e => e.IsUserShare).HasDefaultValueSql("((0))");
+            });
+
+            modelBuilder.Entity<Feedback6>(entity =>
+            {
+                entity.Property(e => e.IsUserShare).HasDefaultValueSql("((0))");
+            });
+
+            modelBuilder.Entity<Feedback7>(entity =>
+            {
+                entity.Property(e => e.IsUserShare).HasDefaultValueSql("((0))");
             });
 
             modelBuilder.Entity<FeedbackForms>(entity =>
