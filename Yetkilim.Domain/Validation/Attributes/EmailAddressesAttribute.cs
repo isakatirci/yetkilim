@@ -10,28 +10,28 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Yetkilim.Domain.Validation.Attributes
 {
-  public class EmailAddressesAttribute : ValidationAttribute
-  {
-    protected override ValidationResult IsValid(
-      object value,
-      ValidationContext validationContext)
+    public class EmailAddressesAttribute : ValidationAttribute
     {
-      if (!(value is IEnumerable<string> strings))
-        throw new ArgumentException("Attribute not applied");
-      EmailAddressAttribute addressAttribute = new EmailAddressAttribute();
-      foreach (string invalidEmail in strings)
-      {
-        if (!addressAttribute.IsValid((object) invalidEmail))
-          return new ValidationResult(this.GetErrorMessage(validationContext, invalidEmail));
-      }
-      return ValidationResult.Success;
-    }
+        protected override ValidationResult IsValid(
+          object value,
+          ValidationContext validationContext)
+        {
+            if (!(value is IEnumerable<string> strings))
+                throw new ArgumentException("Attribute not applied");
+            EmailAddressAttribute addressAttribute = new EmailAddressAttribute();
+            foreach (string invalidEmail in strings)
+            {
+                if (!addressAttribute.IsValid((object)invalidEmail))
+                    return new ValidationResult(this.GetErrorMessage(validationContext, invalidEmail));
+            }
+            return ValidationResult.Success;
+        }
 
-    private string GetErrorMessage(ValidationContext validationContext, string invalidEmail)
-    {
-      if (!string.IsNullOrEmpty(this.ErrorMessage))
-        return this.ErrorMessage;
-      return validationContext.DisplayName + " değeri valid email adresleri içermeli! (" + invalidEmail + ")";
+        private string GetErrorMessage(ValidationContext validationContext, string invalidEmail)
+        {
+            if (!string.IsNullOrEmpty(this.ErrorMessage))
+                return this.ErrorMessage;
+            return validationContext.DisplayName + " değeri valid email adresleri içermeli! (" + invalidEmail + ")";
+        }
     }
-  }
 }

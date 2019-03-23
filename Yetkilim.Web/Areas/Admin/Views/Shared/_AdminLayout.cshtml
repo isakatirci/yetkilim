@@ -80,12 +80,26 @@
 </head>
 
 <body class="layout layout-vertical layout-left-navigation layout-above-toolbar layout-above-footer">
-
     <main>
         <partial name="_Navbar" />
         <div id="wrapper">
             <partial name="_Menu" />
             <div class="content-wrapper">
+                @*@{
+                    var temp = User.Claims.FirstOrDefault(x => x.Type == "Demo");
+
+                    if (temp != null && temp.Value == "Evet")
+                    {
+                        <text>
+
+                            <div class="alert alert-danger" role="alert">
+                                Misafir Şirket
+                            </div>
+                        </text>
+                    }
+
+                }*@
+
                 <div class="content custom-scrollbar">
                     @RenderBody()
                 </div>

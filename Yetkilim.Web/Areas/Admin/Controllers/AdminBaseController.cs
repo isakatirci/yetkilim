@@ -8,5 +8,6 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
     [Authorize(AuthenticationSchemes = Consts.AdminArea.AuthenticationScheme, Roles = Consts.AdminArea.BaseRole)]
     public class AdminBaseController : Controller
     {
+
     }
 }

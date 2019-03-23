@@ -8,18 +8,19 @@ using System.Collections.Generic;
 
 namespace Yetkilim.Domain.Entity
 {
-  public class Company : TrackableEntity<int>
-  {
-    public string Name { get; set; }
+    public class Company : TrackableEntity<int>
+    {
+        public string Name { get; set; }
 
-    public string Image { get; set; }
+        public string Image { get; set; }
 
-    public string Address { get; set; }
+        public string Address { get; set; }
 
-    public int CompanyTypeId { get; set; }
+        public int CompanyTypeId { get; set; }
+        public string Demo { get; set; }
 
-    public virtual CompanyType CompanyType { get; set; }
+        public virtual CompanyType CompanyType { get; set; }
 
-    public ICollection<Place> Places { get; set; }
-  }
+        public ICollection<Place> Places { get; set; }
+    }
 }

@@ -13,8 +13,20 @@
     <div class="page-content p-6">
         <div class="content container">
             <div class="row">
-                <partial name="_CompanyForm"/>
+                <partial name="_CompanyForm" />
             </div>
         </div>
     </div>
 </div>
+
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $("#frmCompany select").each(function () {
+                $(this).select2();
+            });
+        });
+    </script>
+}

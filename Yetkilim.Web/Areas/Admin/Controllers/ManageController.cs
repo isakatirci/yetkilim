@@ -11,6 +11,7 @@ using Yetkilim.Business.Services;
 using Yetkilim.Domain.DTO;
 using Yetkilim.Global;
 using Yetkilim.Web.Areas.Admin.Models;
+using Yetkilim.Web.Models.Ef;
 
 namespace Yetkilim.Web.Areas.Admin.Controllers
 {
@@ -85,18 +86,33 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
                 }
 
                 var user = userRes.Data;
+                var demo = false;
+
+                using (yetkilimDBContext db = new yetkilimDBContext())
+                {
+                    var com = db.Companies.FirstOrDefault(x => x.Id == userRes.Data.CompanyId);
+                    if (com != null && string.Equals("Evet", com.Demo, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        demo = true;
+                    }
+                }
+
 
                 var claims = new List<Claim>()
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.Name),
                     new Claim(ClaimTypes.Email, user.Email),
+                    //new Claim("Demo", demo ? "Evet":"Hayir"),
                     new Claim(ClaimTypes.Role, user.Role.ToString()),
                 };
 
                 var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
 
                 await HttpContext.SignInAsync(Consts.AdminArea.AuthenticationScheme, claimsPrincipal);
+
+                
+
 
                 return RedirectToAction("Index", "Manage");
             }

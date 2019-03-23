@@ -20,6 +20,7 @@ namespace Yetkilim.Web.Models.Ef
         public string Name { get; set; }
         public string Image { get; set; }
         public string Address { get; set; }
+        public string Demo { get; set; }
         public int CompanyTypeId { get; set; }
         public bool IsDeleted { get; set; }
 

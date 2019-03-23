@@ -10,6 +10,7 @@ using Yetkilim.Business.Services;
 using Yetkilim.Domain.DTO;
 using Yetkilim.Global.Model;
 using Yetkilim.Web.Models;
+using Yetkilim.Web.Models.Ef;
 
 namespace Yetkilim.Web.Controllers
 {
@@ -17,25 +18,29 @@ namespace Yetkilim.Web.Controllers
     {
         private readonly IPlaceService _placeService;
         private readonly IFeedbackService _feedbackService;
+        private readonly ICompanyService _companyService;
 
         private readonly ILogger _logger;
         private readonly IHostingEnvironment _hostingEnvironment;
 
         public HomeController(ILogger<HomeController> logger, IHostingEnvironment hostingEnvironment, IPlaceService placeService,
-            IFeedbackService feedbackService)
+            IFeedbackService feedbackService, ICompanyService companyService)
         {
             _logger = logger;
             _hostingEnvironment = hostingEnvironment;
             _placeService = placeService;
             _feedbackService = feedbackService;
+            _companyService = companyService;
         }
 
         public IActionResult Index()
+
+
         {
-            if (_hostingEnvironment.IsDevelopment())
-            {
-                return RedirectToAction("Index", "Manage", new { area = "Admin" });
-            }
+            //if (_hostingEnvironment.IsDevelopment())
+            //{
+            //    return RedirectToAction("Index", "Manage", new { area = "Admin" });
+            //}
 
             return View();
         }
@@ -79,10 +84,9 @@ namespace Yetkilim.Web.Controllers
                 //    model.FormId = formRes.Data.Id;
                 //    model.FormData = formRes.Data.FormItems;
                 //}
-
-                // TODO: şimdilik default form gösterilecek
-                model.FormId = 1;
-
+                // TODO: şimdilik default form gösterilecek        
+                var company = _companyService.GetCompanyAsync(id).Result.Data;              
+                return View("~/Views/Feedback/Feedback" + company.CompanyTypeId + ".cshtml");
             }
             catch (Exception ex)
             {
@@ -148,5 +152,159 @@ namespace Yetkilim.Web.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        public IActionResult Feedback0(Feedback0 feedback)
+        {
+            try
+            {
+                //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture); 
+                using (yetkilimDBContext db = new yetkilimDBContext())
+                {
+                    feedback.CreatedDate = DateTime.Now;
+                    db.Feedback0.Add(feedback);
+                    db.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                return Content(ex.ToString());
+            }
+            return new EmptyResult();
+        }
+        public IActionResult Feedback1(Feedback1 feedback)
+        {
+            try
+            {
+                //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture); 
+                using (yetkilimDBContext db = new yetkilimDBContext())
+                {
+                    feedback.CreatedDate = DateTime.Now;
+                    db.Feedback1.Add(feedback);
+                    db.SaveChanges();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return Content(ex.ToString());
+            }
+            return new EmptyResult();
+        }
+        public IActionResult Feedback2(Feedback2 feedback)
+        {
+            try
+            {
+                //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture); 
+                using (yetkilimDBContext db = new yetkilimDBContext())
+                {
+                    feedback.CreatedDate = DateTime.Now;
+                    db.Feedback2.Add(feedback);
+                    db.SaveChanges();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return Content(ex.ToString());
+            }
+            return new EmptyResult();
+        }
+        public IActionResult Feedback3(Feedback3 feedback)
+        {
+            try
+            {
+                //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture);   
+                using (yetkilimDBContext db = new yetkilimDBContext())
+                {
+                    feedback.CreatedDate = DateTime.Now;
+                    db.Feedback3.Add(feedback);
+                    db.SaveChanges();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return Content(ex.ToString());
+            }
+            return new EmptyResult();
+        }
+        public IActionResult Feedback4(Feedback4 feedback)
+        {
+            try
+            {
+                //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture);  
+                using (yetkilimDBContext db = new yetkilimDBContext())
+                {
+                    feedback.CreatedDate = DateTime.Now;
+                    db.Feedback4.Add(feedback);
+                    db.SaveChanges();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return Content(ex.ToString());
+            }
+            return new EmptyResult();
+        }
+        public IActionResult Feedback5(Feedback5 feedback)
+        {
+            try
+            {
+                //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture);  
+                using (yetkilimDBContext db = new yetkilimDBContext())
+                {
+                    feedback.CreatedDate = DateTime.Now;
+                    db.Feedback5.Add(feedback);
+                    db.SaveChanges();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return Content(ex.ToString());
+            }
+            return new EmptyResult();
+        }
+        public IActionResult Feedback6(Feedback6 feedback)
+        {
+            try
+            {
+                //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture); 
+                using (yetkilimDBContext db = new yetkilimDBContext())
+                {
+                    feedback.CreatedDate = DateTime.Now;
+                    db.Feedback6.Add(feedback);
+                    db.SaveChanges();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return Content(ex.ToString());
+            }
+            return new EmptyResult();
+        }
+        public IActionResult Feedback7(Feedback7 feedback)
+        {
+            try
+            {
+                //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture);
+                using (yetkilimDBContext db = new yetkilimDBContext())
+                {
+                    feedback.CreatedDate = DateTime.Now;
+                    db.Feedback7.Add(feedback);
+                    db.SaveChanges();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return Content(ex.ToString());
+            }
+            return new EmptyResult();
+        }
+
+
     }
 }

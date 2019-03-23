@@ -6,16 +6,17 @@
 
 namespace Yetkilim.Domain.DTO
 {
-  public class CompanyDetailDTO
-  {
-    public string Name { get; set; }
+    public class CompanyDetailDTO
+    {
+        public string Name { get; set; }
 
-    public string Image { get; set; }
+        public string Image { get; set; }
 
-    public string Address { get; set; }
+        public string Address { get; set; }
+        public string Demo { get; set; }
 
-    public int CompanyTypeId { get; set; }
+        public int CompanyTypeId { get; set; }
 
-    public ParameterDTO CompanyType { get; set; }
-  }
+        public ParameterDTO CompanyType { get; set; }
+    }
 }

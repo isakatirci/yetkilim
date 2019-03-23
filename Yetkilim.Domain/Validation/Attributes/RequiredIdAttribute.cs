@@ -8,24 +8,24 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Yetkilim.Domain.Validation.Attributes
 {
-  public class RequiredIdAttribute : ValidationAttribute
-  {
-    protected override ValidationResult IsValid(
-      object value,
-      ValidationContext validationContext)
+    public class RequiredIdAttribute : ValidationAttribute
     {
-      int result;
-      int.TryParse(value.ToString(), out result);
-      if (result > 0)
-        return ValidationResult.Success;
-      return new ValidationResult(this.GetErrorMessage(validationContext));
-    }
+        protected override ValidationResult IsValid(
+          object value,
+          ValidationContext validationContext)
+        {
+            int result;
+            int.TryParse(value.ToString(), out result);
+            if (result > 0)
+                return ValidationResult.Success;
+            return new ValidationResult(this.GetErrorMessage(validationContext));
+        }
 
-    private string GetErrorMessage(ValidationContext validationContext)
-    {
-      if (!string.IsNullOrEmpty(this.ErrorMessage))
-        return this.ErrorMessage;
-      return validationContext.DisplayName + " değeri set edilmeli!";
+        private string GetErrorMessage(ValidationContext validationContext)
+        {
+            if (!string.IsNullOrEmpty(this.ErrorMessage))
+                return this.ErrorMessage;
+            return validationContext.DisplayName + " değeri set edilmeli!";
+        }
     }
-  }
 }

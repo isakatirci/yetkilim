@@ -141,7 +141,7 @@ namespace Yetkilim.Web.Controllers
         {
             var model = new ChangePasswordViewModel();
             return View(model);
-        }
+        }   
 
         [HttpPost]
         public async Task<ViewResult> ChangePassword(ChangePasswordViewModel model)

@@ -37,17 +37,17 @@ namespace Yetkilim.Web.Controllers
             return string.Equals(value, other, StringComparison.InvariantCultureIgnoreCase);
         }
 
-        class ComparerPropertyInfo : IComparer<PropertyInfo>
-        {
-            public int Compare(PropertyInfo x, PropertyInfo y)
-            {
-                return string.Compare(x.Name, y.Name, StringComparison.InvariantCultureIgnoreCase);
-            }
-        }
+        //class ComparerPropertyInfo : IComparer<PropertyInfo>
+        //{
+        //    public int Compare(PropertyInfo x, PropertyInfo y)
+        //    {
+        //        return string.Compare(x.Name, y.Name, StringComparison.InvariantCultureIgnoreCase);
+        //    }
+        //}
         private string myTableMaker<T>(T[] list)
         {
             PropertyInfo[] properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            Array.Sort(properties, new ComparerPropertyInfo());
+            //Array.Sort(properties, new ComparerPropertyInfo());
             var table = "<table class=\"responsive-table striped highlight display nowrap\" style=\"width:100%\" id=\"feedbacktable\"><thead><tr>";
             for (int j = 0; j < properties.Length; j++)
             {

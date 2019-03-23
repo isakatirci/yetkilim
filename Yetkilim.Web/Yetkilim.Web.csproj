@@ -915,18 +915,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Yetkilim.Business">
-      <HintPath>..\lib\Yetkilim.Business.dll</HintPath>
-    </Reference>
-    <Reference Include="Yetkilim.Domain">
-      <HintPath>..\lib\Yetkilim.Domain.dll</HintPath>
-    </Reference>
-    <Reference Include="Yetkilim.Global">
-      <HintPath>..\lib\Yetkilim.Global.dll</HintPath>
-    </Reference>
-    <Reference Include="Yetkilim.Infrastructure">
-      <HintPath>..\lib\Yetkilim.Infrastructure.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\Yetkilim.Business\Yetkilim.Business.csproj" />
+    <ProjectReference Include="..\Yetkilim.Domain\Yetkilim.Domain.csproj" />
+    <ProjectReference Include="..\Yetkilim.Global\Yetkilim.Global.csproj" />
+    <ProjectReference Include="..\Yetkilim.Infrastructure\Yetkilim.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
