@@ -10,7 +10,7 @@ namespace Yetkilim.Domain.DTO
 {
   public class PlaceSearchModel : SearchModel
   {
-    public int CompanyId { get; set; }
+    public int? CompanyId { get; set; }
 
     public double? Latitude { get; set; }
 

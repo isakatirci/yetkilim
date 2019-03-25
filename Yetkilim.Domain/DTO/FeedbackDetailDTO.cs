@@ -4,20 +4,71 @@
 // MVID: 9451A12F-2E26-461F-B515-9B3493CE1118
 // Assembly location: C:\Users\isa\source\repos\yetkilim\Yetkilim.Web\bin\Debug\netcoreapp2.2\Yetkilim.Domain.dll
 
+using System;
+
 namespace Yetkilim.Domain.DTO
 {
-  public class FeedbackDetailDTO
-  {
-    public int Id { get; set; }
+    public class FeedbackDetailDTO
+    {
+        public int Id
+        {
+            get;
+            set;
+        }
 
-    public int EmployeeRate { get; set; }
+        public bool IsAnon
+        {
+            get;
+            set;
+        }
 
-    public int FlavorRate { get; set; }
+        public UserDTO User
+        {
+            get;
+            set;
+        }
 
-    public int PriceRate { get; set; }
+        public bool IsUserShare
+        {
+            get;
+            set;
+        }
 
-    public int CleaningRate { get; set; }
+        public string DeskCode
+        {
+            get;
+            set;
+        }
 
-    public int AdviseRate { get; set; }
-  }
+        public string Description
+        {
+            get;
+            set;
+        }
+
+        public FeedbackDetailInfoDTO Info
+        {
+            get;
+            set;
+        }
+
+        public int PlcId
+        {
+            get;
+            set;
+        }
+
+        public string Place
+        {
+            get;
+            set;
+        }
+
+        public DateTime CreatedDate
+        {
+            get;
+            set;
+        }
+    }
+
 }

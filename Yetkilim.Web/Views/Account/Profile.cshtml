@@ -52,11 +52,11 @@
                                     <span class="ti-pencil-alt"></span>
                                 </div>
                             </div>
-                            <div class="card-item orange">
+                            <div class="card-item orange promotion-link">
                                 <span class="numbers">
-                                    <span class="count">0</span>
+                                    <span class="count">@ViewBag.UserPromotionCount</span>
                                 </span>
-                                <span class="desc">kazanılan promosyon (yakında)</span>
+                                <span class="desc">aktif promosyonlar</span>
                                 <div class="icon">
                                     <span class="ti-wallet"></span>
                                 </div>
@@ -77,3 +77,23 @@
     </div><!-- .container -->
 
 </div><!-- .content-container -->
+
+@section Styles{ 
+    <style>
+        .home-cards {
+            display: flex;
+            -moz-flex-wrap: wrap;
+            -ms-flex-wrap: wrap;
+            -o-flex-wrap: wrap;
+            -webkit-flex-wrap: wrap;
+            flex-wrap: wrap;
+        }
+    </style>
+}
+@section Scripts{
+    <script>
+        $(".promotion-link").click(function(e) {
+            window.location = '@Url.Action("MyPromotions")';
+        });
+    </script>
+}

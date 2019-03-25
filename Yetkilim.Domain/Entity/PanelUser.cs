@@ -9,25 +9,75 @@ using Yetkilim.Domain.Enums;
 
 namespace Yetkilim.Domain.Entity
 {
-  public class PanelUser : TrackableEntity<int>
-  {
-    [StringLength(100)]
-    public string Name { get; set; }
+    public class PanelUser : TrackableEntity<int>
+    {
+        [StringLength(100)]
+        public string Name
+        {
+            get;
+            set;
+        }
 
-    [StringLength(100)]
-    public string Surname { get; set; }
+        [StringLength(100)]
+        public string Surname
+        {
+            get;
+            set;
+        }
 
-    [StringLength(255)]
-    public string Email { get; set; }
+        [StringLength(255)]
+        public string Email
+        {
+            get;
+            set;
+        }
 
-    public string Password { get; set; }
+        public string Password
+        {
+            get;
+            set;
+        }
 
-    public bool IsDeleted { get; set; }
+        public bool IsDeleted
+        {
+            get;
+            set;
+        }
 
-    public UserRole Role { get; set; }
+        public string ResetCode
+        {
+            get;
+            set;
+        }
 
-    public int CompanyId { get; set; }
+        public UserRole Role
+        {
+            get;
+            set;
+        }
 
-    public Company Company { get; set; }
-  }
+        public int CompanyId
+        {
+            get;
+            set;
+        }
+
+        public Company Company
+        {
+            get;
+            set;
+        }
+
+        public int? PlaceId
+        {
+            get;
+            set;
+        }
+
+        public Place Place
+        {
+            get;
+            set;
+        }
+    }
 }

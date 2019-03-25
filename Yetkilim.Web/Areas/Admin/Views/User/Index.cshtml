@@ -1,8 +1,158 @@
-﻿@model object
+﻿@using Yetkilim.Domain.DTO
+@model PanelUserModel
+<div class="doc data-table-doc page-layout simple full-width">
 
-@{
-    ViewBag.Title = "title";
-    Layout = "_Layout";
-}
+    <!-- HEADER -->
+    <div class="page-header bg-primary text-auto p-6 row no-gutters align-items-center justify-content-between">
+        @*<h1 class="doc-title h4" id="content">Değerlendirmeler</h1>*@
+        <div class="col-auto">
+            <a href="@Url.Action("Create")" class="btn btn-light">YENİ KULLANICI EKLE</a>
+        </div>
+    </div>
 
-<h2>title</h2>
+    <!-- / HEADER -->
+    <!-- CONTENT -->
+    <div class="page-content p-6">
+        <div class="content container">
+            <div class="row">
+
+                <div class="col-12">
+                    <div class="example ">
+
+                        <div class="description">
+                            <div class="description-text">
+                                <h3>Kullanıcılar</h3>
+                            </div>
+                        </div>
+
+                        <div class="source-preview-wrapper">
+                            <div class="preview">
+                                <div class="preview-elements">
+
+                                    <table id="sample-data-table" class="table">
+                                        <thead>
+                                            <tr>
+                                                <th class="secondary-text">
+                                                    <div class="table-header">
+                                                        <span class="column-title">Ad Soyad</span>
+                                                    </div>
+                                                </th>
+                                                <th class="secondary-text">
+                                                    <div class="table-header">
+                                                        <span class="column-title">E-Posta</span>
+                                                    </div>
+                                                </th>
+                                                <th class="secondary-text">
+                                                    <div class="table-header">
+                                                        <span class="column-title">Rol</span>
+                                                    </div>
+                                                </th>
+                                                <th class="secondary-text">
+                                                    <div class="table-header">
+                                                        <span class="column-title">Mekan</span>
+                                                    </div>
+                                                </th>
+                                                <th class="secondary-text">
+                                                    <div class="table-header">
+                                                        <span class="column-title">Tarih</span>
+                                                    </div>
+                                                </th>
+                                                <th class="secondary-text">
+                                                    <div class="table-header">
+                                                        <span class="column-title">İşlemler</span>
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var user in Model.Users ?? Enumerable.Empty<PanelUserDTO>())
+                                            {
+                                                if (Model.IsSuperAdmin)
+                                                {
+                                                    user.PlaceName = user.Company.Name + " - " + user.PlaceName;
+                                                }
+                                                <tr>
+                                                    <td>@user.Name</td>
+                                                    <td>@user.Email</td>
+                                                    <td>@user.Role</td>
+                                                    <td>@user.PlaceName</td>
+                                                    <td>@user.CreatedDate.ToString("dd.MM.yyyy")</td>
+                                                    <td>
+                                                        @user.Id
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+
+                                    <script type="text/javascript">
+                                        $('#sample-data-table').dataTable({
+                                            responsive: true,
+                                            "language": {
+                                                "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Turkish.json"
+                                            },
+                                            lengthChange: false,
+                                            dom: 'rft<"dataTables_footer"ip>',
+                                            "columnDefs":
+                                                [
+                                                    {
+                                                        "targets": 5,
+                                                        "orderable": false,
+                                                        render: function (data, type, row, meta) {
+                                                            if (type === 'display') {
+                                                                data = '<a class="btn btn-info" href="/admin/user/update/' + encodeURIComponent(data) + '">Düzenle</a>' +
+                                                                    '<a class="btn btn-danger" onclick=DeleteData("' + encodeURIComponent(data) + '");>Sil</a>';
+                                                            }
+                                                            return data;
+                                                        }
+                                                    }
+
+                                                ]
+                                        });
+
+                                    </script>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- CONTENT -->
+
+</div>
+
+<script>
+    function DeleteData(id)
+    {
+        if (confirm("Kaydı silmek istediğinize emin misiniz?"))
+        {
+            Delete(id);
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+    function Delete(Id)
+    {
+        var url = "@Url.Action("Delete","User")";
+
+        $.post(url, { Id: Id }, function (res)
+        {
+            if (res.isSuccess === true) {
+                alert("Kayıt silindi.");
+                window.location.reload();
+            }
+            else
+            {
+                alert("Hata oluştu! : " + res.formMessage);
+            }
+        });
+    }
+</script>

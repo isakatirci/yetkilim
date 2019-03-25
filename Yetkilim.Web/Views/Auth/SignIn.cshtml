@@ -1,4 +1,5 @@
 ﻿@model LoginViewModel
+
 <div class="container">
     <div class="row no-mb">
         <div class="col s12">
@@ -7,7 +8,10 @@
                 <div class="page-title animated fadeInRight">
                     Giriş Yap
                 </div><!-- .page-title -->
+                
                 <div class="login-box">
+                    <p>Giriş yap, promosyonları ve diğer fırsatları kaçırma!</p>
+                    <p><br/></p>
                     @if (string.IsNullOrWhiteSpace(Model.FormMessage) == false)
                     {
                         <div class="alert is-danger x-hidden-focus mb-4">
@@ -18,6 +22,7 @@
                     <form id="loginForm" method="post" action="@Url.Action("SignIn")">
                         <input type="hidden" asp-for="IsFeedbackRedirect" />
                         <input type="hidden" asp-for="ReturnUrl" />
+
                         <div class="input-field">
                             <span class="ti-email prefix"></span>
                             <input id="email" name="Email" value="@Model.Email" type="email" placeholder="E-posta adresinizi giriniz" class="validate" required>
@@ -36,13 +41,14 @@
                                 <span>Beni hatırla</span>
                             </label>
                         </div>
-                        <!--<button class="btn block">GİRİŞ YAP</button>  -->
-                        <button class="btn block waves-effect waves-light">GİRİŞ YAP  <i class="material-icons">send</i></button>
+                         <!--<button class="btn block">GİRİŞ YAP</button>  -->
+                        <button class="btn block waves-effect waves-light">GİRİŞ YAP<i class="material-icons">send</i></button>
+
                         @if (Model.IsFeedbackRedirect)
                         {
                             <div class="social-login socmed mt-3">
                                 <a class="btn block facebook" asp-action="SignIn" asp-route-provider="Facebook" asp-route-returnUrl="@Model.ReturnUrl"><i class="icon fa fa-facebook"></i> FACEBOOK İLE GİRİŞ YAP</a>
-                                @*<a class="btn block instagram" href="#!"><i class="icon fa fa-instagram"></i> INSTAGRAM İLE GİRİŞ YAP</a>*@
+                                <a class="btn block instagram" asp-action="SignIn" asp-route-provider="Instagram" asp-route-returnUrl="@Model.ReturnUrl"><i class="icon fa fa-instagram"></i> INSTAGRAM İLE GİRİŞ YAP</a>
                             </div>
                         }
                         <p class="additional-text">
@@ -50,6 +56,7 @@
                             Hesabın mı yok? <a href="@Url.Action("SignUp")">Hemen kayıt olmak için tıkla!</a>
                         </p>
                     </form>
+
                     <div class="social-login socmed mt-3">
                         @if (Model.IsFeedbackRedirect)
                         {
@@ -60,8 +67,7 @@
                         {
                             <span class="caption text-center mb-2">YA DA</span>
                             <a class="btn block facebook" asp-action="SignIn" asp-route-provider="Facebook" asp-route-returnUrl="@Model.ReturnUrl"><i class="icon fa fa-facebook"></i> FACEBOOK İLE GİRİŞ YAP</a>
-
-                            @*<a class="btn block instagram" href="#!"><i class="icon fa fa-instagram"></i> INSTAGRAM İLE GİRİŞ YAP</a>*@
+                            <a class="btn block instagram" asp-action="SignIn" asp-route-provider="Instagram" asp-route-returnUrl="@Model.ReturnUrl"><i class="icon fa fa-instagram"></i> INSTAGRAM İLE GİRİŞ YAP</a>
                         }
                     </div>
                 </div><!-- .login-box -->
@@ -70,9 +76,10 @@
         </div>
     </div>
 </div>
-@section Styles{
-    <style>
 
+@section Styles{
+
+    <style>
         .social-login {
             margin-bottom: 20px;
         }

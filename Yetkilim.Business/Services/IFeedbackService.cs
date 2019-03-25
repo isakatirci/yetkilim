@@ -11,13 +11,16 @@ using Yetkilim.Global.Model;
 
 namespace Yetkilim.Business.Services
 {
-  public interface IFeedbackService
-  {
-    Task<Result<FeedbackDTO>> AddFeedbackAsync(FeedbackDTO feedback);
+    public interface IFeedbackService
+    {
+        Task<Result<FeedbackDTO>> AddFeedbackAsync(FeedbackDTO feedback);
 
-    Task<Result<List<FeedbackDTO>>> GetAllFeedbackAsync(
-      FeedbackSearchModel searchModel);
+        Task<Result<List<FeedbackDTO>>> GetAllFeedbackAsync(CompanyUserSearchModel searchModel);
 
-    Task<Result<int>> GetFeedbackCountByUserIdAsync(int userId);
-  }
+        Task<Result<List<FeedbackDetailDTO>>> GetAllFeedbackDetailAsync(CompanyUserSearchModel searchModel);
+
+        Task<Result<int>> GetFeedbackCountByUserIdAsync(int userId);
+
+        Task<Result<int>> GetAllFeedbackCountAsync(int? companyId, int? placeId);
+    }
 }

@@ -1,4 +1,8 @@
-﻿<aside id="aside" class="aside aside-left" data-fuse-bar="aside" data-fuse-bar-media-step="md" data-fuse-bar-position="left">
+﻿@using Yetkilim.Domain.Enums
+@{
+    var currentUser = (AdminCookieUserModel)ViewBag.CurrentUser;
+}
+<aside id="aside" class="aside aside-left" data-fuse-bar="aside" data-fuse-bar-media-step="md" data-fuse-bar-position="left">
     <div class="aside-content bg-primary-700 text-auto">
         <div class="aside-toolbar">
             <div class="logo">
@@ -16,11 +20,11 @@
             <li class="nav-item">
                 <a class="nav-link ripple " href="@Url.Action("Index","Manage")">
                     <i class="icon s-4 icon-tile-four"></i>
-                    <span>Dashboard</span>
+                    <span>Ana Sayfa</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link ripple " href="apps-mail.html" data-url="apps-dashboards-server.html">
+                <a class="nav-link ripple " href="@Url.Action("Index","Feedback")">
                     <i class="icon s-4 icon-email"></i>
                     <span>Değerlendirmeler</span>
                 </a>
@@ -32,70 +36,72 @@
                 </a>
                 <ul id="collapse-charts" class='collapse ' role="tabpanel" aria-labelledby="heading-charts" data-children=".nav-item">
                     <li class="nav-item">
-                        <a class="nav-link ripple " href="components-charts-nvd3.html" data-url="apps-dashboards-server.html">
+                        <a class="nav-link ripple " href="@Url.Action("Index", "Report")">
                             <span>Memnuniyet Raporu</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link ripple " href="@Url.Action("Index2", "Report")">
+                            <span>Rakip Analizi</span>
                         </a>
                     </li>
                 </ul>
             </li>
             <li class="nav-item">
-                <a class="nav-link ripple " href="components-snackbar.html" data-url="apps-dashboards-server.html">
+                <a class="nav-link ripple " href="@Url.Action("Index","Promotion")">
                     <i class="icon s-4 icon-page-layout-footer"></i>
                     <span>Promosyonlar</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link ripple " href="@Url.Action("SignOut","Auth")" data-url="apps-dashboards-server.html">
+                <a class="nav-link ripple " href="@Url.Action("SignOut","Manage")">
                     <i class="icon s-4 icon-power"></i>
-                    <span>Promosyonlar</span>
+                    <span>Çıkış Yap</span>
                 </a>
             </li>
-            <li class="subheader">
-                <span>FİRMA YÖNETİM</span>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link ripple " href="pages-profile.html" data-url="apps-dashboards-server.html">
-                    <i class="icon s-4 icon-account"></i>
-                    <span>Kullanıcılar</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link ripple " href="pages-profile.html" data-url="apps-dashboards-server.html">
-                    <i class="icon s-4 icon-layers"></i>
-                    <span>Şubeler</span>
-                </a>
-            </li>
-            <li class="subheader">
-                <span>SUPER ADMIN</span>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link ripple " href="@Url.Action("Index", "Company")">
-                    <i class="icon s-4 icon-store"></i>
-                    <span>Firmalar</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link ripple " href="@Url.Action("Index", "Place")">
-                    <i class="icon s-4 icon-bullseye"></i>
-                    <span>Mekanlar</span>
-                </a>
-            </li>
-            <li class="nav-item" role="tab" id="heading-charts">
-                <a class="nav-link ripple with-arrow collapsed" data-toggle="collapse" data-target="#collapse-feedbacks" href="#" aria-expanded="false" aria-controls="collapse-charts">
-                    <i class="icon s-4 icon-poll"></i>
-                    <span>Feedbacks</span>
-                </a>
-                <ul id="collapse-feedbacks" class='collapse ' role="tabpanel" aria-labelledby="heading-charts" data-children=".nav-item">                 
-                    <li class="nav-item"><a class="nav-link ripple" href="/Admin/Company/FeedbackIndex?feedbackid=0"><span>Feedback 0</span></a></li>
-                    <li class="nav-item"><a class="nav-link ripple" href="/Admin/Company/FeedbackIndex?feedbackid=1"><span>Feedback 1</span></a></li>
-                    <li class="nav-item"><a class="nav-link ripple" href="/Admin/Company/FeedbackIndex?feedbackid=2"><span>Feedback 2</span></a></li>
-                    <li class="nav-item"><a class="nav-link ripple" href="/Admin/Company/FeedbackIndex?feedbackid=3"><span>Feedback 3</span></a></li>
-                    <li class="nav-item"><a class="nav-link ripple" href="/Admin/Company/FeedbackIndex?feedbackid=4"><span>Feedback 4</span></a></li>
-                    <li class="nav-item"><a class="nav-link ripple" href="/Admin/Company/FeedbackIndex?feedbackid=5"><span>Feedback 5</span></a></li>
-                    <li class="nav-item"><a class="nav-link ripple" href="/Admin/Company/FeedbackIndex?feedbackid=6"><span>Feedback 6</span></a></li>
-                    <li class="nav-item"><a class="nav-link ripple" href="/Admin/Company/FeedbackIndex?feedbackid=7"><span>Feedback 7</span></a></li>
-                </ul>
-            </li>
+            @if (currentUser.Role == UserRole.Admin || currentUser.Role == UserRole.SuperAdmin)
+            {
+                <li class="subheader">
+                    <span>FİRMA YÖNETİM</span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link ripple " href="@Url.Action("Update", "Company", new {Id = currentUser.CompanyId})">
+                        <i class="icon s-4 icon-account"></i>
+                        <span>Profil</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link ripple " href="@Url.Action("Index", "User")">
+                        <i class="icon s-4 icon-account-multiple"></i>
+                        <span>Kullanıcılar</span>
+                    </a>
+                </li>
+                /*<li class="nav-item">
+                    <a class="nav-link ripple " href="@Url.Action("Index", "Place")">
+                        <i class="icon s-4 icon-layers"></i>
+                        <span>Şubeler</span>
+                    </a>
+                </li>*/
+            }
+            @if (currentUser.Role == UserRole.SuperAdmin)
+            {
+                <li class="subheader">
+                    <span>SUPER ADMIN</span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link ripple " href="@Url.Action("Index", "Company")">
+                        <i class="icon s-4 icon-store"></i>
+                        <span>Firmalar</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link ripple " href="@Url.Action("Index", "Place")">
+                        <i class="icon s-4 icon-bullseye"></i>
+                        <span>Mekanlar</span>
+                    </a>
+                </li>
+            }
+
         </ul>
     </div>
 </aside>

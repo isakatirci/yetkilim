@@ -16,11 +16,12 @@
                 {
                     <!-- Page title -->
                     <div class="page-title animated fadeInRight">
-                        Görüşleriniz
+                        Görüşleriniz Bizim için Çok Değerli!
                     </div><!-- .page-title -->
 
                     <div class="entry-content feature_forms animated fadeInUp">
-                        <p>Mekanı değerlendirmenizi sağlamak amacıyla hazırlanmış aşağıdaki sorulara cevap veriniz.</p>
+                        <p>Aldığınız hizmetin kalitesini iyileştirmek için var gücümüzle çalışıyoruz. 
+                            Bu değerlendirmenin, en alt sorumludan en üst sorumluya kadar ulaştığını hatırlatmak isteriz.</p>
 
                         <input id="formId" type="hidden" value="@Model.FormId" />
                         @*<div class="fb-render">
@@ -66,6 +67,18 @@
                             <span class="helper-text" data-error="Lütfen seçim yapınız"></span>
                         </div>
 
+                        <div class="home-widget pt-3">
+                            <div class="widget-title">
+                                Masa Kodu
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s12 no-mb no-mt">
+                                    <input type="text" id="deskCode" class="no-mb"  required="required"/>
+                                    <span class="helper-text" data-error="Lütfen giriş yapınız"></span>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="home-widget" id="textarea">
                             <div class="widget-title">
                                 İletmek istedikleriniz
@@ -79,15 +92,19 @@
                             </div>
                         </div>
 
-                        <div class="switch mb-4">
-                            Bilgilerimin firma ile paylaşılmasına <br />
-                            <label>
-                                izin vermiyorum
-                                <input id="chcShare" type="checkbox" checked>
-                                <span class="lever"></span>
-                                izin veriyorum
-                            </label>
-                        </div>
+                        @if (Model.IsLogged)
+                        {
+                            <div class="switch mb-4">
+                                Bilgilerimin firma ile paylaşılmasına <br />
+                                <label>
+                                    izin vermiyorum
+                                    <input id="chcShare" type="checkbox" checked>
+                                    <span class="lever"></span>
+                                    izin veriyorum
+                                </label>
+                            </div>
+                        }
+
 
                         <a id="btnSend" href="#" class="btn orange block">GÖNDER</a>
 
@@ -183,6 +200,20 @@
         margin: 0 0 15px 0;
     }
 
+    input.invalid ~ .helper-text {
+        color: transparent;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        pointer-events: none;
+    }
+
+        input.invalid ~ .helper-text:after {
+            content: attr(data-error);
+            color: #F44336;
+        }
+
     .rateInput.invalid ~ .helper-text {
         color: transparent;
         -webkit-user-select: none;
@@ -243,8 +274,6 @@
             $("#btnSend").click(function(e) {
                 e.preventDefault();
                 
-                $("#btnSend").attr("disabled", true);
-
                 var hasInvalidRate = false;
                 $.each($(".rateInput"), function (idx, rateInput) {
                     var elm = $(rateInput);
@@ -255,30 +284,46 @@
                     }
                 });
 
+                var deskCode = $("#deskCode").val();
+
+                if (!deskCode) {
+                    $("#deskCode").addClass("invalid");
+                    return;
+                }
+
                 if (hasInvalidRate === true)
                     return;
+
+                $("#btnSend").attr("disabled", true);
 
                 //var formValue = JSON.stringify(renderInstance.userData);
                 var formId = $("#formId").val();
                 var description = $("#description").val();
+               
                 //var likeRate = $("#likeRate").val();
+
+                var isShare = false;
+
+                if ($("#chcShare").length > 0)
+                    isShare = $("#chcShare").is(':checked');
 
                 var data = {
                     //FormValue: formValue,
                     BrowserFp: browserFp,
                     FormId: formId,
+                    DeskCode: deskCode,
                     Description: description,
                     EmployeeRate: $("#personelIlgisi").rateYo("rating"),
                     FlavorRate: $("#lezzet").rateYo("rating"),
                     PriceRate: $("#fiyat").rateYo("rating"),
                     CleaningRate: $("#hijyen").rateYo("rating"),
                     AdviseRate: $("#tavsiye").rateYo("rating"),
-                    IsUserShare : $("#chcShare").is(':checked')
+                    IsUserShare: isShare
                     //LikeRate: likeRate
                 }
 
                 $.post('@Url.Action("Feedback")', data, function(data){
-                    alert("Değerlendirmeniz gönderildi!");
+                    alert("Değerlendirmeniz şube müdürümüze ve üstündeki tüm sorumlulara iletildi. \n Geri bildiriminiz için teşekkür ederiz! ");
                     window.location = "/";
 
                 }).fail(function(e, a, b, c) {

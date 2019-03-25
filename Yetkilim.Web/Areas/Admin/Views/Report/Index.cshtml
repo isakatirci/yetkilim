@@ -1,0 +1,230 @@
+﻿@model Report1Model
+@using System.Globalization
+@using Yetkilim.Domain.DTO
+@using Yetkilim.Web.Helpers
+@{
+    var rnd = new Random();
+    var firstDate = DateTime.Today.AddMonths(-3);
+}
+<style>
+    @@media(max-width: 450px) {
+        .nvtooltip {
+            max-width: 40px;
+            white-space: pre-wrap;
+        }
+    }
+</style>
+<div class="doc nvd3-doc page-layout simple full-width">
+
+    <!-- HEADER -->
+    <div class="page-header bg-primary text-auto p-6 row no-gutters align-items-center justify-content-between">
+        @if (Model.Places.Count > 0)
+        {
+            <div class="col-sm-10">
+                <select class="form-control" id="selectPlace">
+                    <option value="0">Hepsi</option>
+                    @foreach (var place in Model.Places ?? Enumerable.Empty<PlaceDTO>())
+                    {
+                        <option value="@place.Id" selected="@(Model.PlaceId == place.Id ? "selected" : null)">@place.Name</option>
+                    }
+                </select>
+            </div>
+        }
+    </div>
+
+    <!-- / HEADER -->
+    <!-- CONTENT -->
+    <div class="page-content p-6">
+        <div class="content container">
+            <div class="row">
+
+                <!-- CONTENT -->
+                <div class="content container">
+
+                    <div class="h5 mb-3">@Model.ReportName</div>
+
+                    <div class="card p-6 mb-12">
+                        <div id="chart1" class='with-3d-shadow with-transitions'>
+                            <svg style="height:500px"> </svg>
+                        </div>
+                    </div>
+                    
+                    <div class="h5 mb-3">@Model.ReportName</div>
+
+                    <div class="card p-6 mb-12">
+                        <div id="chart2" class='with-3d-shadow with-transitions'>
+                            <svg style="height:500px"> </svg>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- / CONTENT -->
+
+            </div>
+        </div>
+    </div>
+    <!-- CONTENT -->
+
+</div>
+<script>
+    var xValues = [];
+    var yValues = [];
+
+
+
+    @foreach (var x in Model.Model1)
+    {
+        @: var item1 = [@x.Key, @x.Value]; xValues.push(item1);
+    }
+
+    @foreach (var y in Model.Model2)
+    {
+        @: var item1 = [@y.Key, @y.Value]; yValues.push(item1);
+    }
+
+    var testdata = [
+        {
+            "key": "Toplam bildirim sayısı",
+            "bar": true,
+            "values": xValues
+        },
+        {
+            "key": "Tavsiye ortalaması",
+            "values": yValues
+        }
+    ].map(function(series) {
+        series.values = series.values.map(function(d) { return { x: d[0], y: d[1] } });
+        return series;
+    });
+    
+    var chart;
+    nv.addGraph(function () {
+        chart = nv.models.linePlusBarChart()
+            .margin({ top: 50, right: 80, bottom: 30, left: 80 })
+            .legendRightAxisHint(' [Sağ Eksen]')
+            .legendLeftAxisHint(' [Sol Eksen]')
+            .color(d3.scale.category10().range());
+
+        chart.xAxis.tickFormat(function (d) {
+            return d3.time.format('%d/%m/%Y')(new Date(d * 1000))
+        }).showMaxMin(false);
+
+        chart.y2Axis.tickFormat(function (d) { return d3.format('.1f')(d) });
+        chart.forceY([0, 5]);
+        chart.bars.forceY([0]).padData(false);
+
+        chart.x2Axis.tickFormat(function (d) {
+            return d3.time.format("%d/%m/%Y")(new Date(d * 1000))
+        }).showMaxMin(false);
+
+        chart.margin({ "left": 25, "right": 25, "top": 40, "bottom": 40 });
+
+        d3.select('#chart1 svg')
+            .datum(testdata)
+            .transition().duration(500).call(chart);
+
+        nv.utils.windowResize(chart.update);
+
+        chart.dispatch.on('stateChange', function (e) { nv.log('New State:', JSON.stringify(e)); });
+        nv.utils.windowResize(chart.update);
+        return chart;
+    });
+
+</script>
+<script>
+
+    var hijyenValues = [];
+    var lezzetValues = [];
+    var fiyatValues = [];
+    var ilgiValues = [];
+
+
+    @foreach (var x in Model.HijyenModel)
+    {
+        @: var item1 = [@x.Key, @x.Value]; hijyenValues.push(item1);
+    }
+
+    @foreach (var y in Model.LezzetModel)
+    {
+        @: var item1 = [@y.Key, @y.Value]; lezzetValues.push(item1);
+    }
+
+    @foreach (var x in Model.FiyatModel)
+    {
+        @: var item1 = [@x.Key, @x.Value]; fiyatValues.push(item1);
+    }
+
+    @foreach (var y in Model.IlgiModel)
+    {
+        @: var item1 = [@y.Key, @y.Value]; ilgiValues.push(item1);
+    }
+
+
+    var testData2 = [
+        {
+            "key": "Hijyen",
+            "values": hijyenValues
+        },
+        {
+            "key": "Lezzet",
+            "values": lezzetValues
+        },
+        {
+            "key": "Fiyat",
+            "values": fiyatValues
+        },
+        {
+            "key": "Personel İlgisi",
+            "values": ilgiValues
+        },
+    ].map(function (series) {
+        series.values = series.values.map(function (d) { return { x: d[0], y: d[1] } });
+        return series;
+    });
+
+
+    /*These lines are all chart setup.  Pick and choose which chart features you want to utilize. */
+    nv.addGraph(function () {
+        var chart = nv.models.lineChart()
+                .margin({ left: 100 })  //Adjust chart margins to give the x-axis some breathing room.
+                .useInteractiveGuideline(true)  //We want nice looking tooltips and a guideline!
+                //.transitionDuration(350)  //how fast do you want the lines to transition?
+                .showLegend(true)       //Show the legend, allowing users to turn on/off line series.
+                .showYAxis(true)        //Show the y-axis
+                .showXAxis(true)        //Show the x-axis
+            ;
+
+        chart.xAxis.tickFormat(function (d) {
+            return d3.time.format('%d/%m/%Y')(new Date(d * 1000))
+        }).showMaxMin(false);
+
+        chart.yAxis     //Chart y-axis settings
+            .axisLabel('Ortalama geri bildirim')
+            .tickFormat(d3.format('.02f'));
+
+        chart.forceY([0, 5]);
+
+        /* Done setting the chart up? Time to render it!*/
+
+        d3.select('#chart2 svg')    //Select the <svg> element you want to render the chart in.
+            .datum(testData2)         //Populate the <svg> element with chart data...
+            .call(chart);          //Finally, render the chart!
+
+        //Update the chart when window resizes.
+        nv.utils.windowResize(function () { chart.update() });
+        return chart;
+    });
+
+
+</script>
+<script>
+    $(document).ready(function () {
+        $("#selectPlace").select2();
+
+        $("#selectPlace").change(function() {
+            window.location = '/admin/report?p=' + $(this).val();
+        });
+    });
+   
+</script>
+@*<script type="text/javascript" src="~/admin/assets/js/components/charts/nvd3.js"></script>*@

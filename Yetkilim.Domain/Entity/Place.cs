@@ -9,22 +9,60 @@ using System.Collections.Generic;
 
 namespace Yetkilim.Domain.Entity
 {
-  public class Place : TrackableEntity<int>
-  {
-    public string Name { get; set; }
+    public class Place : TrackableEntity<int>
+    {
+        public string Name
+        {
+            get;
+            set;
+        }
 
-    public string Address { get; set; }
+        public string Address
+        {
+            get;
+            set;
+        }
 
-    public double? Latitude { get; set; }
+        public double? Latitude
+        {
+            get;
+            set;
+        }
 
-    public double? Longitude { get; set; }
+        public double? Longitude
+        {
+            get;
+            set;
+        }
 
-    public IPoint Location { get; set; }
+        public IPoint Location
+        {
+            get;
+            set;
+        }
 
-    public int CompanyId { get; set; }
+        public bool IsDeleted
+        {
+            get;
+            set;
+        }
 
-    public virtual Company Company { get; set; }
+        public int CompanyId
+        {
+            get;
+            set;
+        }
 
-    public ICollection<Feedback> Feedbacks { get; set; }
-  }
+        public virtual Company Company
+        {
+            get;
+            set;
+        }
+
+        public ICollection<Feedback> Feedbacks
+        {
+            get;
+            set;
+        }
+    }
 }

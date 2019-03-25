@@ -13,22 +13,22 @@ using Yetkilim.Global.Model;
 
 namespace Yetkilim.Business.Services
 {
-  public interface IPlaceService
-  {
-    Task<Result<Place>> AddPlaceAsync(PlaceDTO place);
+    public interface IPlaceService
+    {
+        Task<Result<Place>> AddPlaceAsync(PlaceDTO place);
 
-    Task<Result<List<PlaceDTO>>> GetAllPlaceAsync(PlaceSearchModel searchModel);
+        Task<Result<List<PlaceDTO>>> GetAllPlaceAsync(PlaceSearchModel searchModel);
 
-    Task<Result<PlaceDTO>> GetPlaceAsync(int id);
+        Task<Result<PlaceDTO>> GetPlaceAsync(int id);
 
-    Task<Result<FeedbackFormDTO>> GetCompanyFormAsync(int placeId);
+        Task<Result<FeedbackFormDTO>> GetCompanyFormAsync(int placeId);
 
-    IQueryable<Place> GetPlaceQueryable();
+        IQueryable<Place> GetPlaceQueryable();
 
-    Task<Result> UpdatePlaceAsync(int id, PlaceDTO place);
+        Task<Result> UpdatePlaceAsync(int id, PlaceDTO place);
 
-    Task<Result> DeletePlaceAsync(int id);
+        Task<Result> DeletePlaceAsync(int? companyId, int id);
 
-    Task<Result<int>> GetPlaceCountByCompanyIdAsync(int companyId);
-  }
+        Task<Result<int>> GetPlaceCountByCompanyIdAsync(int? companyId);
+    }
 }

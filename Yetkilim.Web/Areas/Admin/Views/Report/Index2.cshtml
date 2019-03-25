@@ -1,0 +1,103 @@
+﻿@model Report2Model
+@using System.Globalization
+@using Yetkilim.Web.Helpers
+@{
+    var rnd = new Random();
+    var firstDate = DateTime.Today.AddMonths(-3);
+}
+<div class="doc nvd3-doc page-layout simple full-width">
+
+    <!-- HEADER -->
+    <div class="page-header bg-primary text-auto p-6 row no-gutters align-items-center justify-content-between">
+
+    </div>
+
+    <!-- / HEADER -->
+    <!-- CONTENT -->
+    <div class="page-content p-6">
+        <div class="content container">
+            <div class="row">
+
+                <!-- CONTENT -->
+                <div class="content container">
+                    <div class="h5 mb-3">Rakip Analizi (10 Firma)</div>
+
+                    <div class="card p-6 mb-12">
+                        <div id="chart2" class='with-3d-shadow with-transitions'>
+                            <svg style="height:500px"> </svg>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- / CONTENT -->
+
+            </div>
+        </div>
+    </div>
+    <!-- CONTENT -->
+
+</div>
+<script>
+
+    var testData = [];
+
+    @for (var i = 0; i < Model.RakiplerModelList.Count; i++)
+    {
+        var rakip = Model.RakiplerModelList[i];
+        @: var values = [];
+        foreach (var x in rakip.LineReportModel)
+        {
+            @: var item1 = [@x.Key, @x.Value]; values.push(item1);
+        }
+
+        var color = "";
+        var strokeWidth= 1.0;
+        if (i == 0)
+        {
+            color = "#222222";
+            strokeWidth = 3.5;
+        }
+        @: var testItem = {"key": '@Html.Raw(rakip.CompanyName)', "values" : values, "color": '@color', 'strokeWidth': '@strokeWidth.ToString(CultureInfo.InvariantCulture)' }; testData.push(testItem);
+    }
+   
+    var testData2 = testData.map(function (series) {
+        series.values = series.values.map(function (d) { return { x: d[0], y: d[1] } });
+        return series;
+    });
+
+
+    /*These lines are all chart setup.  Pick and choose which chart features you want to utilize. */
+    nv.addGraph(function () {
+        var chart = nv.models.lineChart()
+                .margin({ left: 100 })  //Adjust chart margins to give the x-axis some breathing room.
+                .useInteractiveGuideline(true)  //We want nice looking tooltips and a guideline!
+                //.transitionDuration(350)  //how fast do you want the lines to transition?
+                .showLegend(true)       //Show the legend, allowing users to turn on/off line series.
+                .showYAxis(true)        //Show the y-axis
+                .showXAxis(true)        //Show the x-axis
+            ;
+
+        chart.xAxis.tickFormat(function (d) {
+            return d3.time.format('%d/%m/%Y')(new Date(d * 1000))
+        }).showMaxMin(false);
+
+        chart.yAxis     //Chart y-axis settings
+            .axisLabel('Ortalama geri bildirim')
+            .tickFormat(d3.format('.02f'));
+
+        chart.forceY([0, 5]);
+
+        /* Done setting the chart up? Time to render it!*/
+
+        d3.select('#chart2 svg')    //Select the <svg> element you want to render the chart in.
+            .datum(testData2)         //Populate the <svg> element with chart data...
+            .call(chart);          //Finally, render the chart!
+
+        //Update the chart when window resizes.
+        nv.utils.windowResize(function () { chart.update() });
+        return chart;
+    });
+
+
+</script>
+@*<script type="text/javascript" src="~/admin/assets/js/components/charts/nvd3.js"></script>*@

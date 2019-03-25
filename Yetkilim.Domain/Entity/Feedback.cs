@@ -6,34 +6,102 @@
 
 namespace Yetkilim.Domain.Entity
 {
-  public class Feedback : TrackableEntity<int>
-  {
-    public string Description { get; set; }
+    public class Feedback : TrackableEntity<int>
+    {
+        public string DeskCode
+        {
+            get;
+            set;
+        }
 
-    public int LikeRate { get; set; }
+        public string Description
+        {
+            get;
+            set;
+        }
 
-    public bool IsUserShare { get; set; }
+        public int LikeRate
+        {
+            get;
+            set;
+        }
 
-    public string FormValue { get; set; }
+        public bool IsUserShare
+        {
+            get;
+            set;
+        }
 
-    public string BrowserFp { get; set; }
+        public string FormValue
+        {
+            get;
+            set;
+        }
 
-    public string IpAddress { get; set; }
+        public string BrowserFp
+        {
+            get;
+            set;
+        }
 
-    public int FormId { get; set; }
+        public string IpAddress
+        {
+            get;
+            set;
+        }
 
-    public virtual FeedbackForm Form { get; set; }
+        public bool IsDeleted
+        {
+            get;
+            set;
+        }
 
-    public int? DetailId { get; set; }
+        public int FormId
+        {
+            get;
+            set;
+        }
 
-    public virtual FeedbackDetail Detail { get; set; }
+        public virtual FeedbackForm Form
+        {
+            get;
+            set;
+        }
 
-    public int? UserId { get; set; }
+        public int? DetailId
+        {
+            get;
+            set;
+        }
 
-    public virtual User User { get; set; }
+        public virtual FeedbackDetail Detail
+        {
+            get;
+            set;
+        }
 
-    public int PlaceId { get; set; }
+        public int? UserId
+        {
+            get;
+            set;
+        }
 
-    public virtual Place Place { get; set; }
-  }
+        public virtual User User
+        {
+            get;
+            set;
+        }
+
+        public int PlaceId
+        {
+            get;
+            set;
+        }
+
+        public virtual Place Place
+        {
+            get;
+            set;
+        }
+    }
 }

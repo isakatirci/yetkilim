@@ -6,32 +6,90 @@
 
 namespace Yetkilim.Domain.DTO
 {
-  public class FeedbackDTO : TrackableEntityDTO
-  {
-    public int Id { get; set; }
+    public class FeedbackDTO : TrackableEntityDTO
+    {
+        public int Id
+        {
+            get;
+            set;
+        }
 
-    public int FormId { get; set; }
+        public int FormId
+        {
+            get;
+            set;
+        }
 
-    public int LikeRate { get; set; }
+        public int LikeRate
+        {
+            get;
+            set;
+        }
 
-    public string Description { get; set; }
+        public string DeskCode
+        {
+            get;
+            set;
+        }
 
-    public bool IsUserShare { get; set; }
+        public string Description
+        {
+            get;
+            set;
+        }
 
-    public string FormValue { get; set; }
+        public bool IsUserShare
+        {
+            get;
+            set;
+        }
 
-    public string BrowserFp { get; set; }
+        public string FormValue
+        {
+            get;
+            set;
+        }
 
-    public string IpAddress { get; set; }
+        public string BrowserFp
+        {
+            get;
+            set;
+        }
 
-    public PlaceInfoDTO Place { get; set; }
+        public string IpAddress
+        {
+            get;
+            set;
+        }
 
-    public FeedbackDetailDTO Detail { get; set; }
+        public PlaceInfoDTO Place
+        {
+            get;
+            set;
+        }
 
-    public int? UserId { get; set; }
+        public FeedbackDetailInfoDTO Detail
+        {
+            get;
+            set;
+        }
 
-    public UserInfoDTO User { get; set; }
+        public int? UserId
+        {
+            get;
+            set;
+        }
 
-    public int PlaceId { get; set; }
-  }
+        public UserInfoDTO User
+        {
+            get;
+            set;
+        }
+
+        public int PlaceId
+        {
+            get;
+            set;
+        }
+    }
 }

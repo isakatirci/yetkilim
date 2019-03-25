@@ -1,0 +1,76 @@
+﻿@model MyPromotionsViewModel
+<div class="content-container no-padding-top">
+    <div class="container">
+        <div class="row no-mb">
+            <div class="col s12">
+                <div class="animated fadeInUp">
+                    <!-- Event card -->
+                    <div class="home-widget mt-4">
+                        <div class="widget-title">
+                            Son promosyonlarım
+                        </div>
+                        @if (string.IsNullOrWhiteSpace(Model.FormMessage) == false)
+                        {
+                        <div class="alert @(Model.HasError ? "is-danger":"is-primary") mb-4 x-hidden-focus">
+                            <p class="alert-title"><i class="fa fa-exclamation"></i> Mesaj</p>
+                            <p>@Html.Raw(Model.FormMessage)</p>
+                        </div>
+                        }
+                        <table id="last-feedback-table" class="table dataTable">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <div class="table-header">
+                                            <span class="column-title">Mekan</span>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="table-header">
+                                            <span class="column-title">Promosyon</span>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="table-header">
+                                            <span class="column-title">Geçerlilik Tarihi</span>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="table-header">
+                                            <span class="column-title">Durum</span>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var feedback in Model.Promotions ?? Enumerable.Empty<MyPromotionViewItem>())
+                                {
+                                <tr>
+                                    <td>@feedback.Place</td>
+                                    <td>@feedback.Description</td>
+                                    <td>@feedback.DueDate.ToShortDateString()</td>
+                                    <td>@feedback.Status</td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div><!-- .home-widget -->
+                    <!-- End Event card -->
+                </div><!-- .animated fadeInUp -->
+            </div><!-- .col s12 -->
+        </div><!-- .row -->
+    </div><!-- .container -->
+</div><!-- .content-container -->
+@section Scripts{
+    <script>
+        $('#last-feedback-table').DataTable({
+            //responsive: true,
+            dom: 'rt<"dataTables_footer"ip>',
+            "responsive": true,
+            "scrollX": true,
+            "order": [[3, "asc"]],
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Turkish.json"
+            }
+        });
+    </script>
+}

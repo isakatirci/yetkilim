@@ -1,0 +1,103 @@
+﻿@using System.Globalization
+@using Yetkilim.Domain.DTO
+@model PromotionFormModel
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/locales/bootstrap-datepicker.tr.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.min.css" />
+
+<div class="col-12">
+    <div class="example">
+        <div class="description">
+            <div class="description-text">
+                <h5>Promosyon Bilgileri</h5>
+            </div>
+        </div>
+
+        <div class="source-preview-wrapper">
+            <div class="preview">
+                <div class="preview-elements">
+                    @if (string.IsNullOrWhiteSpace(Model.FormMessage) == false)
+                    {
+                        <div class="alert @(Model.IsSuccess ? "alert-success": "alert-danger") alert-dismissible fade show" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                            @Model.FormMessage
+                            @if (Model.IsSuccess)
+                            {
+                                <a class="alert-link" href="@Url.Action("Index")">Promosyon listesine dön.</a>
+                            }
+                        </div>
+                    }
+                    <div class="container">
+                        <form method="post" enctype="multipart/form-data" action="@ViewData["Action"]">
+                            <div class="form-group row">
+                                <label for="selectPlace" class="col-sm-2 col-form-label">Mekan</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control" id="selectPlace" name="PlaceId">
+                                        @foreach (var place in Model.Places ?? Enumerable.Empty<PlaceDTO>())
+                                        {
+                                            <option value="@place.Id" selected="@(Model.PlaceId == place.Id ? "selected" : null)">@place.Name</option>
+                                        }
+                                    </select>
+                                </div>
+                                <span asp-validation-for="PlaceId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group row">
+                                <label for="selectUser" class="col-sm-2 col-form-label">Kullanıcı</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control" id="selectUser" name="UserId" required="required">
+                                        @foreach (var user in Model.Users ?? Enumerable.Empty<UserDTO>())
+                                        {
+                                            <option value="@user.Id" selected="@(Model.UserId == user.Id ? "selected" : null)">@user.Name - @user.Email</option>
+                                        }
+                                    </select>
+                                </div>
+                                <span asp-validation-for="PlaceId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group row">
+                                <label for="txtFirmName" class="col-sm-2 col-form-label">Mesaj</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control" name="Message" rows="3" required="required">@Model.Message</textarea>
+                                </div>
+                                <span asp-validation-for="Message" class="text-danger"></span>
+                            </div>
+                            <div class="form-group row">
+                                <label for="example-date-input" class="col-sm-2 col-form-label">Son Kullanım Tarihi</label>
+                                <div class="col-sm-10">
+                                    <input class="form-control" type="text" name="DueDateStr" id="example-date-input" autocomplete="off" required="required">
+                                </div>
+                                <span asp-validation-for="DueDateStr" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-sm-10">
+                                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .custom-file-label {
+        padding: inherit !important;
+    }
+</style>
+<script>
+    $(document).ready(function () {  
+        $("#selectPlace").select2();
+        $("#selectUser").select2();
+
+        $('#example-date-input').datepicker({
+            format: "dd/mm/yyyy",
+            language: "tr"
+        }).datepicker("setDate", '@Model.DueDate.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture)');
+    });
+
+</script>

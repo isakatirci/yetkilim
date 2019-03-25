@@ -1,25 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Yetkilim.Business.Services;
 using Yetkilim.Domain.DTO;
-using Yetkilim.Global;
+using Yetkilim.Domain.Enums;
+using Yetkilim.Global.Model;
 using Yetkilim.Web.Areas.Admin.Models;
-using Yetkilim.Web.Models.Ef;
 
 namespace Yetkilim.Web.Areas.Admin.Controllers
 {
     public class ManageController : AdminBaseController
     {
         private readonly ILogger<ManageController> _logger;
+
         private readonly IFeedbackService _feedbackService;
+
         private readonly IPlaceService _placeService;
+
         private readonly IPanelUserService _panelUserService;
 
         public ManageController(ILogger<ManageController> logger, IFeedbackService feedbackService, IPlaceService placeService, IPanelUserService panelUserService)
@@ -30,107 +37,171 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
             _panelUserService = panelUserService;
         }
 
-        public async Task<ViewResult> Index()
+        public async Task<IActionResult> Index()
         {
-            var model = new DashboardViewModel();
-
-            var companyId = 71;
-            int? placeId = null;
-
-            var feedbackSearchModel = new FeedbackSearchModel()
+            try
             {
-                CompanyId = companyId,
-                PlaceId = placeId,
-                Page = 1,
-                PageSize = 10
-            };
-
-
-            var feedbackResult = await _feedbackService.GetAllFeedbackAsync(feedbackSearchModel);
-            if (feedbackResult.IsSuccess)
-            {
-                var feedbacks = feedbackResult.Data;
-
-                model.Feedbacks = feedbacks;
-                model.FeedbackCount = feedbacks.Count;
+                DashboardViewModel model = new DashboardViewModel();
+                int? companyId = base.CurrentUser.CompanyId;
+                int? num = base.CurrentUser.PlaceId;
+                if (base.CurrentUser.Role == UserRole.SuperAdmin)
+                {
+                    companyId = null;
+                    num = null;
+                }
+                CompanyUserSearchModel feedbackSearchModel = new CompanyUserSearchModel
+                {
+                    CompanyId = companyId,
+                    PlaceId = num,
+                    Page = 1,
+                    PageSize = 10
+                };
+                Result<int> feedbackCount = await _feedbackService.GetAllFeedbackCountAsync(companyId, num);
+                Result<List<FeedbackDTO>> result = await _feedbackService.GetAllFeedbackAsync(feedbackSearchModel);
+                if (result.IsSuccess)
+                {
+                    model.Feedbacks = (from o in result.Data
+                                       orderby o.CreatedDate descending
+                                       select o).ToList();
+                    model.FeedbackCount = feedbackCount.Data;
+                }
+                Result<int> result2 = await _placeService.GetPlaceCountByCompanyIdAsync(companyId);
+                if (result2.IsSuccess)
+                {
+                    model.PlaceCount = result2.Data;
+                }
+                ((dynamic)this.ViewBag).CompanyName = base.CurrentUser.CompanyName;
+                return this.View((object)model);
             }
-
-
-            var placeCountResult = await _placeService.GetPlaceCountByCompanyIdAsync(companyId);
-            if (placeCountResult.IsSuccess)
-                model.PlaceCount = placeCountResult.Data;
-
-            return View(model);
+            catch (Exception ex)
+            {
+                LoggerExtensions.LogError(_logger, ex, "Panel Index Error", Array.Empty<object>());
+                return this.RedirectToAction("SignOut");
+            }
         }
 
         [AllowAnonymous]
         public IActionResult Login()
         {
-            var model = new AdminLoginViewModel();
-            return View(model);
+            AdminLoginViewModel adminLoginViewModel = new AdminLoginViewModel();
+            return this.View((object)adminLoginViewModel);
         }
 
         [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Login(AdminLoginViewModel model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (this.ModelState.IsValid)
+            {
+                try
+                {
+                    Result<PanelUserDTO> result = await _panelUserService.GetUserAsync(model.Email, model.Password);
+                    if (!result.IsSuccess)
+                    {
+                        model.FormMessage = "E-Posta ya da Şifre bilgisi yanlış, lütfen bilgilerinizi kontrol edin.";
+                        return this.View((object)model);
+                    }
+                    PanelUserDTO data = result.Data;
+                    List<Claim> claims = new List<Claim>
+                {
+                    new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", data.Id.ToString()),
+                    new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", data.Name),
+                    new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", data.Email),
+                    new Claim("CompanyId", data.CompanyId.ToString()),
+                    new Claim("PlaceId", data.PlaceId.ToString()),
+                    new Claim("CompanyName", data.Company.Name),
+                    new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", data.Role.ToString())
+                };
+                    ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims, "ClaimIdentity"));
+                    await AuthenticationHttpContextExtensions.SignInAsync(this.HttpContext, "AdminAreaCookies", claimsPrincipal);
+                    return this.RedirectToAction("Index", "Manage");
+                }
+                catch (Exception ex)
+                {
+                    LoggerExtensions.LogError(_logger, ex, "Panel Login Error", Array.Empty<object>());
+                    model.FormMessage = "İşleminiz gerçekleştirilemedi.";
+                    return this.View((object)model);
+                }
+            }
+            return this.View((object)model);
+        }
 
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            AdminLoginViewModel model = new AdminLoginViewModel();
             try
             {
-                var userRes = await _panelUserService.GetUserAsync(model.Email, model.Password);
-                if (!userRes.IsSuccess)
+                Result result = await _panelUserService.ForgotPasswordAsync(email);
+                if (!result.IsSuccess)
                 {
-                    model.FormMessage = userRes.FormMessage;
-                    return View(model);
+                    model.FormMessage = result.FormMessage;
+                    return this.Json((object)model);
                 }
-
-                var user = userRes.Data;
-                var demo = false;
-
-                using (yetkilimDBContext db = new yetkilimDBContext())
-                {
-                    var com = db.Companies.FirstOrDefault(x => x.Id == userRes.Data.CompanyId);
-                    if (com != null && string.Equals("Evet", com.Demo, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        demo = true;
-                    }
-                }
-
-
-                var claims = new List<Claim>()
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.Name),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    //new Claim("Demo", demo ? "Evet":"Hayir"),
-                    new Claim(ClaimTypes.Role, user.Role.ToString()),
-                };
-
-                var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
-
-                await HttpContext.SignInAsync(Consts.AdminArea.AuthenticationScheme, claimsPrincipal);
-
-                
-
-
-                return RedirectToAction("Index", "Manage");
+                model.IsSuccessForgot = true;
+                return this.Json((object)model);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Panel Login Error");
+                LoggerExtensions.LogError(_logger, ex, "Panel ForgotPassword Error", Array.Empty<object>());
                 model.FormMessage = "İşleminiz gerçekleştirilemedi.";
-
-                return View(model);
+                return this.Json((object)model);
             }
         }
 
+        [AllowAnonymous]
+        public IActionResult ResetPassword(string code)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+            {
+                return this.RedirectToAction("Login");
+            }
+            AdminUserResetPasswordModel adminUserResetPasswordModel = new AdminUserResetPasswordModel
+            {
+                Code = code
+            };
+            return this.View((object)adminUserResetPasswordModel);
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(AdminUserResetPasswordModel model)
+        {
+            if (this.ModelState.IsValid)
+            {
+                try
+                {
+                    if (model.Password != model.PasswordRe)
+                    {
+                        model.FormMessage = "Şifre ve tekrarı aynı olmalıdır.";
+                        return this.View((object)model);
+                    }
+                    Result result = await _panelUserService.ResetPasswordAsync(model.Code, model.Email, model.Password);
+                    if (!result.IsSuccess)
+                    {
+                        model.FormMessage = result.FormMessage;
+                        return this.View((object)model);
+                    }
+                    model.IsSuccess = true;
+                    model.FormMessage = "Yeni şifreniz ile giriş yapabilirsiniz.";
+                    return this.View((object)model);
+                }
+                catch (Exception ex)
+                {
+                    LoggerExtensions.LogError(_logger, ex, "Panel ResetPassword Error", Array.Empty<object>());
+                    model.FormMessage = "İşleminiz gerçekleştirilemedi.";
+                    return this.View((object)model);
+                }
+            }
+            return this.View((object)model);
+        }
+
         [Route("signout")]
-        //[HttpPost]
         public async Task<IActionResult> SignOut()
         {
-            await HttpContext.SignOutAsync(Consts.AdminArea.AuthenticationScheme);
-            return RedirectToAction("Index", "Home");
+            await AuthenticationHttpContextExtensions.SignOutAsync(this.HttpContext, "AdminAreaCookies");
+            return this.RedirectToAction("Login", "Manage");
         }
     }
 }

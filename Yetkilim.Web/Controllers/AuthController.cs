@@ -1,16 +1,17 @@
-﻿using System;
+﻿// AuthController
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Yetkilim.Business.Services;
 using Yetkilim.Domain.DTO;
-using Yetkilim.Global;
+using Yetkilim.Global.Model;
+using Yetkilim.Web.Controllers;
 using Yetkilim.Web.Models;
 
 namespace Yetkilim.Web.Controllers
@@ -19,6 +20,7 @@ namespace Yetkilim.Web.Controllers
     public class AuthController : BaseController
     {
         private readonly ILogger<AuthController> _logger;
+
         private readonly IUserService _userService;
 
         public AuthController(ILogger<AuthController> logger, IUserService userService)
@@ -30,250 +32,221 @@ namespace Yetkilim.Web.Controllers
         [Route("signin")]
         public IActionResult SignIn(string returnUrl, [FromQuery(Name = "fr")] bool isFeedbackRedirect)
         {
-            var localReturnUrl = Url.IsLocalUrl(returnUrl) ? returnUrl : Url.Action("Index", "Home");
-
-            if (CurrentUser != null)
-                return Redirect(localReturnUrl);
-
-            var model = new LoginViewModel()
+            string text = this.Url.IsLocalUrl(returnUrl) ? returnUrl : UrlHelperExtensions.Action(this.Url, "Index", "Home");
+            if (base.CurrentUser != null)
             {
-                ReturnUrl = localReturnUrl,
+                return this.Redirect(text);
+            }
+            LoginViewModel loginViewModel = new LoginViewModel
+            {
+                ReturnUrl = text,
                 IsFeedbackRedirect = isFeedbackRedirect
             };
-
-            return View(model);
+            return this.View((object)loginViewModel);
         }
 
         [Route("signin")]
         [HttpPost]
         public async Task<IActionResult> SignIn(LoginViewModel model)
         {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            try
+            if (this.ModelState.IsValid)
             {
-                var userRes = await _userService.GetUserAsync(model.Email, model.Password);
-                if (!userRes.IsSuccess)
+                try
                 {
-                    model.FormMessage = userRes.FormMessage;
-                    return View(model);
+                    Result<UserDTO> result = await _userService.GetUserAsync(model.Email, model.Password);
+                    if (!result.IsSuccess)
+                    {
+                        model.FormMessage = result.FormMessage;
+                        return this.View((object)model);
+                    }
+                    UserDTO data = result.Data;
+                    List<Claim> claims = new List<Claim>
+                {
+                    new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", data.Id.ToString()),
+                    new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", data.Name),
+                    new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", data.Email),
+                    new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "Member")
+                };
+                    ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims, "ClaimIdentity"));
+                    AuthenticationProperties val = new AuthenticationProperties();
+                    val.IsPersistent=(true);
+                    val.ExpiresUtc=((DateTimeOffset?)(model.IsRemember ? DateTimeOffset.UtcNow.AddDays(7.0) : DateTimeOffset.UtcNow.AddHours(2.0)));
+                    AuthenticationProperties val2 = val;
+                    await AuthenticationHttpContextExtensions.SignInAsync(this.HttpContext, "Cookies", claimsPrincipal, val2);
+                    if (this.Url.IsLocalUrl(model.ReturnUrl))
+                    {
+                        return this.Redirect(model.ReturnUrl);
+                    }
+                    return this.RedirectToAction("Index", "Home");
                 }
-
-                var user = userRes.Data;
-
-
-                var claims = new List<Claim>()
+                catch (Exception ex)
                 {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.Name),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, Consts.UserRoles.Member)
-                };
-
-                var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims, Consts.Authentication.IdentityType));
-
-                //var authRes = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-                //var claimsPrincipal = new ClaimsPrincipal(authRes.Ticket.Principal.Identity);
-                //claimsPrincipal.AddIdentity(new ClaimsIdentity(claims, Consts.Authentication.IdentityType));
-
-                var authProps = new AuthenticationProperties
-                {
-                    IsPersistent = true,
-                    ExpiresUtc =
-                        model.IsRemember ? DateTimeOffset.UtcNow.AddDays(7) : DateTimeOffset.UtcNow.AddHours(2),
-                };
-
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, authProps);
-
-                if (Url.IsLocalUrl(model.ReturnUrl))
-                    return Redirect(model.ReturnUrl);
-
-                return RedirectToAction("Index", "Home");
+                    LoggerExtensions.LogError(_logger, ex, "SignIn Post Error", Array.Empty<object>());
+                    model.FormMessage = "İşleminiz gerçekleştirilemedi.";
+                    return this.View((object)model);
+                }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "SignIn Post Error");
-                model.FormMessage = "İşleminiz gerçekleştirilemedi.";
-                return View(model);
-            }
+            return this.View((object)model);
         }
 
         [Route("signin/{provider}")]
         public IActionResult SignIn(string provider, string returnUrl = null)
         {
-            return Challenge(
-                new AuthenticationProperties { RedirectUri = Url.Action("ExternalLoginCallback", new { returnUrl }) },
-                provider);
+            //IL_0001: Unknown result type (might be due to invalid IL or missing references)
+            //IL_0006: Unknown result type (might be due to invalid IL or missing references)
+            //IL_0031: Expected O, but got Unknown
+            AuthenticationProperties val = new AuthenticationProperties();
+            val.RedirectUri=(UrlHelperExtensions.Action(this.Url, "ExternalLoginCallback", (object)new
+            {
+                returnUrl
+            }));
+            return this.Challenge(val, new string[1]
+            {
+            provider
+            });
         }
 
         [Route("signup")]
         public IActionResult SignUp()
         {
-            var model = new RegisterViewModel();
-            return View(model);
+            RegisterViewModel registerViewModel = new RegisterViewModel();
+            return this.View((object)registerViewModel);
         }
 
         [Route("signup")]
         [HttpPost]
         public async Task<ViewResult> SignUp(RegisterViewModel model)
         {
-            if (!ModelState.IsValid)
-                return View(model);
-
+            if (!this.ModelState.IsValid)
+            {
+                return this.View((object)model);
+            }
             if (model.Password != model.RePassword)
             {
                 model.FormMessage = "Şifre ve şifre tekrarı aynı olmalıdır.";
-                return View();
+                return this.View();
             }
-
             try
             {
-                var userDto = new UserDTO()
+                UserDTO model2 = new UserDTO
                 {
                     Name = model.FullName,
                     Email = model.Email,
                     Phone = model.Phone,
                     Password = model.Password
                 };
-
-                var userRes = await _userService.AddUserAsync(userDto);
-
-                if (!userRes.IsSuccess)
+                Result<UserDTO> result = await _userService.AddUserAsync(model2);
+                if (!result.IsSuccess)
                 {
-                    model.FormMessage = userRes.FormMessage;
-                    return View(model);
+                    model.FormMessage = result.FormMessage;
+                    return this.View((object)model);
                 }
-
                 model.IsSuccess = true;
                 model.FormMessage = "İşleminiz başarılı bir şekilde gerçekleştirildi.";
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "SignUp Post Error");
-
+                LoggerExtensions.LogError(_logger, ex, "SignUp Post Error", Array.Empty<object>());
                 model.FormMessage = "İşleminiz gerçekleştirilemedi.";
-                return View(model);
+                return this.View((object)model);
             }
-
-            return View(model);
+            return this.View((object)model);
         }
 
-
         [AllowAnonymous]
-        [HttpGet(nameof(ExternalLoginCallback))]
+        [HttpGet("ExternalLoginCallback")]
         public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
         {
-         
-            //Here we can retrieve the claims
-            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            var signInModel = new LoginViewModel()
+            AuthenticateResult result = await AuthenticationHttpContextExtensions.AuthenticateAsync(this.HttpContext, "Cookies");
+            LoginViewModel signInModel = new LoginViewModel
             {
                 ReturnUrl = returnUrl,
                 FormMessage = "İşleminiz gerçekleştirilirken sorun oluştu."
             };
-
-            // read external identity from the temporary cookie
-            if (result?.Succeeded != true)
-                return View("SignIn", signInModel);
-
-            // retrieve claims of the external user
-            var externalUser = result.Principal;
-            if (externalUser == null)
-                return View("SignIn", signInModel);
-
-
-            // retrieve claims of the external user
-            var claims = externalUser.Claims.ToList();
-
-            // try to determine the unique id of the external user - the most common claim type for that are the sub claim and the NameIdentifier
-            // depending on the external provider, some other claim type might be used
-            var userIdClaim = claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
+            AuthenticateResult obj = result;
+            if (obj == null || !obj.Succeeded)
+            {
+                return this.View("SignIn", (object)signInModel);
+            }
+            ClaimsPrincipal principal = result.Principal;
+            if (principal == null)
+            {
+                return this.View("SignIn", (object)signInModel);
+            }
+            List<Claim> source = principal.Claims.ToList();
+            Claim claim = source.FirstOrDefault((Claim x) => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
+            if (claim == null)
             {
                 signInModel.FormMessage = "Kullanıcı bilgilerinize erişelemedi. Yetkilim uygulamasına erişim verdiğinize emin olup tekrar deneyin.";
-                return View("SignIn", signInModel);
+                return this.View("SignIn", (object)signInModel);
             }
-
-            var emailClaim = claims.FirstOrDefault(x => x.Type == ClaimTypes.Email);
-            if (emailClaim == null)
+            string externalProvider = claim.Issuer;
+            Claim emailClaim = null;
+            if (externalProvider == "Facebook")
             {
-                signInModel.FormMessage = "E-Posta bilgilerinize erişelemedi. Yetkilim uygulamasının e-posta adresinize erişimine izin verdiğinize emin olup tekrar deneyin.";
-                return View("SignIn", signInModel);
+                emailClaim = source.FirstOrDefault((Claim x) => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress");
+                if (emailClaim == null)
+                {
+                    signInModel.FormMessage = "E-Posta bilgilerinize erişelemedi. Yetkilim uygulamasının e-posta adresinize erişimine izin verdiğinize emin olup tekrar deneyin.";
+                    return this.View("SignIn", (object)signInModel);
+                }
             }
-
-            var nameClaim = claims.FirstOrDefault(x => x.Type == ClaimTypes.Name);
-
-            var externalUserId = userIdClaim.Value;
-            var externalProvider = userIdClaim.Issuer;
-            var userId = 0;
-
+            Claim nameClaim = source.FirstOrDefault((Claim x) => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name");
+            string externalUserId = claim.Value;
             try
             {
-                var userRes = await _userService.GetExternalUserAsync(externalProvider, externalUserId);
-                if (!userRes.IsSuccess)
+                Result<UserDTO> result2 = await _userService.GetExternalUserAsync(externalProvider, externalUserId);
+                int ıd;
+                if (!result2.IsSuccess)
                 {
-                    if (userRes.ResultCode == "NOT_REGISTERED")
+                    if (!(result2.ResultCode == "NOT_REGISTERED"))
                     {
-                        var userDto = new UserDTO()
-                        {
-                            Name = nameClaim?.Value,
-                            Email = emailClaim.Value
-                        };
-
-                        var registerRes = await _userService.AddExternalUserAsync(externalProvider, externalUserId, userDto);
-                        if (!registerRes.IsSuccess)
-                        {
-                            signInModel.FormMessage = registerRes.FormMessage;
-                            return View("SignIn", signInModel);
-                        }
-
-                        userId = registerRes.Data.Id;
+                        signInModel.FormMessage = result2.FormMessage;
+                        return this.View("SignIn", (object)signInModel);
                     }
-                    else
+                    UserDTO model = new UserDTO
                     {
-                        signInModel.FormMessage = userRes.FormMessage;
-                        return View("SignIn", signInModel);
+                        Name = nameClaim?.Value,
+                        Email = emailClaim?.Value
+                    };
+                    Result<UserDTO> result3 = await _userService.AddExternalUserAsync(externalProvider, externalUserId, model);
+                    if (!result3.IsSuccess)
+                    {
+                        signInModel.FormMessage = result3.FormMessage;
+                        return this.View("SignIn", (object)signInModel);
                     }
+                    ıd = result3.Data.Id;
                 }
                 else
                 {
-                    userId = userRes.Data.Id;
+                    ıd = result2.Data.Id;
                 }
-
-                var extraClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
-                    nameClaim,
-                    new Claim(ClaimTypes.Role, Consts.UserRoles.Member)
-                };
-
-                var claimsPrincipal = new ClaimsPrincipal(result.Ticket.Principal.Identity);
-                claimsPrincipal.AddIdentity(new ClaimsIdentity(extraClaims, Consts.Authentication.IdentityType));
-
-                var props = new AuthenticationProperties { IsPersistent = true };
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, props);
+                List<Claim> claims = new List<Claim>
+            {
+                new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", ıd.ToString()),
+                nameClaim,
+                new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "Member")
+            };
+                ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(result.Ticket.Principal.Identity);
+                claimsPrincipal.AddIdentity(new ClaimsIdentity(claims, "ClaimIdentity"));
+                AuthenticationProperties val = new AuthenticationProperties();
+                val.IsPersistent=(true);
+                await AuthenticationHttpContextExtensions.SignInAsync(this.HttpContext, "Cookies", claimsPrincipal, val);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Facebook Post Error");
-
-                return View("SignIn", signInModel);
+                LoggerExtensions.LogError(_logger, ex, "Facebook Post Error", Array.Empty<object>());
+                return this.View("SignIn", (object)signInModel);
             }
-
-            return LocalRedirect(returnUrl ?? "/");
+            return this.LocalRedirect(returnUrl ?? "/");
         }
 
-
         [Route("signout")]
-        //[HttpPost]
         public async Task<IActionResult> SignOut()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Index", "Home");
+            await AuthenticationHttpContextExtensions.SignOutAsync(this.HttpContext, "Cookies");
+            return this.RedirectToAction("Index", "Home");
         }
     }
 }
+

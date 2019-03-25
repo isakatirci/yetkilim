@@ -1,4 +1,5 @@
-﻿@model MyFeedbacksViewModel
+﻿@using Yetkilim.Domain.DTO
+@model MyFeedbacksViewModel
 <div class="content-container no-padding-top">
     <div class="container">
         <div class="row no-mb">
@@ -24,9 +25,39 @@
                                             <span class="column-title">Mekan</span>
                                         </div>
                                     </th>
+                                    <th class="secondary-text">
+                                        <div class="table-header">
+                                            <span class="column-title">Masa Kodu</span>
+                                        </div>
+                                    </th>
+                                    <th class="secondary-text">
+                                        <div class="table-header">
+                                            <span class="column-title">Personel İlgisi</span>
+                                        </div>
+                                    </th>
+                                    <th class="secondary-text">
+                                        <div class="table-header">
+                                            <span class="column-title">Lezzet</span>
+                                        </div>
+                                    </th>
+                                    <th class="secondary-text">
+                                        <div class="table-header">
+                                            <span class="column-title">Fiyat</span>
+                                        </div>
+                                    </th>
+                                    <th class="secondary-text">
+                                        <div class="table-header">
+                                            <span class="column-title">Hijyen</span>
+                                        </div>
+                                    </th>
+                                    <th class="secondary-text">
+                                        <div class="table-header">
+                                            <span class="column-title">Tavsiye Eder misiniz?</span>
+                                        </div>
+                                    </th>
                                     <th>
                                         <div class="table-header">
-                                            <span class="column-title">Açıklama</span>
+                                            <span class="column-title">İletmek istedikleriniz</span>
                                         </div>
                                     </th>
                                     <th>
@@ -37,13 +68,19 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var feedback in Model.Feedbacks ?? Enumerable.Empty<MyFeedbackViewItem>())
+                                @foreach (var feedback in Model.Feedbacks ?? Enumerable.Empty<FeedbackDetailDTO>())
                                 {
-                                    <tr>
-                                        <td>@feedback.Place</td>
-                                        <td>@feedback.Description</td>
-                                        <td>@feedback.CreatedDate.ToShortDateString()</td>
-                                    </tr>
+                                <tr>
+                                    <td>@feedback.Place</td>
+                                    <td>@feedback.DeskCode</td>
+                                    <td>@feedback.Info.EmployeeRate</td>
+                                    <td>@feedback.Info.FlavorRate</td>
+                                    <td>@feedback.Info.PriceRate</td>
+                                    <td>@feedback.Info.CleaningRate</td>
+                                    <td>@feedback.Info.AdviseRate</td>
+                                    <td>@feedback.Description</td>
+                                    <td>@feedback.CreatedDate.ToShortDateString()</td>
+                                </tr>
                                 }
                             </tbody>
                         </table>

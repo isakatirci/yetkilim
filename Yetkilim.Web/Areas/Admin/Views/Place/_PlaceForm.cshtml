@@ -8,7 +8,6 @@
                 <h5>Mekan Bilgileri</h5>
             </div>
         </div>
-
         <div class="source-preview-wrapper">
             <div class="preview">
                 <div class="preview-elements">
@@ -27,18 +26,23 @@
                     }
                     <div class="container">
                         <form method="post" enctype="multipart/form-data" action="@ViewData["Action"]">
-                            <div class="form-group row">
-                                <label for="selectFirm" class="col-sm-2 col-form-label">Firma</label>
-                                <div class="col-sm-10">
-                                    <select class="form-control" id="selectFirm" name="CompanyId" required="required">
-                                        @foreach (var company in Model.Companies ?? Enumerable.Empty<CompanyInfoDTO>())
-                                        {
-                                            <option id="@company.Id">@company.Name</option>
-                                        }
-                                    </select>
+                            @if (Model.IsSuperAdmin)
+                            {
+                                <div class="form-group row">
+                                    <label for="selectFirm" class="col-sm-2 col-form-label">Firma</label>
+                                    <div class="col-sm-10">
+
+                                        <select class="form-control" id="selectFirm" name="CompanyId" required="required">
+                                            @foreach (var company in Model.Companies ?? Enumerable.Empty<CompanyInfoDTO>())
+                                            {
+                                                <option id="@company.Id">@company.Name</option>
+                                            }
+                                        </select>
+
+                                    </div>
+                                    <span asp-validation-for="CompanyId" class="text-danger"></span>
                                 </div>
-                                <span asp-validation-for="CompanyId" class="text-danger"></span>
-                            </div>
+                            }
                             <div class="form-group row">
                                 <label for="txtFirmName" class="col-sm-2 col-form-label">Mekan Adı</label>
                                 <div class="col-sm-10">
@@ -53,7 +57,6 @@
                                 </div>
                                 <span asp-validation-for="Address" class="text-danger"></span>
                             </div>
-
                             <div class="form-group row">
                                 <label for="txtLat" class="col-sm-2 col-form-label">Koordinat X</label>
                                 <div class="col-sm-10">
@@ -61,7 +64,6 @@
                                 </div>
                                 <span asp-validation-for="Latitude" class="text-danger"></span>
                             </div>
-
                             <div class="form-group row">
                                 <label for="txtLon" class="col-sm-2 col-form-label">Koordinat Y</label>
                                 <div class="col-sm-10">
@@ -69,7 +71,6 @@
                                 </div>
                                 <span asp-validation-for="Longitude" class="text-danger"></span>
                             </div>
-
                             <div class="form-group row">
                                 <div class="col-sm-10">
                                     <button type="submit" class="btn btn-primary">Kaydet</button>
@@ -77,14 +78,13 @@
                             </div>
                         </form>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 <style>
+
     .custom-file-label {
         padding: inherit !important;
     }

@@ -1,239 +1,249 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
+﻿// AccountController
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Yetkilim.Business.Services;
 using Yetkilim.Domain.DTO;
+using Yetkilim.Global.Model;
+using Yetkilim.Web.Controllers;
 using Yetkilim.Web.Models;
 
-namespace Yetkilim.Web.Controllers
+[Authorize]
+public class AccountController : BaseController
 {
-    [Authorize]
-    public class AccountController : BaseController
+    private readonly ILogger<AccountController> _logger;
+
+    private readonly IUserService _userService;
+
+    private readonly IFeedbackService _feedbackService;
+
+    private readonly IPromotionService _promotionService;
+
+    public AccountController(ILogger<AccountController> logger, IUserService userService, IFeedbackService feedbackService, IPromotionService promotionService)
     {
-        private readonly ILogger<AccountController> _logger;
-        private readonly IUserService _userService;
-        private readonly IFeedbackService _feedbackService;
+        _logger = logger;
+        _userService = userService;
+        _feedbackService = feedbackService;
+        _promotionService = promotionService;
+    }
 
-        public AccountController(ILogger<AccountController> logger, IUserService userService, IFeedbackService feedbackService)
+    public async Task<ViewResult> Profile()
+    {
+        ProfileViewModel model = new ProfileViewModel();
+        try
         {
-            _logger = logger;
-            _userService = userService;
-            _feedbackService = feedbackService;
+            int userId = base.CurrentUser.UserId;
+            Result<UserDTO> result = await _userService.GetUserByIdAsync(userId);
+            if (!result.IsSuccess)
+            {
+                model.FormMessage = result.FormMessage;
+                return this.View((object)model);
+            }
+            UserDTO data = result.Data;
+            model.FullName = data.Name;
+            model.IsExternal = data.IsExternal;
+            model.CreatedDate = data.CreatedDate;
+            Result<int> result2 = await _feedbackService.GetFeedbackCountByUserIdAsync(userId);
+            if (result2.IsSuccess)
+            {
+                model.FeedbackCount = result2.Data;
+            }
+            return this.View((object)model);
         }
-        public async Task<ViewResult> Profile()
+        catch (Exception ex)
         {
-            var model = new ProfileViewModel();
+            LoggerExtensions.LogError(_logger, ex, "Profile Edit Error", Array.Empty<object>());
+            model.FormMessage = "İşleminiz gerçekleştirilemedi.";
+            return this.View((object)model);
+        }
+    }
 
+    public async Task<ViewResult> Edit()
+    {
+        ProfileEditViewModel model = new ProfileEditViewModel();
+        try
+        {
+            int userId = base.CurrentUser.UserId;
+            Result<UserDTO> result = await _userService.GetUserByIdAsync(userId);
+            if (!result.IsSuccess)
+            {
+                model.FormMessage = result.FormMessage;
+                return this.View((object)model);
+            }
+            UserDTO data = result.Data;
+            model.FullName = data.Name;
+            model.Email = data.Email;
+            model.Phone = data.Phone;
+            model.IsExternal = data.IsExternal;
+            return this.View((object)model);
+        }
+        catch (Exception ex)
+        {
+            LoggerExtensions.LogError(_logger, ex, "Profile Edit Error", Array.Empty<object>());
+            model.FormMessage = "İşleminiz gerçekleştirilemedi.";
+            return this.View((object)model);
+        }
+    }
+
+    [HttpPost]
+    public async Task<ViewResult> Edit(ProfileEditViewModel model)
+    {
+        if (this.ModelState.IsValid)
+        {
             try
             {
-                var userId = CurrentUser.UserId;
-
-                var userRes = await _userService.GetUserByIdAsync(userId);
-                if (!userRes.IsSuccess)
-                {
-                    model.FormMessage = userRes.FormMessage;
-                    return View(model);
-                }
-                var user = userRes.Data;
-
-                model.FullName = user.Name;
-                model.IsExternal = user.IsExternal;
-                model.CreatedDate = user.CreatedDate;
-
-                var feedbackCountRes = await _feedbackService.GetFeedbackCountByUserIdAsync(userId);
-                if (feedbackCountRes.IsSuccess)
-                    model.FeedbackCount = feedbackCountRes.Data;
-
-
-                return View(model);
-
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Profile Edit Error");
-
-                model.FormMessage = "İşleminiz gerçekleştirilemedi.";
-                return View(model);
-            }
-        }
-
-        public async Task<ViewResult> Edit()
-        {
-            var model = new ProfileEditViewModel();
-
-            try
-            {
-                var userId = CurrentUser.UserId;
-
-                var userRes = await _userService.GetUserByIdAsync(userId);
-                if (!userRes.IsSuccess)
-                {
-                    model.FormMessage = userRes.FormMessage;
-                    return View(model);
-                }
-
-                var user = userRes.Data;
-
-                model.FullName = user.Name;
-                model.Email = user.Email;
-                model.Phone = user.Phone;
-                model.IsExternal = user.IsExternal;
-
-                return View(model);
-
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Profile Edit Error");
-
-                model.FormMessage = "İşleminiz gerçekleştirilemedi.";
-                return View(model);
-            }
-        }
-
-        [HttpPost]
-        public async Task<ViewResult> Edit(ProfileEditViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            try
-            {
-                var userId = CurrentUser.UserId;
-
-                var userDto = new UserDTO()
+                int userId = base.CurrentUser.UserId;
+                UserDTO model2 = new UserDTO
                 {
                     Name = model.FullName,
                     Email = model.Email,
                     Phone = model.Phone,
                     Password = model.Password
                 };
-
-                var userRes = await _userService.UpdateUserAsync(userId, userDto);
-                if (!userRes.IsSuccess)
+                Result result = await _userService.UpdateUserAsync(userId, model2);
+                if (!result.IsSuccess)
                 {
-                    model.FormMessage = userRes.FormMessage;
-                    return View(model);
+                    model.FormMessage = result.FormMessage;
+                    return this.View((object)model);
                 }
-
                 model.IsSuccess = true;
                 model.FormMessage = "İşleminiz başarılı bir şekilde gerçekleştirildi.";
-
-                return View(model);
+                return this.View((object)model);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Profile Edit Post Error");
-
+                LoggerExtensions.LogError(_logger, ex, "Profile Edit Post Error", Array.Empty<object>());
                 model.FormMessage = "İşleminiz gerçekleştirilemedi.";
-                return View(model);
+                return this.View((object)model);
             }
         }
+        return this.View((object)model);
+    }
 
-        public ViewResult ChangePassword()
+    public ViewResult ChangePassword()
+    {
+        ChangePasswordViewModel changePasswordViewModel = new ChangePasswordViewModel();
+        return this.View((object)changePasswordViewModel);
+    }
+
+    [HttpPost]
+    public async Task<ViewResult> ChangePassword(ChangePasswordViewModel model)
+    {
+        if (!this.ModelState.IsValid)
         {
-            var model = new ChangePasswordViewModel();
-            return View(model);
-        }   
-
-        [HttpPost]
-        public async Task<ViewResult> ChangePassword(ChangePasswordViewModel model)
+            return this.View((object)model);
+        }
+        if (!(model.NewPassword != model.NewPasswordRe))
         {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            if (model.NewPassword != model.NewPasswordRe)
-            {
-                model.FormMessage = "Şifre ve şifre tekrarı aynı olmalıdır.";
-                return View(model);
-            }
-
             try
             {
-                var userId = CurrentUser.UserId;
-
-                var userRes =
-                    await _userService.ChangePasswordAsync(userId, model.OldPassword, model.NewPassword);
-
-                if (!userRes.IsSuccess)
+                int userId = base.CurrentUser.UserId;
+                Result result = await _userService.ChangePasswordAsync(userId, model.OldPassword, model.NewPassword);
+                if (!result.IsSuccess)
                 {
-                    model.FormMessage = userRes.FormMessage;
-                    return View(model);
+                    model.FormMessage = result.FormMessage;
+                    return this.View((object)model);
                 }
-
                 model.IsSuccess = true;
                 model.FormMessage = "İşleminiz başarılı bir şekilde gerçekleştirildi.";
-
-                return View(model);
+                return this.View((object)model);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Change Password Post Error");
-
+                LoggerExtensions.LogError(_logger, ex, "Change Password Post Error", Array.Empty<object>());
                 model.FormMessage = "İşleminiz gerçekleştirilemedi.";
-                return View(model);
+                return this.View((object)model);
             }
         }
-        
-        public async Task<ViewResult> MyFeedbacks()
+        model.FormMessage = "Şifre ve şifre tekrarı aynı olmalıdır.";
+        return this.View((object)model);
+    }
+
+    public async Task<ViewResult> MyFeedbacks()
+    {
+        MyFeedbacksViewModel model = new MyFeedbacksViewModel();
+        try
         {
-            var model = new MyFeedbacksViewModel();
-
-            try
+            int userId = base.CurrentUser.UserId;
+            CompanyUserSearchModel val = new CompanyUserSearchModel();
+            ((SearchModel)val).PageSize = 40;
+            val.UserId=(int?)userId;
+            CompanyUserSearchModel val2 = val;
+            Result<List<FeedbackDetailDTO>> result = await _feedbackService.GetAllFeedbackDetailAsync(val2);
+            if (!result.IsSuccess)
             {
-                var userId = CurrentUser.UserId;
-
-                var searchModel = new FeedbackSearchModel()
-                {
-                    PageSize = 40,
-                    UserId = userId
-                };
-                
-                var feedbackRes = await _feedbackService.GetAllFeedbackAsync(searchModel);
-                if (!feedbackRes.IsSuccess)
-                {
-                    model.HasError = true;
-                    model.FormMessage = feedbackRes.FormMessage;
-                    return View(model);
-                }
-
-                var feedbacks = feedbackRes.Data;
-                if (feedbacks == null || !feedbacks.Any())
-                {
-                    model.FormMessage = "Hiç değerlendirme yapmadınız. <a href='/home/search'>Mekan arayıp değerlendirme yapmak için tıklayın.</a>";
-                    return View(model);
-                }
-
-                model.Feedbacks = new List<MyFeedbackViewItem>();
-
-                foreach (var feedback in feedbacks)
-                {
-                    model.Feedbacks.Add(new MyFeedbackViewItem()
-                    {
-                        Place = feedback.Place.Name,
-                        Description = feedback.Description,
-                        CreatedDate = feedback.CreatedDate
-                    });
-                }
-
-                return View(model);
-
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "MyFeedbacks Error");
-
                 model.HasError = true;
-                model.FormMessage = "İşleminiz gerçekleştirilemedi.";
-                return View(model);
+                model.FormMessage = result.FormMessage;
+                return this.View((object)model);
             }
+            List<FeedbackDetailDTO> data = result.Data;
+            if (data == null || !data.Any())
+            {
+                model.FormMessage = "Hiç değerlendirme yapmadınız. <a href='/home/search'>Mekan arayıp değerlendirme yapmak için tıklayın.</a>";
+                return this.View((object)model);
+            }
+            model.Feedbacks = (from o in data
+                               orderby o.CreatedDate descending
+                               select o).ToList();
+            return this.View((object)model);
+        }
+        catch (Exception ex)
+        {
+            LoggerExtensions.LogError(_logger, ex, "MyFeedbacks Error", Array.Empty<object>());
+            model.HasError = true;
+            model.FormMessage = "İşleminiz gerçekleştirilemedi.";
+            return this.View((object)model);
+        }
+    }
+
+    public async Task<ViewResult> MyPromotions()
+    {
+        MyPromotionsViewModel model = new MyPromotionsViewModel();
+        try
+        {
+            int userId = base.CurrentUser.UserId;
+            CompanyUserSearchModel val = new CompanyUserSearchModel();
+            ((SearchModel)val).PageSize = 40;
+            val.UserId = (int?)userId;
+            CompanyUserSearchModel val2 = val;
+            Result<List<PromotionDTO>> result = await _promotionService.GetAllPromotionAsync(val2);
+            if (!result.IsSuccess)
+            {
+                model.HasError = true;
+                model.FormMessage = result.FormMessage;
+                return this.View((object)model);
+            }
+            List<PromotionDTO> data = result.Data;
+            if (data == null || !data.Any())
+            {
+                model.FormMessage = "Hiç promosyonunuz yok :( <br/> Üzülmeyin <a href='/home/search'>Mekan arayıp değerlendirip promosyon kazanmak için tıklayın.</a>";
+                return this.View((object)model);
+            }
+            model.Promotions = new List<MyPromotionViewItem>();
+            foreach (PromotionDTO item in from o in data
+                                          orderby o.Status
+                                          select o)
+            {
+                model.Promotions.Add(new MyPromotionViewItem
+                {
+                    Place = item.Place.Name,
+                    Description = item.Message,
+                    DueDate = item.DueDate,
+                    Status = item.Status
+                });
+            }
+            return this.View((object)model);
+        }
+        catch (Exception ex)
+        {
+            LoggerExtensions.LogError(_logger, ex, "MyPromotions Error", Array.Empty<object>());
+            model.HasError = true;
+            model.FormMessage = "İşleminiz gerçekleştirilemedi.";
+            return this.View((object)model);
         }
     }
 }

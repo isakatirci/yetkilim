@@ -1,74 +1,47 @@
 ﻿<div class="content-container no-padding-top">
-
     <div class="home-widget animated fadeInRight">
-
         <!-- Shop slider -->
         <div class="home-slider shop">
             <div class="item">
-                <!-- Shop slider #1 -->
-                <div class="entry-thumb">
-                    <img src="assets/images/slider3.jpeg" alt="">
-
-                    @*<div class="post-caption">
-                        <div class="title">
-                            Upto 70% discount!
-                        </div>
-                        <p class="desc">
-                            Lorem ipsum dolor sit amet
-                        </p>
-                    </div>*@
-
-                </div>
-            </div><!-- .item #1 -->
-            <div class="item">
                 <!-- Shop slider #2 -->
                 <div class="entry-thumb">
-                    <img src="assets/images/slider2.jpeg" alt="">
-
+                    <img src="assets/images/slider1.jpeg" alt="">
                     @*<div class="post-caption">
-                        <div class="title">
-                            Buy 1 get 1 free
-                        </div>
-                        <p class="desc">
-                            Lorem ipsum dolor sit amet
-                        </p>
-                    </div>*@
-
+                            <div class="title">
+                                Aldığın Hizmeti Değerlendir!
+                            </div>
+                            <p class="desc">
+                                Değerlendirmen anında Yetkili'ye ulaşsın!
+                            </p>
+                        </div>*@
                 </div>
             </div><!-- .item #2 -->
             <div class="item">
                 <!-- Shop slider #3 -->
                 <div class="entry-thumb">
-                    <img src="assets/images/slider1.jpeg" alt="">
-
+                    <img src="assets/images/slider2.jpeg" alt="">
                     @*<div class="post-caption">
-                        <div class="title">
-                            Happy month sale
-                        </div>
-                        <p class="desc">
-                            Lorem ipsum dolor sit amet
-                        </p>
-                    </div>*@
-
+                            <div class="title">
+                                Aldığın Hizmeti Değerlendir!
+                            </div>
+                            <p class="desc">
+                                Değerlendirmen anında Yetkili'ye ulaşsın!
+                            </p>
+                        </div>*@
                 </div>
             </div><!-- .item #3 -->
         </div><!-- .home-slider shop -->
         <!-- End Shop slider -->
-
     </div><!--.home-widget animated fadeInRight -->
-
     <div class="container">
         <div class="row no-mb">
             <div class="col s12">
-
                 <div class="animated fadeInUp">
-
                     <!-- Categories -->
                     <div class="home-widget">
                         <div class="widget-title">
                             Hadi başla!
                         </div>
-
                         <div class="row shop-category">
                             <div class="col s4 m3 l2">
                                 <a href="@Url.Action("Search", "Home")" class="icon">
@@ -95,17 +68,36 @@
                                 </div>
                             </div>
                         </div>
-
                     </div><!-- .home-widget -->
                     <!-- End Categories -->
                 </div><!-- .animated fadeInUp -->
-
             </div><!-- .col s12 -->
         </div><!-- .row -->
     </div><!-- .container -->
-
 </div><!-- .content-container -->
+@section Styles{
+    <style>
+        @@media only screen and (min-width: 601px) and (max-width: 1024px) {
+            .entry-thumb img {
+                max-height: 455px;
+                margin: -62px 0 0 0px;
+            }
+        }
 
+        @@media only screen and (min-width: 1025px) {
+            .home-widget {
+                max-width: 1000px;
+                margin: auto;
+            }
+            .entry-thumb img {
+                max-height: 600px;
+                margin: 0 0 0 0px;
+            }
+        }
+    </style>
+
+
+}
 @section Scripts{
-   
+
 }

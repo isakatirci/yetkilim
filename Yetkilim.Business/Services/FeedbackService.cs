@@ -18,6 +18,7 @@ using Yetkilim.Domain.Entity;
 using Yetkilim.Global.Context;
 using Yetkilim.Global.Model;
 using Yetkilim.Infrastructure.Data.UnitOfWork;
+using Yetkilim.Infrastructure.Email;
 
 namespace Yetkilim.Business.Services
 {
@@ -25,40 +26,47 @@ namespace Yetkilim.Business.Services
     {
         private readonly IYetkilimUnitOfWork _unitOfWork;
 
-        public FeedbackService(IYetkilimUnitOfWork unitOfWork, IGlobalContext globalContext)
+        private readonly IEmailSender _emailSender;
+
+        public FeedbackService(IYetkilimUnitOfWork unitOfWork, IGlobalContext globalContext, IEmailSender emailSender)
             : base(globalContext)
         {
             _unitOfWork = unitOfWork;
+            _emailSender = emailSender;
         }
 
         public async Task<Result<FeedbackDTO>> AddFeedbackAsync(FeedbackDTO feedback)
         {
-            Feedback item = Mapper.Map<FeedbackDTO, Feedback>(feedback);
-            Feedback res = await _unitOfWork.EntityRepository<Feedback>().CreateAsync(item);
+            Feedback entity = Mapper.Map<FeedbackDTO, Feedback>(feedback);
+            Feedback res = await _unitOfWork.EntityRepository<Feedback>().CreateAsync(entity);
             await _unitOfWork.SaveChangesAsync();
-            FeedbackDTO mapItem = Mapper.Map<Feedback, FeedbackDTO>(res);
-            return Result.Data(mapItem);
+            Place place = await _unitOfWork.EntityRepository<Place>().GetFirstAsync((Place w) => w.Id == feedback.PlaceId, null);
+            string[] toAddresses = (from s in _unitOfWork.EntityRepository<PanelUser>().GetQueryable((PanelUser w) => ((int)w.Role == 3 && (object)w.PlaceId == (object)(int?)place.Id) || ((int)w.Role == 2 && w.CompanyId == place.CompanyId), null).ToList()
+                                    select s.Email).Distinct().ToArray();
+            await _emailSender.Send(toAddresses, "Firmanıza geri bildirimde bulunuldu!", place.Name + " mekanınızda bir geri bildirim iletildi. <br/> Masa Kodu: " + feedback.DeskCode + " Mesaj : " + feedback.Description);
+            return Result.Data(Mapper.Map<Feedback, FeedbackDTO>(res));
         }
 
-        public async Task<Result<List<FeedbackDTO>>> GetAllFeedbackAsync(FeedbackSearchModel searchModel)
+        public async Task<Result<List<FeedbackDTO>>> GetAllFeedbackAsync(CompanyUserSearchModel searchModel)
         {
             searchModel.FixPageDefinations();
-            int companyId = searchModel.CompanyId;
+            int? companyId = searchModel.CompanyId;
             int? placeId = searchModel.PlaceId;
             int? userId = searchModel.UserId;
-            IQueryable<Feedback> query = _unitOfWork.EntityRepository<Feedback>().GetQueryable((Feedback w) => (placeId.HasValue && (object)(int?)w.PlaceId == (object)placeId) || (userId.HasValue && (object)w.UserId == (object)userId) || w.Place.CompanyId == companyId, null);
+            IQueryable<Feedback> source = _unitOfWork.EntityRepository<Feedback>().GetQueryable((Feedback w) => w.IsDeleted == false && ((object)placeId == null || (object)(int?)w.PlaceId == (object)placeId) && ((object)userId == null || (object)w.UserId == (object)userId) && ((object)companyId == null || (object)(int?)w.Place.CompanyId == (object)companyId), null);
             if (!string.IsNullOrEmpty(searchModel.SearchText))
             {
-                query = from w in query
-                        where w.Description.Contains(searchModel.SearchText)
-                        select w;
+                source = from w in source
+                         where w.Description.Contains(searchModel.SearchText)
+                         select w;
             }
-            return Result.Data(await EntityFrameworkQueryableExtensions.ToListAsync<FeedbackDTO>(from s in (from o in query
-                                                                                                            orderby o.Id
+            return Result.Data(await EntityFrameworkQueryableExtensions.ToListAsync<FeedbackDTO>(from s in (from o in source
+                                                                                                            orderby o.Id descending
                                                                                                             select o).Skip(searchModel.PageSize * searchModel.PageIndex).Take(searchModel.PageSize)
                                                                                                  select new FeedbackDTO
                                                                                                  {
                                                                                                      Id = s.Id,
+                                                                                                     DeskCode = s.DeskCode,
                                                                                                      Description = s.Description,
                                                                                                      CreatedDate = s.CreatedDate,
                                                                                                      CreatedBy = s.CreatedBy,
@@ -77,9 +85,58 @@ namespace Yetkilim.Business.Services
                                                                                                  }, default(CancellationToken)));
         }
 
+        public async Task<Result<List<FeedbackDetailDTO>>> GetAllFeedbackDetailAsync(CompanyUserSearchModel searchModel)
+        {
+            searchModel.FixPageDefinations();
+            int? companyId = searchModel.CompanyId;
+            int? placeId = searchModel.PlaceId;
+            int? userId = searchModel.UserId;
+            IQueryable<Feedback> source = _unitOfWork.EntityRepository<Feedback>().GetQueryable((Feedback w) => w.IsDeleted == false && ((object)placeId == null || (object)(int?)w.PlaceId == (object)placeId) && ((object)userId == null || (object)w.UserId == (object)userId) && ((object)companyId == null || (object)(int?)w.Place.CompanyId == (object)companyId), null);
+            if (!string.IsNullOrEmpty(searchModel.SearchText))
+            {
+                source = from w in source
+                         where w.Description.Contains(searchModel.SearchText)
+                         select w;
+            }
+            return Result.Data(await EntityFrameworkQueryableExtensions.ToListAsync<FeedbackDetailDTO>(from s in (from o in source
+                                                                                                                  orderby o.Id
+                                                                                                                  select o).Skip(searchModel.PageSize * searchModel.PageIndex).Take(searchModel.PageSize)
+                                                                                                       select new FeedbackDetailDTO
+                                                                                                       {
+                                                                                                           Id = s.Id,
+                                                                                                           DeskCode = s.DeskCode,
+                                                                                                           Description = s.Description,
+                                                                                                           CreatedDate = s.CreatedDate,
+                                                                                                           PlcId = s.PlaceId,
+                                                                                                           Place = s.Place.Name,
+                                                                                                           Info = (s.DetailId.HasValue ? new FeedbackDetailInfoDTO
+                                                                                                           {
+                                                                                                               EmployeeRate = s.Detail.EmployeeRate,
+                                                                                                               FlavorRate = s.Detail.FlavorRate,
+                                                                                                               PriceRate = s.Detail.PriceRate,
+                                                                                                               CleaningRate = s.Detail.CleaningRate,
+                                                                                                               AdviseRate = s.Detail.AdviseRate
+                                                                                                           } : null),
+                                                                                                           User = (s.UserId.HasValue ? new UserDTO
+                                                                                                           {
+                                                                                                               Id = s.User.Id,
+                                                                                                               Name = s.User.Name,
+                                                                                                               Email = s.User.Email,
+                                                                                                               Phone = s.User.Phone
+                                                                                                           } : null),
+                                                                                                           IsUserShare = s.IsUserShare,
+                                                                                                           IsAnon = (s.UserId.HasValue == false)
+                                                                                                       }, default(CancellationToken)));
+        }
+
         public async Task<Result<int>> GetFeedbackCountByUserIdAsync(int userId)
         {
-            return Result.Data(await _unitOfWork.EntityRepository<Feedback>().GetCountAsync((Feedback w) => (object)w.UserId == (object)(int?)userId));
+            return Result.Data(await _unitOfWork.EntityRepository<Feedback>().GetCountAsync((Feedback w) => w.IsDeleted == false && (object)w.UserId == (object)(int?)userId));
+        }
+
+        public async Task<Result<int>> GetAllFeedbackCountAsync(int? companyId, int? placeId)
+        {
+            return Result.Data(await _unitOfWork.EntityRepository<Feedback>().GetCountAsync((Feedback w) => w.IsDeleted == false && ((object)placeId == null || (object)(int?)w.PlaceId == (object)placeId) && ((object)companyId == null || (object)(int?)w.Place.CompanyId == (object)companyId)));
         }
     }
 }

@@ -1,308 +1,286 @@
-﻿using System;
+// CompanyController
+using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Yetkilim.Business.Services;
 using Yetkilim.Domain.DTO;
 using Yetkilim.Domain.Entity;
-using Yetkilim.Global;
+using Yetkilim.Domain.Enums;
 using Yetkilim.Global.Model;
+using Yetkilim.Web.Areas.Admin.Controllers;
 using Yetkilim.Web.Areas.Admin.Models;
 using Yetkilim.Web.Helpers;
 using Yetkilim.Web.Models;
-using Yetkilim.Web.Models.Ef;
 
 namespace Yetkilim.Web.Areas.Admin.Controllers
 {
+
+
     public class CompanyController : AdminBaseController
     {
         private readonly ICompanyService _companyService;
-        private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly ILogger<CompanyController> _logger;
-        Dictionary<int, string> _companyTypes = new Dictionary<int, string>() {
-           {1,"Cafe" },
-           {2, "Restoran"},
-           {3, "Otel"},
-           {4, "Güzellik Salonu"},
-           {5, "Benzin İstasyonu"},
-           {6, "Kuaför"},
-           {7, "Seyahat Şirketi"},
-           {8, "Hastane"},
-           {9, "Mağaza"},
-           {10, "Market"},
-           {11, "Event"}
-        };
 
-        public CompanyController(ILogger<CompanyController> logger, IHostingEnvironment hostingEnvironment,
-            ICompanyService companyService)
+        private readonly IHostingEnvironment _hostingEnvironment;
+
+        private readonly ILogger<CompanyController> _logger;
+
+        public CompanyController(ILogger<CompanyController> logger, IHostingEnvironment hostingEnvironment, ICompanyService companyService)
         {
             _logger = logger;
             _companyService = companyService;
             _hostingEnvironment = hostingEnvironment;
         }
 
+        [Authorize(AuthenticationSchemes = "AdminAreaCookies", Roles = "SuperAdmin")]
         public IActionResult Index()
         {
-            return View();
+            return this.View();
         }
 
         [HttpPost]
         public IActionResult LoadCompanyData()
         {
+            //IL_0016: Unknown result type (might be due to invalid IL or missing references)
+            //IL_001b: Unknown result type (might be due to invalid IL or missing references)
+            //IL_002c: Unknown result type (might be due to invalid IL or missing references)
+            //IL_004c: Unknown result type (might be due to invalid IL or missing references)
+            //IL_006c: Unknown result type (might be due to invalid IL or missing references)
+            //IL_009d: Unknown result type (might be due to invalid IL or missing references)
+            //IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+            //IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+            //IL_00f9: Unknown result type (might be due to invalid IL or missing references)
             try
             {
-                var x = Request.Form["draw"];
-                var draw = Request.Form["draw"].FirstOrDefault();
-
-                // Skip number of Rows count  
-                var start = Request.Form["start"].FirstOrDefault();
-
-                // Paging Length 10,20  
-                var length = Request.Form["length"].FirstOrDefault();
-
-                // Sort Column Name  
-                var sortColumn = Request
-                    .Form["columns[" + Request.Form["order[0][column]"].FirstOrDefault() + "][name]"].FirstOrDefault();
-
-                // Sort Column Direction (asc, desc)  
-                var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();
-
-                // Search Value from (Search box)  
-                var searchValue = Request.Form["search[value]"].FirstOrDefault();
-
-                //Paging Size (10, 20, 50,100)  
-                var pageSize = length != null ? Convert.ToInt32(length) : 0;
-
-                var skip = start != null ? Convert.ToInt32(start) : 0;
-
-                var recordsTotal = 0;
-
-                // getting all Customer data  
-                var customerData = _companyService.GetCompanyQueryable();
-                //Sorting  
-                if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
-                    customerData = customerData.OrderBy(sortColumn + " " + sortColumnDirection);
-                //Search  
+                StringValues val = this.Request.Form["draw"];
+                string draw = ((IEnumerable<string>)(object)this.Request.Form["draw"]).FirstOrDefault();
+                string text = ((IEnumerable<string>)(object)this.Request.Form["start"]).FirstOrDefault();
+                string text2 = ((IEnumerable<string>)(object)this.Request.Form["length"]).FirstOrDefault();
+                string text3 = ((IEnumerable<string>)(object)this.Request.Form["columns[" + ((IEnumerable<string>)(object)this.Request.Form["order[0][column]"]).FirstOrDefault() + "][name]"]).FirstOrDefault();
+                string text4 = ((IEnumerable<string>)(object)this.Request.Form["order[0][dir]"]).FirstOrDefault();
+                string searchValue = ((IEnumerable<string>)(object)this.Request.Form["search[value]"]).FirstOrDefault();
+                int count = (text2 != null) ? Convert.ToInt32(text2) : 0;
+                int count2 = (text != null) ? Convert.ToInt32(text) : 0;
+                int num = 0;
+                IQueryable<Company> queryable = _companyService.GetCompanyQueryable();
+                if (!string.IsNullOrEmpty(text3) || !string.IsNullOrEmpty(text4))
+                {
+                    queryable = DynamicQueryableExtensions.OrderBy<Company>(queryable, text3 + " " + text4, Array.Empty<object>());
+                }
                 if (!string.IsNullOrEmpty(searchValue))
-                    customerData = customerData.Where(m => m.Name.Contains(searchValue));
-
-                //total number of rows counts   
-                recordsTotal = customerData.Count();
-                //Paging   
-                var items = customerData.Skip(skip).Take(pageSize).ToList();
-
-
-
-                var data = items.Select(a => new { a.Id, a.Name, a.Address, a.CreatedDate
-
-                    , Demo = string.Equals(a.Demo, "Evet", StringComparison.InvariantCultureIgnoreCase) ? "Evet" : "Hayır"
-                    , CompanyTypeName = _companyTypes.ContainsKey(a.CompanyTypeId) ? _companyTypes[a.CompanyTypeId] : "Diğer"
-
-                }).ToList();             
-
-
-                //Returning Json Data  
-                return Json(new {draw, recordsFiltered = recordsTotal, recordsTotal, data });
+                {
+                    queryable = from m in queryable
+                                where m.Name.Contains(searchValue)
+                                select m;
+                }
+                num = queryable.Count();
+                List<Company> data = queryable.Skip(count2).Take(count).ToList();
+                return this.Json((object)new
+                {
+                    draw = draw,
+                    recordsFiltered = num,
+                    recordsTotal = num,
+                    data = data
+                });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                var X = 5;
+                int num2 = 5;
                 throw;
             }
         }
 
+        [Authorize(AuthenticationSchemes = "AdminAreaCookies", Roles = "SuperAdmin")]
         public IActionResult Create()
         {
-            var model = new CompanyFormModel();
-            return View(model);
+            CompanyFormModel companyFormModel = new CompanyFormModel();
+            return this.View((object)companyFormModel);
         }
-
-
-        //       var list = new List<Tuple<string, string>> {
-        //                Tuple.Create
-        //                Tuple.Create
-        //                Tuple.Create
-        //                Tuple.Create
-        //                Tuple.Create
-        //                Tuple.Create
-        //                Tuple.Create
-        //                Tuple.Create
-        //                Tuple.Create
-        //                Tuple.Create
-        //                Tuple.Create
-        //            };
 
         [HttpPost]
         public async Task<IActionResult> Create(CompanyFormModel model)
         {
-            if (!ModelState.IsValid) return View(model);
-
-            try
+            if (this.ModelState.IsValid)
             {
-                var logoFile = model.LogoFile;
-                string uniqueFileName = null;
-                if (logoFile != null && logoFile.Length > 0)
+                try
                 {
-                    uniqueFileName = FileHelper.GetUniqueFileName(logoFile.FileName);
-                    var uploadDirectory =
-                        Path.Combine(_hostingEnvironment.WebRootPath, Consts.UploadFolders.AdminBaseFolder);
-                    var filePath = Path.Combine(uploadDirectory, uniqueFileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    if (string.IsNullOrWhiteSpace(model.ManagerName) || string.IsNullOrWhiteSpace(model.ManagerEmail))
                     {
-                        await logoFile.CopyToAsync(stream);
+                        model.IsSuccess = false;
+                        model.FormMessage = "Firma yetkilisi bilgileri girilmelidir.";
+                        return this.View((object)model);
                     }
-                }
-
-                var company = Mapper.Map<CompanyFormModel, CompanyDetailDTO>(model);
-                company.Image = uniqueFileName;
-
-
-                // TODO: şimdilik
-                //company.CompanyTypeId = 1;
-
-                if (!string.Equals(company.Demo,"Evet",StringComparison.InvariantCultureIgnoreCase))
-                {
-                    var managerUser = new PanelUserDTO()
+                    IFormFile logoFile = model.LogoFile;
+                    string uniqueFileName = null;
+                    if (logoFile != null && logoFile.Length > 0)
+                    {
+                        uniqueFileName = FileHelper.GetUniqueFileName(logoFile.FileName);
+                        if (string.IsNullOrWhiteSpace(_hostingEnvironment.WebRootPath))
+                        {
+                            _hostingEnvironment.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                        }
+                        string path = Path.Combine(_hostingEnvironment.WebRootPath, "admin/uploads");
+                        string path2 = Path.Combine(path, uniqueFileName);
+                        using (FileStream stream = new FileStream(path2, FileMode.Create))
+                        {
+                            await logoFile.CopyToAsync((Stream)stream, default(CancellationToken));
+                        }
+                    }
+                    CompanyDetailDTO companyDetailDTO = Mapper.Map<CompanyFormModel, CompanyDetailDTO>(model);
+                    companyDetailDTO.Image = uniqueFileName;
+                    PanelUserDTO manager = new PanelUserDTO
                     {
                         Email = model.ManagerEmail,
                         Name = model.ManagerName,
                         Surname = model.ManagerSurname
                     };
-                    var result = await _companyService.AddCompanyAsync(company, managerUser);
+                    Result<CompanyDetailDTO> result = await _companyService.AddCompanyAsync(companyDetailDTO, manager);
                     model.FormMessage = result.FormMessage;
                     model.IsSuccess = result.IsSuccess;
+                    if (model.IsSuccess)
+                    {
+                        model.FormMessage = "İşleminiz başarılı bir şekilde gerçekleştirildi.";
+                    }
+                    return this.View((object)model);
                 }
-              
-
-                if (model.IsSuccess)
-                    model.FormMessage = "İşleminiz başarılı bir şekilde gerçekleştirildi.";
-
-                return View(model);
+                catch (Exception ex)
+                {
+                    LoggerExtensions.LogError(_logger, ex, "Create Error", Array.Empty<object>());
+                    model.IsSuccess = false;
+                    model.FormMessage = "İşleminiz gerçekleştirilemedi.";
+                    return this.View((object)model);
+                }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Create Error");
-                model.IsSuccess = false;
-                model.FormMessage = "İşleminiz gerçekleştirilemedi.";
-
-                return View(model);
-            }
+            return this.View((object)model);
         }
 
-        public async Task<ViewResult> Update(int id)
+        [Authorize(AuthenticationSchemes = "AdminAreaCookies", Roles = "SuperAdmin,Admin")]
+        public async Task<IActionResult> Update(int id)
         {
-            var model = new CompanyFormModel();
-            try
+            if (base.CurrentUser.Role != UserRole.Dealer && (base.CurrentUser.Role != UserRole.Admin || base.CurrentUser.CompanyId == id))
             {
-                var result = await _companyService.GetCompanyAsync(id);
-                if (result.IsSuccess)
-                    model = Mapper.Map<CompanyDetailDTO, CompanyFormModel>(result.Data);
-                else
-                    model.FormMessage = result.FormMessage;
-
-                return View(model);
+                CompanyFormModel model = new CompanyFormModel();
+                try
+                {
+                    Result<CompanyDetailDTO> result = await _companyService.GetCompanyAsync(id);
+                    if (result.IsSuccess)
+                    {
+                        model = Mapper.Map<CompanyDetailDTO, CompanyFormModel>(result.Data);
+                    }
+                    else
+                    {
+                        model.FormMessage = result.FormMessage;
+                    }
+                    model.IsUpdate = true;
+                    return this.View((object)model);
+                }
+                catch (Exception ex)
+                {
+                    LoggerExtensions.LogError(_logger, ex, "GET Update Error {0}", new object[1]
+                    {
+                    id
+                    });
+                    model.FormMessage = "İşleminiz gerçekleştirilemedi.";
+                    return this.View((object)model);
+                }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "GET Update Error {0}", id);
-                model.FormMessage = "İşleminiz gerçekleştirilemedi.";
-
-                return View(model);
-            }
+            return this.RedirectToAction("Index", "Manage");
         }
 
         [HttpPost]
-        public async Task<ViewResult> Update(int id, CompanyFormModel model)
+        [Authorize(AuthenticationSchemes = "AdminAreaCookies", Roles = "SuperAdmin,Admin")]
+        public async Task<IActionResult> Update(int id, CompanyFormModel model)
         {
-            if (!ModelState.IsValid) return View(model);
-
-            try
+            if (base.CurrentUser.Role != UserRole.SuperAdmin && base.CurrentUser.CompanyId != id)
             {
-                var company = Mapper.Map<CompanyFormModel, CompanyDetailDTO>(model);
-                // TODO: şimdilik
-                company.CompanyTypeId = 1;
-
-                var logoFile = model.LogoFile;
-                if (logoFile != null)
+                return this.RedirectToAction("Index", "Manage");
+            }
+            model.IsUpdate = true;
+            if (this.ModelState.IsValid)
+            {
+                try
                 {
-                    var uniqueFileName = FileHelper.GetUniqueFileName(logoFile.FileName);
-                    var uploadDirectory = Path.Combine(_hostingEnvironment.WebRootPath,
-                        Consts.UploadFolders.AdminBaseFolder);
-                    var filePath = Path.Combine(uploadDirectory, uniqueFileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    CompanyDetailDTO company = Mapper.Map<CompanyFormModel, CompanyDetailDTO>(model);
+                    IFormFile logoFile = model.LogoFile;
+                    if (logoFile != null)
                     {
-                        await logoFile.CopyToAsync(stream);
+                        string uniqueFileName = FileHelper.GetUniqueFileName(logoFile.FileName);
+                        if (string.IsNullOrWhiteSpace(_hostingEnvironment.WebRootPath))
+                        {
+                            _hostingEnvironment.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                        }
+                        string path = Path.Combine(_hostingEnvironment.WebRootPath, "admin/uploads");
+                        string path2 = Path.Combine(path, uniqueFileName);
+                        using (FileStream stream = new FileStream(path2, FileMode.Create))
+                        {
+                            await logoFile.CopyToAsync((Stream)stream, default(CancellationToken));
+                        }
+                        company.Image = uniqueFileName;
+                        model.Image = uniqueFileName;
                     }
-
-                    company.Image = uniqueFileName;
-                    model.Image = uniqueFileName;
+                    Result result = await _companyService.UpdateCompanyAsync(id, company);
+                    model.FormMessage = result.FormMessage;
+                    model.IsSuccess = result.IsSuccess;
+                    if (model.IsSuccess)
+                    {
+                        model.FormMessage = "İşleminiz başarılı bir şekilde gerçekleştirildi.";
+                    }
+                    return this.View((object)model);
                 }
-
-
-                //if (!string.Equals(company.Demo, "Evet", StringComparison.InvariantCultureIgnoreCase))
-                //{
-                //    var managerUser = new PanelUserDTO()
-                //    {
-                //        Email = model.ManagerEmail,
-                //        Name = model.ManagerName,
-                //        Surname = model.ManagerSurname
-                //    };
-                //    var result = await _companyService.AddCompanyAsync(company, managerUser);
-                //    model.FormMessage = result.FormMessage;
-                //    model.IsSuccess = result.IsSuccess;
-                //}
-
-
-                var result = await _companyService.UpdateCompanyAsync(id, company);
-
-
-              
-
-
-                model.FormMessage = result.FormMessage;
-                model.IsSuccess = result.IsSuccess;
-                if (model.IsSuccess)
-                    model.FormMessage = "İşleminiz başarılı bir şekilde gerçekleştirildi.";
-
-                return View(model);
+                catch (Exception ex)
+                {
+                    LoggerExtensions.LogError(_logger, ex, "POST Update Error {0}", new object[1]
+                    {
+                    id
+                    });
+                    model.FormMessage = "İşleminiz gerçekleştirilemedi.";
+                    return this.View((object)model);
+                }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "POST Update Error {0}", id);
-                model.FormMessage = "İşleminiz gerçekleştirilemedi.";
-
-                return View(model);
-            }
+            return this.View((object)model);
         }
 
+        [Authorize(AuthenticationSchemes = "AdminAreaCookies", Roles = "SuperAdmin")]
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                var result = await _companyService.DeleteCompanyAsync(id);
-
+                Result result = await _companyService.DeleteCompanyAsync(id);
                 if (result.IsSuccess)
-                    return Json(new {result.IsSuccess});
-
-                return Json(new { result.IsSuccess , result.FormMessage});
+                {
+                    return this.Json((object)new
+                    {
+                        result.IsSuccess
+                    });
+                }
+                return this.Json((object)new
+                {
+                    result.IsSuccess,
+                    result.FormMessage
+                });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "POST Delete Error {0}", id);
-
-                return Json(new {IsSuccess = false, FormMessage = "İşleminiz gerçekleştirilemedi"});
+                LoggerExtensions.LogError(_logger, ex, "POST Delete Error {0}", new object[1]
+                {
+                id
+                });
+                return this.Json((object)new
+                {
+                    IsSuccess = false,
+                    FormMessage = "İşleminiz gerçekleştirilemedi"
+                });
             }
         }
 
@@ -311,101 +289,19 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
         {
             try
             {
-                var res = await _companyService.GetAllCompanyAsync(quickSearchModel.ToSearchModel());
-                return Json(new {items = res.Data});
+                return this.Json((object)new
+                {
+                    items = (await _companyService.GetAllCompanyAsync(quickSearchModel.ToSearchModel())).Data
+                });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "QuickSearchCompany {0}", quickSearchModel);
-
-                var res = Result.Fail("İşleminiz gerçekleştirilemedi!", ex);
-                return Json(res);
+                LoggerExtensions.LogError(_logger, ex, "QuickSearchCompany {0}", new object[1]
+                {
+                quickSearchModel
+                });
+                return this.Json((object)Result.Fail("İşleminiz gerçekleştirilemedi!", ex));
             }
         }
-
-
-        private string myTableMaker<T>(T[] list)
-        {
-            PropertyInfo[] properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            //Array.Sort(properties, new ComparerPropertyInfo());
-            var table = "<table id=\"feed-back-table\" class=\"table dataTable\"><thead><tr>";
-            for (int j = 0; j < properties.Length; j++)
-            {
-                table += "<th><div class=\"table-header\"><span class=\"column-title\">" + properties[j].Name + "</span><div></th>";
-            }
-            table += "</tr></thead><tbody>";
-            for (int i = 0; i < list.Length; i++)
-            {
-                table += "<tr>";
-                for (int j = 0; j < properties.Length; j++)
-                {
-                    table += "<td>" + properties[j].GetValue(list[i], null) + "</td>";
-                }
-                table += "</tr>";
-            }
-            table += "</tbody></table>";
-
-            return table;
-        }
-
-        private bool myEquals(string value, string other)
-        {
-            return string.Equals(value, other, StringComparison.InvariantCultureIgnoreCase);
-        }
-
-        public IActionResult FeedbackIndex(string feedbackid)
-        {
-            if (string.IsNullOrWhiteSpace(feedbackid))
-            {
-                return RedirectToAction(actionName: "Index");
-            }
-
-            var table = string.Empty;
-
-            using (yetkilimDBContext db = new yetkilimDBContext())
-            {
-                db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-                db.ChangeTracker.AutoDetectChangesEnabled = false;
-                //db.ProxyCreationEnabled = false;            
-                if (myEquals(feedbackid, "0"))
-                {
-                    table = myTableMaker(db.Feedback0.AsNoTracking().ToArray());
-                }
-                else if (myEquals(feedbackid, "1"))
-                {
-                    table = myTableMaker(db.Feedback1.AsNoTracking().ToArray());
-                }
-                else if (myEquals(feedbackid, "2"))
-                {
-                    table = myTableMaker(db.Feedback2.AsNoTracking().ToArray());
-                }
-                else if (myEquals(feedbackid, "3"))
-                {
-                    table = myTableMaker(db.Feedback3.AsNoTracking().ToArray());
-                }
-                else if (myEquals(feedbackid, "4"))
-                {
-                    table = myTableMaker(db.Feedback4.AsNoTracking().ToArray());
-                }
-                else if (myEquals(feedbackid, "5"))
-                {
-                    table = myTableMaker(db.Feedback5.AsNoTracking().ToArray());
-                }
-                else if (myEquals(feedbackid, "6"))
-                {
-                    table = myTableMaker(db.Feedback6.AsNoTracking().ToArray());
-                }
-                else if (myEquals(feedbackid, "7"))
-                {
-                    table = myTableMaker(db.Feedback7.AsNoTracking().ToArray());
-                }
-            }
-
-            ViewBag.Table = table;
-
-            return View();
-        }
-
-
     }
 }
