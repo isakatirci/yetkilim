@@ -1,4 +1,4 @@
-$(function () {
+ï»¿$(function () {
 
     'use strict';
 
@@ -104,7 +104,7 @@ $(function () {
     $('.home-slider.shop').slick({
         dots: true,
         arrows: false,
-        fade: false,
+        fade: true,
         autoplay: true,
         autoplaySpeed: 5000,
         speed: 800,
@@ -293,7 +293,7 @@ $(function () {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(useLocation, errorLocation);
         } else {
-            alert("Tarayýcýnýzýn konum desteði bulunmuyor.");
+            alert("TarayÄ±cÄ±nÄ±zÄ±n konum desteÄŸi bulunmuyor.");
         }
     }
 
@@ -303,15 +303,15 @@ $(function () {
         switch (error.code) {
             case error.PERMISSION_DENIED:
                 constant = "PERMISSION_DENIED";
-                message = "Konum eriþimine izin vermeniz gerekmektedir.";
+                message = "Telefonunuzun konum izinlerinin aÃ§Ä±k olduÄŸuna emin olun. Kontrol etmek iÃ§in: Ayarlar->Gizlilik-> Konum Servisleri-> TarayÄ±cÄ±nÄ±z(Safari ya da diÄŸerleri) -> Konuma izin ver.";
                 break;
             case error.POSITION_UNAVAILABLE:
                 constant = "POSITION_UNAVAILABLE";
-                message = "Konum kullanýlamýyor.";
+                message = "Konum kullanÄ±lamÄ±yor.";
                 break;
             case error.TIMEOUT:
                 constant = "TIMEOUT";
-                message = "Konum bulma zaman aþýmýna uðradý.";
+                message = "Konum bulma zaman aÅŸÄ±mÄ±na uÄŸradÄ±.";
                 break;
             default:
                 constant = "Unrecognized error";
@@ -321,7 +321,8 @@ $(function () {
         if (!message)
             message = error.message;
 
-        alert("Error code: " + error.code + "\nConstant: " + constant + "\nMessage: " + message);
+        //alert("Error code: " + error.code + "\nConstant: " + constant + "\nMessage: " + message);
+        alert(message);
     }
 
     function useLocation(position) {

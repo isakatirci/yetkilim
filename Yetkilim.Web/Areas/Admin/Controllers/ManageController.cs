@@ -70,8 +70,8 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
                 {
                     model.PlaceCount = result2.Data;
                 }
-                ((dynamic)this.ViewBag).CompanyName = base.CurrentUser.CompanyName;
-                return this.View((object)model);
+                ((dynamic)ViewBag).CompanyName = base.CurrentUser.CompanyName;
+                return View((object)model);
             }
             catch (Exception ex)
             {
@@ -84,7 +84,7 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
         public IActionResult Login()
         {
             AdminLoginViewModel adminLoginViewModel = new AdminLoginViewModel();
-            return this.View((object)adminLoginViewModel);
+            return View((object)adminLoginViewModel);
         }
 
         [AllowAnonymous]
@@ -99,7 +99,7 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
                     if (!result.IsSuccess)
                     {
                         model.FormMessage = "E-Posta ya da Şifre bilgisi yanlış, lütfen bilgilerinizi kontrol edin.";
-                        return this.View((object)model);
+                        return View((object)model);
                     }
                     PanelUserDTO data = result.Data;
                     List<Claim> claims = new List<Claim>
@@ -120,10 +120,10 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
                 {
                     LoggerExtensions.LogError(_logger, ex, "Panel Login Error", Array.Empty<object>());
                     model.FormMessage = "İşleminiz gerçekleştirilemedi.";
-                    return this.View((object)model);
+                    return View((object)model);
                 }
             }
-            return this.View((object)model);
+            return View((object)model);
         }
 
         [AllowAnonymous]
@@ -161,7 +161,7 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
             {
                 Code = code
             };
-            return this.View((object)adminUserResetPasswordModel);
+            return View((object)adminUserResetPasswordModel);
         }
 
         [AllowAnonymous]
@@ -175,26 +175,26 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
                     if (model.Password != model.PasswordRe)
                     {
                         model.FormMessage = "Şifre ve tekrarı aynı olmalıdır.";
-                        return this.View((object)model);
+                        return View((object)model);
                     }
                     Result result = await _panelUserService.ResetPasswordAsync(model.Code, model.Email, model.Password);
                     if (!result.IsSuccess)
                     {
                         model.FormMessage = result.FormMessage;
-                        return this.View((object)model);
+                        return View((object)model);
                     }
                     model.IsSuccess = true;
                     model.FormMessage = "Yeni şifreniz ile giriş yapabilirsiniz.";
-                    return this.View((object)model);
+                    return View((object)model);
                 }
                 catch (Exception ex)
                 {
                     LoggerExtensions.LogError(_logger, ex, "Panel ResetPassword Error", Array.Empty<object>());
                     model.FormMessage = "İşleminiz gerçekleştirilemedi.";
-                    return this.View((object)model);
+                    return View((object)model);
                 }
             }
-            return this.View((object)model);
+            return View((object)model);
         }
 
         [Route("signout")]

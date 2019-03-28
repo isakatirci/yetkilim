@@ -74,7 +74,7 @@ namespace Yetkilim.Web.Controllers
                     ((dynamic)this.ViewBag).UserPromotionCount = data.ToString();
                 }
             }
-            this.OnActionExecuting(context);
+            base.OnActionExecuting(context);
         }
 
         //public BaseController()

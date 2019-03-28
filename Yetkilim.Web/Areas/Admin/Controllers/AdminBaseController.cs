@@ -64,7 +64,7 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             ((dynamic)this.ViewBag).CurrentUser = CurrentUser;
-            this.OnActionExecuting(context);
+            base.OnActionExecuting(context);
         }
 
         //public AdminBaseController()

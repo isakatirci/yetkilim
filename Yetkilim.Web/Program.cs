@@ -12,25 +12,32 @@ namespace Yetkilim.Web
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static IConfiguration Configuration
         {
-            CreateWebHostBuilder(args).Build().Run();
+            get;
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .UseConfiguration(Configuration)
-                .ConfigureLogging(logging =>
-                {
-                    logging.ClearProviders();
-                    logging.AddConsole();
-                });
+        static Program()
+        {
+            Program.Configuration = (new ConfigurationBuilder()).SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", false, true).AddJsonFile(string.Concat("appsettings.", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production", ".json"), true).Build();
+        }
 
-        public static IConfiguration Configuration { get; } = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", false, true)
-            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", true)
-            .Build();
+        public Program()
+        {
+        }
+
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
+        {
+            return WebHost.CreateDefaultBuilder(args).UseStartup<Startup>().UseConfiguration(Program.Configuration).ConfigureLogging((ILoggingBuilder logging) =>
+            {
+                logging.ClearProviders();
+                logging.AddConsole();
+            });
+        }
+
+        public static void Main(string[] args)
+        {
+            Program.CreateWebHostBuilder(args).Build().Run();
+        }
     }
 }

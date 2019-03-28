@@ -898,6 +898,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.Instagram" Version="2.0.1" />
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="GeoAPI" Version="1.7.5" />
     <PackageReference Include="Microsoft.AspNetCore.App" />

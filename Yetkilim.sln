@@ -5,13 +5,13 @@ VisualStudioVersion = 15.0.28010.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yetkilim.Web", "Yetkilim.Web\Yetkilim.Web.csproj", "{979FB258-2D77-45F6-B853-C4A3DAED9E83}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yetkilim.Infrastructure", "Yetkilim.Infrastructure\Yetkilim.Infrastructure.csproj", "{C1AE3B1A-0F57-4480-A484-2BBD3C8A13D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yetkilim.Infrastructure", "Yetkilim.Infrastructure\Yetkilim.Infrastructure.csproj", "{C1AE3B1A-0F57-4480-A484-2BBD3C8A13D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yetkilim.Domain", "Yetkilim.Domain\Yetkilim.Domain.csproj", "{32B1F4BA-90B3-4DA4-92A1-1DC9CAF9CDC1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yetkilim.Domain", "Yetkilim.Domain\Yetkilim.Domain.csproj", "{32B1F4BA-90B3-4DA4-92A1-1DC9CAF9CDC1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yetkilim.Global", "Yetkilim.Global\Yetkilim.Global.csproj", "{35A9F12C-0E26-4D37-A64E-BC08262120D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yetkilim.Global", "Yetkilim.Global\Yetkilim.Global.csproj", "{35A9F12C-0E26-4D37-A64E-BC08262120D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yetkilim.Business", "Yetkilim.Business\Yetkilim.Business.csproj", "{2834290E-9727-41AB-A1E0-0D780FCB52EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yetkilim.Business", "Yetkilim.Business\Yetkilim.Business.csproj", "{2834290E-9727-41AB-A1E0-0D780FCB52EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

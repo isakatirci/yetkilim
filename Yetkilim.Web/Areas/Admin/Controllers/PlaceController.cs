@@ -1,47 +1,24 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Yetkilim.Business.Services;
 using Yetkilim.Domain.DTO;
 using Yetkilim.Domain.Entity;
 using Yetkilim.Domain.Enums;
 using Yetkilim.Global.Model;
+using Yetkilim.Web.Areas.Admin.Controllers;
 using Yetkilim.Web.Areas.Admin.Models;
 
 namespace Yetkilim.Web.Areas.Admin.Controllers
 {
-    using AutoMapper;
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Primitives;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Dynamic.Core;
-    using System.Threading.Tasks;
-    using Yetkilim.Business.Services;
-    using Yetkilim.Domain.DTO;
-    using Yetkilim.Domain.Entity;
-    using Yetkilim.Domain.Enums;
-    using Yetkilim.Global.Model;
-    using Yetkilim.Web.Areas.Admin.Controllers;
-    using Yetkilim.Web.Areas.Admin.Models;
-
     [Authorize(AuthenticationSchemes = "AdminAreaCookies", Roles = "SuperAdmin,Admin")]
     public class PlaceController : AdminBaseController
     {
