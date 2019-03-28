@@ -39,25 +39,25 @@ namespace Yetkilim.Business.Services
         public async Task<Result<CompanyDetailDTO>> AddCompanyAsync(CompanyDetailDTO company, PanelUserDTO manager)
         {
             Result<CompanyDetailDTO> res = new Result<CompanyDetailDTO>();
-            _unitOfWork.BeginTransaction(IsolationLevel.ReadCommitted);
-            try
+               try
             {
                 Company item = Mapper.Map<CompanyDetailDTO, Company>(company);
                 Company created = await _unitOfWork.EntityRepository<Company>().CreateAsync(item);
                 await _unitOfWork.SaveChangesAsync();
                 manager.CompanyId = created.Id;
+         _unitOfWork.BeginTransaction(IsolationLevel.ReadCommitted);
                 manager.Role = UserRole.Admin;
-                Result<PanelUserDTO> userRes = await _panelUserService.AddUserAsync(manager);
-                if (!userRes.IsSuccess)
-                {
-                    _unitOfWork.Rollback();
-                    return res.Fail(userRes.Messages);
-                }
+                //Result<PanelUserDTO> userRes = await _panelUserService.AddUserAsync(manager);
+                //if (!userRes.IsSuccess)
+                //{
+                //    _unitOfWork.Rollback();
+                //    return res.Fail(userRes.Messages);
+                //}
                 _unitOfWork.Commit();
                 CompanyDetailDTO mapItem = Mapper.Map<Company, CompanyDetailDTO>(created);
                 return Result.Data(mapItem);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 _unitOfWork.Rollback();
                 throw;

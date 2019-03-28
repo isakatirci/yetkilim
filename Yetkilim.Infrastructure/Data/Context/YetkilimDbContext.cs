@@ -34,6 +34,8 @@ namespace Yetkilim.Infrastructure.Data.Context
     public DbSet<User> Users { get; set; }
 
     public DbSet<CompanyType> CompanyTypes { get; set; }
+        public DbSet<CompanyFeedback> CompanyFeedbacks { get; set; }
+        
 
     public YetkilimDbContext(DbContextOptions<YetkilimDbContext> options)
       : base((DbContextOptions) options)

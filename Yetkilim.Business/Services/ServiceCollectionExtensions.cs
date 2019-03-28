@@ -12,17 +12,20 @@ namespace Yetkilim.Business.Services
 {
   public static class ServiceCollectionExtensions
   {
-    public static IServiceCollection AddBusinessServices(
-      this IServiceCollection services)
-    {
-      services.AddScoped<IYetkilimUnitOfWork, YetkilimUnitOfWork>();
-      services.AddScoped<IPlaceService, PlaceService>();
-      services.AddScoped<IFeedbackService, FeedbackService>();
-      services.AddScoped<ICompanyService, CompanyService>();
-      services.AddScoped<IUserService, UserService>();
-      services.AddScoped<IPanelUserService, PanelUserService>();
-      services.AddScoped<IEmailSender, EmailSender>();
-      return services;
-    }
+        public static IServiceCollection AddBusinessServices(this IServiceCollection services)
+        {
+            ServiceCollectionServiceExtensions.AddScoped<IYetkilimUnitOfWork, YetkilimUnitOfWork>(services);
+            ServiceCollectionServiceExtensions.AddScoped<IPlaceService, PlaceService>(services);
+            ServiceCollectionServiceExtensions.AddScoped<IFeedbackService, FeedbackService>(services);
+            ServiceCollectionServiceExtensions.AddScoped<ICompanyService, CompanyService>(services);
+            ServiceCollectionServiceExtensions.AddScoped<IUserService, UserService>(services);
+            ServiceCollectionServiceExtensions.AddScoped<IPanelUserService, PanelUserService>(services);
+            ServiceCollectionServiceExtensions.AddScoped<IPromotionService, PromotionService>(services);
+            ServiceCollectionServiceExtensions.AddScoped<IEmailSender, EmailSender>(services);
+            ServiceCollectionServiceExtensions.AddScoped<ICompanyFeedbackService, CompanyFeedbackService>(services);
+            
+            return services;
+        }
+    
   }
 }

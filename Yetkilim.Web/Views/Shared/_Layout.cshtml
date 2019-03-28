@@ -8,7 +8,6 @@
     <meta name="apple-touch-fullscreen" content="yes">
     <meta name="HandheldFriendly" content="True">
     <meta http-equiv="x-ua-compatible" content="IE=edge">
-
     <link rel="apple-touch-icon" sizes="57x57" href="~/assets/favicon/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="~/assets/favicon/apple-icon-60x60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="~/assets/favicon/apple-icon-72x72.png">
@@ -18,7 +17,7 @@
     <link rel="apple-touch-icon" sizes="144x144" href="~/assets/favicon/apple-icon-144x144.png">
     <link rel="apple-touch-icon" sizes="152x152" href="~/assets/favicon/apple-icon-152x152.png">
     <link rel="apple-touch-icon" sizes="180x180" href="~/assets/favicon/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192"  href="~/assets/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="~/assets/favicon/android-icon-192x192.png">
     <link rel="icon" type="image/png" sizes="32x32" href="~/assets/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="96x96" href="~/assets/favicon/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="~/assets/favicon/favicon-16x16.png">
@@ -27,10 +26,9 @@
     <meta name="msapplication-TileImage" content="~/assets/favicon/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
     <!-- Data tables -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.18/r-2.2.2/datatables.min.css"/>
-
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.18/r-2.2.2/datatables.min.css" />
     <link rel="stylesheet" type="text/css" href="~/assets/css/style.css">
-   
+
     @RenderSection("Styles", required: false)
 </head>
 <body>
@@ -38,9 +36,14 @@
         <partial name="_Sidebar" />
         <div id="page" class="fixed-navbar">
             <partial name="_Navbar" />
+            @if (ViewBag.WarningDemo != null)
+            {
+                <div class="alert alert-danger" role="alert">
+                    @ViewBag.WarningDemo
+                </div>
 
+            }
             @RenderBody()
-
             <partial name="_Footer" />
             <!-- Back to top Link -->
             <div id="to-top" class="main-bg">

@@ -49,8 +49,9 @@ namespace Yetkilim.Business.Services
         public async Task<Result<List<PlaceDTO>>> GetAllPlaceAsync(PlaceSearchModel searchModel)
         {
             searchModel.FixPageDefinations();
-            int? companyId = searchModel.CompanyId;
-            IQueryable<Place> source = _unitOfWork.EntityRepository<Place>().GetQueryable((Place w) => w.IsDeleted == false && ((object)companyId == null || (object)(int?)w.CompanyId == (object)companyId), null);
+            //int? companyId = searchModel.CompanyId;
+            //&& ((object)companyId == null || (object)(int?)w.CompanyId == (object)companyId)
+            IQueryable<Place> source = _unitOfWork.EntityRepository<Place>().GetQueryable((Place w) => w.IsDeleted == false, null);
             if (!string.IsNullOrEmpty(searchModel.SearchText))
             {
                 string[] searchTexts = searchModel.SearchText.ToLower().Split(' ');

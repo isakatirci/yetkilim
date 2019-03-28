@@ -27,6 +27,7 @@ namespace Yetkilim.Web.Models.Ef
         public virtual DbSet<Feedback5> Feedback5 { get; set; }
         public virtual DbSet<Feedback6> Feedback6 { get; set; }
         public virtual DbSet<Feedback7> Feedback7 { get; set; }
+        public virtual DbSet<CompanyFeedback> CompanyFeedback { get; set; }
         public virtual DbSet<FeedbackDetail> FeedbackDetail { get; set; }
         public virtual DbSet<FeedbackForms> FeedbackForms { get; set; }
         public virtual DbSet<Feedbacks> Feedbacks { get; set; }
@@ -39,8 +40,8 @@ namespace Yetkilim.Web.Models.Ef
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=.;Database=yetkilimDB;Trusted_Connection=True;Integrated Security=true", x => x.UseNetTopologySuite());
+//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                optionsBuilder.UseSqlServer(Program.Configuration["ConnectionStrings:YetkilimDbContext"], x => x.UseNetTopologySuite());
             }
         }
 
