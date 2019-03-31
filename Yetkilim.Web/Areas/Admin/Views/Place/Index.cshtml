@@ -57,6 +57,11 @@
                         </th>
                         <th>
                             <div class="table-header">
+                                <span class="column-title">Guest</span>
+                            </div>
+                        </th>
+                        <th>
+                            <div class="table-header">
                                 <span class="column-title">Firma</span>
                             </div>
                         </th>
@@ -131,19 +136,20 @@
                     "searchable": false
                 },
                 {
-                    "targets": 6,
+                    "targets": 7,
                     render:function(data){
                         return moment(data).format('Do MMMM YYYY');
                     }
                 },
                 {
-                    "targets": 7,
+                    "targets": 8,
                     "orderable": false
                 }
             ],
             "columns": [
                 { "data": "id", "name": "Id", "autoWidth": true },
-                { "data": "company.name", "name": "Company.Name", "autoWidth": true },
+                { "data": "guest", "name": "Guest", "autoWidth": true },
+                { "data": "companyName", "name": "CompanyName", "autoWidth": true },
                 { "data": "name", "name": "Name", "autoWidth": true },
                 { "data": "address", "name": "Address", "autoWidth": true },
                 { "data": "latitude", "name": "Latitude", "autoWidth": true },

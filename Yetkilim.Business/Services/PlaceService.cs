@@ -8,6 +8,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -58,13 +59,13 @@ namespace Yetkilim.Business.Services
                 if (searchTexts.Length == 1)
                 {
                     source = from w in source
-                             where w.Name.ToLower().Contains(searchTexts[0])
+                             where w.Name.ToLower().Contains(searchTexts[0].Trim())
                              select w;
                 }
                 if (searchTexts.Length > 1)
                 {
                     source = from w in source
-                             where searchTexts.Any((string x) => w.Name.ToLower().Contains(x))
+                             where searchTexts.Any((string x) => w.Name.ToLower().Trim().Contains(x))
                              select w;
                 }
             }
@@ -83,22 +84,29 @@ namespace Yetkilim.Business.Services
                          orderby o.Name
                          select o;
             }
-            return Result.Data(await EntityFrameworkQueryableExtensions.ToListAsync<PlaceDTO>(from s in source.Skip(searchModel.PageSize * searchModel.PageIndex).Take(searchModel.PageSize)
+
+            var sorgu = source.ToString();
+
+            var temp  = Result.Data(await EntityFrameworkQueryableExtensions.ToListAsync<PlaceDTO>(from s in source.Skip(searchModel.PageSize * searchModel.PageIndex).Take(searchModel.PageSize)
                                                                                               select new PlaceDTO
                                                                                               {
                                                                                                   Id = s.Id,
                                                                                                   Name = s.Name,
                                                                                                   Address = s.Address,
                                                                                                   Latitude = s.Latitude,
+                                                                                                  Guest = s.Guest,
                                                                                                   Longitude = s.Longitude,
                                                                                                   CompanyId = s.CompanyId,
                                                                                                   Company = new CompanyInfoDTO
                                                                                                   {
                                                                                                       Id = s.Company.Id,
                                                                                                       Name = s.Company.Name,
-                                                                                                      Image = s.Company.Image
+                                                                                                      Image = s.Company.Image,
+                                                                                                      Demo = s.Company.Demo
                                                                                                   }
                                                                                               }, default(CancellationToken)));
+
+            return temp;
         }
 
         public async Task<Result<PlaceDTO>> GetPlaceAsync(int id)
@@ -138,6 +146,7 @@ namespace Yetkilim.Business.Services
                        Id = s.Id,
                        Name = s.Name,
                        Address = s.Address,
+                       Guest=s.Guest,
                        Latitude = s.Latitude,
                        Longitude = s.Longitude,
                        CreatedDate = s.CreatedDate,
@@ -165,6 +174,7 @@ namespace Yetkilim.Business.Services
                 return Result.Fail("Mekan bulunamadı!");
             }
             place2.Name = place.Name;
+            place2.Guest = place.Guest;
             place2.Address = place.Address;
             place2.Latitude = place.Latitude;
             place2.Longitude = place.Longitude;
@@ -185,6 +195,7 @@ namespace Yetkilim.Business.Services
                 List<Feedback> feedbacks = _unitOfWork.EntityRepository<Feedback>().GetQueryable((Feedback w) => w.IsDeleted == false && w.PlaceId == id, null).ToList();
                 try
                 {
+                    _unitOfWork.BeginTransaction();
                     foreach (PanelUser item2 in list)
                     {
                         item2.IsDeleted = true;
@@ -200,9 +211,9 @@ namespace Yetkilim.Business.Services
                     _unitOfWork.Commit();
                     return Result.Success();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    _unitOfWork.Rollback();
+                    _unitOfWork.Rollback();                  
                     return Result.Fail("İşlem sırasında transaction sorunu oluştu!");
                 }
             }

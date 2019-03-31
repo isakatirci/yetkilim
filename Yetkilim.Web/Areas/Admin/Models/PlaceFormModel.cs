@@ -1,3 +1,4 @@
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -45,6 +46,12 @@ namespace Yetkilim.Web.Areas.Admin.Models
 			set;
 		}
 
+		public string Guest
+		{
+			get;
+			set;
+		}
+
 		public double? Latitude
 		{
 			get;
@@ -63,9 +70,15 @@ namespace Yetkilim.Web.Areas.Admin.Models
 			get;
 			set;
 		}
+		public List<SelectListItem> YesOrNo { get; set; }
+
 
 		public PlaceFormModel()
 		{
+			YesOrNo = new List<SelectListItem>();
+			YesOrNo.Add(new SelectListItem(text: "Evet", value: "Evet", selected: string.Equals(this.Guest, "Evet", StringComparison.InvariantCultureIgnoreCase)));
+			YesOrNo.Add(new SelectListItem(text: "Hayır", value: "Hayir", selected: string.Equals(this.Guest, "Hayir", StringComparison.InvariantCultureIgnoreCase)));
+
 		}
 	}
 }

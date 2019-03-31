@@ -83,7 +83,34 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
                                 select m;
                 }
                 num = queryable.Count();
-                List<Place> data = queryable.Skip(count2).Take(count).ToList();
+                var items = queryable.Skip(count2).Take(count).ToList();
+
+
+                //                { "data": "id", "name": "Id", "autoWidth": true },
+                //                { "data": "companyName", "name": "CompanyName", "autoWidth": true },
+                //                { "data": "name", "name": "Name", "autoWidth": true },
+                //                { "data": "address", "name": "Address", "autoWidth": true },
+                //                { "data": "latitude", "name": "Latitude", "autoWidth": true },
+                //                { "data": "longitude", "name": "Longitude", "autoWidth": true },
+                //                { "data": "guest", "name": "Guest", "autoWidth": true },
+                //                { "data": "createdDate", "name": "CreatedDate", "autoWidth": true },
+
+                var data = items.Select(a => new {
+                    a.Id,
+                    CompanyName = a.Company.Name,
+                    a.Name,
+                    a.Address,
+                    a.Latitude,
+                    a.Longitude,
+                    a.CreatedDate
+
+             ,
+                    Guest = string.Equals(a.Guest, "Evet", StringComparison.InvariantCultureIgnoreCase) ? "Evet" : "Hayır"
+             ,
+
+                }).ToList();
+
+
                 return this.Json((object)new
                 {
                     draw = draw,

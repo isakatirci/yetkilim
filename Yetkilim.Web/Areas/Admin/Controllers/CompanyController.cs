@@ -35,6 +35,20 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
 
         private readonly ILogger<CompanyController> _logger;
 
+        Dictionary<int, string> _companyTypes = new Dictionary<int, string>() {
+           {1,"Cafe" },
+           {2, "Restoran"},
+           {3, "Otel"},
+           {4, "Güzellik Salonu"},
+           {5, "Benzin İstasyonu"},
+           {6, "Kuaför"},
+           {7, "Seyahat Şirketi"},
+           {8, "Hastane"},
+           {9, "Mağaza"},
+           {10, "Market"},
+           {11, "Event"}
+        };
+
         public CompanyController(ILogger<CompanyController> logger, IHostingEnvironment hostingEnvironment, ICompanyService companyService)
         {
             _logger = logger;
@@ -84,7 +98,23 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
                                 select m;
                 }
                 num = queryable.Count();
-                List<Company> data = queryable.Skip(count2).Take(count).ToList();
+
+                //List<Company> data = queryable.Skip(count2).Take(count).ToList();
+                var items = queryable.Skip(count2).Take(count).ToList();
+
+                var data = items.Select(a => new {
+                    a.Id,
+                    a.Name,
+                    a.Address,
+                    a.CreatedDate
+
+                    ,
+                    Demo = string.Equals(a.Demo, "Evet", StringComparison.InvariantCultureIgnoreCase) ? "Evet" : "Hayır"
+                    ,
+                    CompanyTypeName = _companyTypes.ContainsKey(a.CompanyTypeId) ? _companyTypes[a.CompanyTypeId] : "Diğer"
+
+                }).ToList();
+
                 return this.Json((object)new
                 {
                     draw = draw,

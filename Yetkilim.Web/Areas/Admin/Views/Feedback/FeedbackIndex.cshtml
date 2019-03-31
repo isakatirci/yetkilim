@@ -1,0 +1,158 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+
+<div class="page-content p-6">
+    <div class="content container">
+        <div class="row">
+
+            <div class="col-12">
+                <div class="example ">
+
+
+
+                    <div class="source-preview-wrapper">
+                        <div class="preview">
+                            <div class="preview-elements">
+
+
+                                <div class="animated fadeInUp">
+                                    @Html.Raw(ViewBag.Table)
+                                </div><!-- .animated fadeInUp -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    @section Scripts{
+        <script>
+
+       $(document).ready(function () {
+           @*$("#company-list-table").DataTable({
+               dom: 'rt<"dataTables_footer"ip>',
+               "language": {
+                   "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Turkish.json"
+               },
+               lengthMenu: [10, 20, 30, 50, 100],
+               pageLength: 10,
+               scrollY: 'auto',
+               scrollX: false,
+               responsive: true,
+               autoWidth: false,
+               scrollCollapse: true,
+               //"processing": true, // for show progress bar
+               "serverSide": true, // for process server side
+               //"filter": true, // this is for disable filter (search box)
+               "orderMulti": false, // for disable multiple column at once
+               "ajax": {
+                   "url": "@Url.Action("LoadCompanyData", "Company")",
+                   "type": "POST",
+                   "datatype": "json"
+               },
+               "columnDefs":
+                   [
+                       {
+                           "targets": [0],
+                           "visible": false,
+                           "searchable": false
+                       },
+                       {
+                           "targets": 4,
+                           "orderable": false
+                       },
+                       {
+                           "targets": 3,
+                           render: function (data) {
+                               return moment(data).format('Do MMMM YYYY');
+                           }
+                       }
+                   ],
+               "columns": [
+                   { "data": "id", "name": "Id", "autoWidth": true },
+                   { "data": "name", "name": "Name", "autoWidth": true },
+                   { "data": "address", "name": "Address", "autoWidth": true },
+                   { "data": "createdDate", "name": "CreatedDate", "autoWidth": true },
+                   { "data": "demo", "name": "Demo", "autoWidth": true },
+                   { "data": "companyTypeName", "name": "companyTypeName", "autoWidth": true },
+                   {
+                       "render": function (data, type, full, meta) {
+                           return '<a class="btn btn-info" href="@Url.Action("Update", "Company")/' +
+                               full.id +
+                               '">Düzenle</a>' +
+                               "<a href='#' class='btn btn-danger' onclick=DeleteData('" +
+                               full.id +
+                               "'); >Sil</a>";
+                       }
+                   },
+                   //{
+                   //    data: null,
+                   //    render: function(data, type, row) {
+                   //        return "<a href='#' class='btn btn-danger' onclick=DeleteData('" + row.Id + "'); >Delete</a>";
+                   //    }
+                   //}
+               ],
+               initComplete: function () {
+                   var api = this.api(),
+                       searchBox = $('#products-search-input');
+
+                   // Bind an external input as a table wide search box
+                   if (searchBox.length > 0) {
+                       searchBox.bind('input', function (e) {
+                           // If the length is 3 or more characters, or the user pressed ENTER, search
+                           if (this.value.length >= 3 || e.keyCode == 13) {
+                               // Call the API search function
+                               api.search(event.target.value).draw();
+                           }
+                           // Ensure we clear the search if they backspace far enough
+                           if (this.value == "") {
+                               api.search(event.target.value).draw();
+                           }
+                           return;
+
+                       });
+                   }
+               },
+           });*@
+
+
+           // Setup - add a text input to each footer cell
+           $('#sample-data-table-feedback thead tr').clone(true).appendTo('#sample-data-table-feedback thead');
+           $('#sample-data-table-feedback thead tr:eq(1) th').each(function (i) {
+               var title = $(this).text();
+               $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+
+               $('input', this).on('keyup change', function () {
+                   if (table.column(i).search() !== this.value) {
+                       table
+                           .column(i)
+                           .search(this.value)
+                           .draw();
+                   }
+               });
+           });
+
+
+           var table = $("#sample-data-table-feedback").DataTable({
+               orderCellsTop: true,
+               fixedHeader: true,
+               responsive: true,            
+               dom: 'rt<"dataTables_footer"ip>'
+
+           });
+
+       });
+
+
+
+
+        </script>
+    }

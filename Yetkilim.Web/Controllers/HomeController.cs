@@ -78,9 +78,11 @@ public class HomeController : BaseController
         };
         try
         {
-            var company = _companyService.GetCompanyAsync(id).Result.Data;
+            var place = _placeService.GetPlaceAsync(id).Result.Data;
 
-            if (string.Equals(company.Demo,"Evet",StringComparison.InvariantCultureIgnoreCase))
+            ViewBag.PlaceName = place.Name;
+
+            if (string.Equals(place.Guest,"Evet",StringComparison.InvariantCultureIgnoreCase))
             {
                 ViewBag.WarningDemo = "Dikkat bu işletme üyemiz değildir. Yine de değerlendirmenizi sorumlulara iletmeye çalışacağız. Dönüş geç yapılabilir ya da yapılmayabilir.";
             }
@@ -88,7 +90,7 @@ public class HomeController : BaseController
 
             using (yetkilimDBContext db = new yetkilimDBContext())
             {
-                var companyFeedback = db.CompanyFeedback.First(x => x.TypeId == company.CompanyTypeId);
+                var companyFeedback = db.CompanyFeedback.First(x => x.TypeId == place.CompanyId);
                 return View("~/Views/Feedback/Feedback" + companyFeedback.FeedbackId + ".cshtml");
             }
 

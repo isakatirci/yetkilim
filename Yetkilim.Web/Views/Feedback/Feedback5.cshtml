@@ -20,13 +20,25 @@
                         Görüşleriniz Bizim için Çok Değerli!
                     </div><!-- .page-title -->
 
+                    @if (ViewBag.PlaceName != null)
+                    {
+
+                        <!-- Page title -->
+                    <div class="page-title animated fadeInRight">
+                        Şube: @ViewBag.PlaceName
+                    </div><!-- .page-title -->
+
+                    }
+
                     <div class="entry-content feature_forms animated fadeInUp">
-                        <p>Aldığınız hizmetin kalitesini iyileştirmek için var gücümüzle çalışıyoruz. 
-                            Bu değerlendirmenin, en alt sorumludan en üst sorumluya kadar ulaştığını hatırlatmak isteriz.</p>
+                        <p>
+                            Aldığınız hizmetin kalitesini iyileştirmek için var gücümüzle çalışıyoruz.
+                            Bu değerlendirmenin, en alt sorumludan en üst sorumluya kadar ulaştığını hatırlatmak isteriz.
+                        </p>
 
                         <input id="formId" type="hidden" value="@Model?.FormId" />
                         @*<div class="fb-render">
-                            </div>*@
+                </div>*@
 
                         <div class="home-widget pt-3">
                             <div class="widget-title">
@@ -74,7 +86,7 @@
                             </div>
                             <div class="row">
                                 <div class="input-field col s12 no-mb no-mt">
-                                    <input type="text" id="personelName" class="no-mb"  required="required"/>
+                                    <input type="text" id="personelName" class="no-mb" required="required" />
                                     <span class="helper-text" data-error="Lütfen giriş yapınız"></span>
                                 </div>
                             </div>
@@ -94,17 +106,17 @@
                         </div>
 
                         @*@if (Model.IsLogged)
-                        {
-                            <div class="switch mb-4">
-                                Bilgilerimin firma ile paylaşılmasına <br />
-                                <label>
-                                    izin vermiyorum
-                                    <input id="chcShare" type="checkbox" checked>
-                                    <span class="lever"></span>
-                                    izin veriyorum
-                                </label>
-                            </div>
-                        }*@
+                {
+                    <div class="switch mb-4">
+                        Bilgilerimin firma ile paylaşılmasına <br />
+                        <label>
+                            izin vermiyorum
+                            <input id="chcShare" type="checkbox" checked>
+                            <span class="lever"></span>
+                            izin veriyorum
+                        </label>
+                    </div>
+                }*@
 
 
                         <a id="btnSend" href="#" class="btn orange block">GÖNDER</a>
@@ -330,9 +342,24 @@
                         console.log(response);
                         alert("İşlem Başarısız Oldu!");
                     } else {
-                        alert("Değerlendirmeniz şube müdürümüze ve üstündeki tüm sorumlulara iletildi. \n Geri bildiriminiz için teşekkür ederiz! ");
-                        //window.location = "/Feedback/FeedbackIndex?feedbackid=5";
-                        window.location = "/";
+                        Swal.fire({
+                            type: 'success',
+                            title: "Değerlendirmeniz şube müdürümüze ve üstündeki tüm sorumlulara iletildi. \n Geri bildiriminiz için teşekkür ederiz! ",
+                            showConfirmButton: false,
+                        }).then((result) => {
+
+                          if (result.value) {
+                                window.location = "/";
+                            }
+                            //if (result.value) {
+                            //    Swal.fire(
+                            //        'Deleted!',
+                            //        'Your file has been deleted.',
+                            //        'success'
+                            //    )
+                            //}
+                        })
+                       // window.location = "/Feedback/FeedbackIndex?feedbackid=1";
                     }   
 
                 }).fail(function(e, a, b, c) {

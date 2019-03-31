@@ -6,6 +6,7 @@
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
     <AspNetCoreModuleName>AspNetCoreModule</AspNetCoreModuleName>
     <UserSecretsId>9fc9a02e-7f41-4c79-b087-de87eb150cb5</UserSecretsId>
+	    <MvcRazorCompileOnPublish>false</MvcRazorCompileOnPublish>    
   </PropertyGroup>
 
   <ItemGroup>
@@ -895,6 +896,12 @@
     <None Include="wwwroot\assets\plugins\themify\SVG\zoom-in.svg" />
     <None Include="wwwroot\assets\plugins\themify\SVG\zoom-out.svg" />
     <None Include="wwwroot\assets\plugins\themify\themify-icons.css" />
+    <None Include="wwwroot\assets\js\sweetalert2\sweetalert2.all.js" />
+    <None Include="wwwroot\assets\js\sweetalert2\sweetalert2.all.min.js" />
+    <None Include="wwwroot\assets\js\sweetalert2\sweetalert2.css" />
+    <None Include="wwwroot\assets\js\sweetalert2\sweetalert2.js" />
+    <None Include="wwwroot\assets\js\sweetalert2\sweetalert2.min.css" />
+    <None Include="wwwroot\assets\js\sweetalert2\sweetalert2.min.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -906,6 +913,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="2.2.3" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.9" />
+    <PackageReference Include="Wahid-SweetAlert2" Version="1.0.0" />
 	<DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.2.3" />
   </ItemGroup>
 

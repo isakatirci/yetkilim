@@ -1,5 +1,18 @@
-﻿<!-- LEFT SIDEBAR -->
+﻿<style>
+    span.badge.new {
+        background-color: #f44336;
+        border-radius: 50%;
+        margin-top: 3px;
+        min-width: 2rem;
+    }
+
+        span.badge.new:after {
+            content: ""
+        }
+</style>
+<!-- LEFT SIDEBAR -->
 <div id="slide-out-left" class="sidenav">
+
     <!-- Sidebar profile -->
     <div class="top-left-nav">
         <div class="profile-cover">
@@ -27,29 +40,33 @@
     <!-- App/Site Menu -->
     <div id="main-menu">
         <ul>
+
             <li class="header">Kullanıcı</li>
             <li><a href="@Url.Action("Index", "Home")"><span class="icon ti-home"></span> Anasayfa</a></li>
             @if (User?.Identity?.IsAuthenticated == true)
             {
                 <li><a href="@Url.Action("Profile", "Account")"><span class="icon ti-user"></span> Profilim</a></li>
-                <li><a href="@Url.Action("SignIn", "Auth")"><span class="icon ti-email"></span> Mesajlarım (Yakında!)</a></li>
+                <li><a href="@Url.Action("Search", "Home")"><span class="icon ti-comment-alt"></span> Değerlendir</a></li>
+                //<li><a href="@Url.Action("SignIn", "Auth")"><span class="icon ti-email red"></span> Mesajlarım (Yakında!)</a></li>
                 <li><a href="@Url.Action("MyFeedbacks", "Account")"><span class="icon ti-comment-alt"></span> Değerlendirmelerim</a></li>
-                <li><a href="@Url.Action("SignIn", "Auth")"><span class="icon ti-medall"></span> Ödüllerim (Yakında!)</a></li>
+                <li><a href="@Url.Action("MyPromotions", "Account")"><span class="icon ti-medall"></span> Promosyonlarım <span class="new badge">@ViewBag.UserPromotionCount</span></a></li>
+                <li><a href="@Url.Action("About", "Home")"><span class="icon ti-file"></span> SSS</a></li>
+                <li><a href="@Url.Action("Contact", "Home")"><span class="icon ti-envelope"></span> İletişim</a></li>
                 <li><a href="@Url.Action("SignOut", "Auth")"><span class="icon ti-power-off"></span> Çıkış Yap</a></li>
             }
             else
             {
                 <li><a href="@Url.Action("SignIn", "Auth")"><span class="icon ti-user"></span> Giriş Yap</a></li>
                 <li><a href="@Url.Action("Search", "Home")"><span class="icon ti-pencil-alt"></span> Değerlendir</a></li>
+                <li><a href="@Url.Action("About", "Home")"><span class="icon ti-file"></span> SSS</a></li>
+                <li><a href="@Url.Action("Contact", "Home")"><span class="icon ti-envelope"></span> İletişim</a></li>
             }
+
             <li class="header">İşletme</li>
-            <li><a href="@Url.Action("Index", "Home")"><span class="icon ti-user"></span> İşletme Başvurusu</a></li>
-            <li class="header">Genel</li>
-            <li><a href="@Url.Action("Index", "Home")"><span class="icon ti-file"></span> SSS</a></li>
-            <li><a href="@Url.Action("Contact", "Home")"><span class="icon ti-envelope"></span> İletişim</a></li>
+            <li><a href="https://www.yetkilim.info" target="_black"><span class="icon ti-user"></span> İşletme Başvurusu</a></li>
         </ul>
     </div>
     <!-- End Site/App Menu -->
+
 </div>
 <!-- END LEFT SIDEBAR -->
-

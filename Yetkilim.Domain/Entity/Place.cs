@@ -47,6 +47,13 @@ namespace Yetkilim.Domain.Entity
             set;
         }
 
+        public string Guest
+        {
+            get;
+            set;
+        }
+
+
         public int CompanyId
         {
             get;

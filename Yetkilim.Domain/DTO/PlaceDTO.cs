@@ -6,20 +6,21 @@
 
 namespace Yetkilim.Domain.DTO
 {
-  public class PlaceDTO
-  {
-    public int Id { get; set; }
+    public class PlaceDTO
+    {
+        public int Id { get; set; }
 
-    public string Name { get; set; }
+        public string Name { get; set; }
 
-    public string Address { get; set; }
+        public string Address { get; set; }
+        public string Guest { get; set; }
 
-    public double? Latitude { get; set; }
+        public double? Latitude { get; set; }
 
-    public double? Longitude { get; set; }
+        public double? Longitude { get; set; }
 
-    public int CompanyId { get; set; }
+        public int CompanyId { get; set; }
 
-    public CompanyInfoDTO Company { get; set; }
-  }
+        public CompanyInfoDTO Company { get; set; }
+    }
 }

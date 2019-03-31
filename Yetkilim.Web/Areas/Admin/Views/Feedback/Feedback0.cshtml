@@ -1,0 +1,185 @@
+﻿@using System.Globalization
+@using Yetkilim.Domain.DTO
+@model CompanyFeedbacksModel
+<div class="doc data-table-doc page-layout simple full-width">
+
+    <!-- HEADER -->
+    <div class="page-header bg-primary text-auto p-6 row no-gutters align-items-center justify-content-between">
+        @*<h1 class="doc-title h4" id="content">Değerlendirmeler</h1>*@
+        <div id="selectPlaceDiv" class="col-sm-10">
+        </div>
+    </div>
+
+    <!-- / HEADER -->
+    <!-- CONTENT -->
+    <div class="page-content p-6">
+        <div class="content container">
+            <div class="row">
+
+                <div class="col-12">
+                    <div class="example ">
+
+                        <div class="description">
+                            <div class="description-text">
+                                <h3>Değerlendirmeler</h3>
+                            </div>
+                        </div>
+
+                        <div class="source-preview-wrapper">
+                            <div class="preview">
+                                <div class="preview-elements">
+
+                                    <table id="sample-data-table" class="table">
+                                        <thead>
+                                            <tr>
+                                                <th class="secondary-text">
+                                                    <div class="table-header">
+                                                        <span class="column-title">Mekan Adı</span>
+                                                    </div>
+                                                </th>
+                                                <th class="secondary-text">
+                                                    <div class="table-header">
+                                                        <span class="column-title">Masa Kodu</span>
+                                                    </div>
+                                                </th>
+                                                <th class="secondary-text">
+                                                    <div class="table-header">
+                                                        <span class="column-title">Tavsiye Eder misiniz?</span>
+                                                    </div>
+                                                </th>
+                                                <th class="secondary-text">
+                                                    <div class="table-header">
+                                                        <span class="column-title">Personel İlgisi</span>
+                                                    </div>
+                                                </th>
+                                                <th class="secondary-text">
+                                                    <div class="table-header">
+                                                        <span class="column-title">Lezzet</span>
+                                                    </div>
+                                                </th>
+                                                <th class="secondary-text">
+                                                    <div class="table-header">
+                                                        <span class="column-title">Fiyat</span>
+                                                    </div>
+                                                </th>
+                                                <th class="secondary-text">
+                                                    <div class="table-header">
+                                                        <span class="column-title">Hijyen</span>
+                                                    </div>
+                                                </th>
+                                                <th class="secondary-text">
+                                                    <div class="table-header">
+                                                        <span class="column-title">Ad Soyad</span>
+                                                    </div>
+                                                </th>
+                                                <th class="secondary-text">
+                                                    <div class="table-header">
+                                                        <span class="column-title">Email</span>
+                                                    </div>
+                                                </th>
+                                                <th class="secondary-text">
+                                                    <div class="table-header">
+                                                        <span class="column-title">Telefon</span>
+                                                    </div>
+                                                </th>
+                                                <th class="secondary-text">
+                                                    <div class="table-header">
+                                                        <span class="column-title">İletmek istedikleriniz</span>
+                                                    </div>
+                                                </th>
+                                                <th class="secondary-text">
+                                                    <div class="table-header">
+                                                        <span class="column-title">Tarih</span>
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var feedback in Model.Feedbacks ?? Enumerable.Empty<FeedbackDetailDTO>())
+                                            {
+                                                <tr>
+                                                    <td>@feedback.Place</td>
+                                                    <td>@feedback.DeskCode</td>
+                                                    <td>@feedback.Info.EmployeeRate</td>
+                                                    <td>@feedback.Info.FlavorRate</td>
+                                                    <td>@feedback.Info.PriceRate</td>
+                                                    <td>@feedback.Info.CleaningRate</td>
+                                                    <td>@feedback.Info.AdviseRate</td>
+
+                                                    @if (feedback.IsAnon)
+                                                    {
+                                                        <td>Anonim</td>
+                                                        <td>Anonim</td>
+                                                        <td>Anonim</td>
+                                                    }
+                                                    else if (feedback.User != null && feedback.IsUserShare)
+                                                    {
+                                                        <td>@feedback.User.Name</td>
+                                                        <td>@feedback.User.Email</td>
+                                                        <td>@feedback.User.Phone</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>Gizli</td>
+                                                        <td>Gizli</td>
+                                                        <td>Gizli</td>
+                                                    }
+
+                                                    <td>@feedback.Description</td>
+
+                                                    <td>@feedback.CreatedDate.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+
+                                    <script type="text/javascript">
+                                        $('#sample-data-table').DataTable({
+                                            responsive: true,
+                                            dom: 'rt<"dataTables_footer"ip>',
+                                            "language": {
+                                                "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Turkish.json"
+                                            },
+                                            "scrollX": true,
+                                            "order": [],
+                                            initComplete: function () {
+                                                this.api().columns().every(function (a, b, c) {
+                                                    if (a > 0)
+                                                        return ;
+                                                    var column = this;
+                                                    var select = $('<select id="selectPlace"><option value="">Hepsi</option></select>')
+                                                        .appendTo("#selectPlaceDiv")
+                                                        .on('change', function () {
+                                                            var val = $.fn.dataTable.util.escapeRegex(
+                                                                $(this).val()
+                                                            );
+
+                                                            column
+                                                                .search(val ? '^' + val + '$' : '', true, false)
+                                                                .draw();
+                                                        });
+
+                                                    column.data().unique().sort().each(function (d, j) {
+                                                        select.append('<option value="' + d + '">' + d + '</option>');
+                                                    });
+                                                });
+                                            }
+                                        });
+
+                                        $(document).ready(function () {
+                                            $("#selectPlace").select2();
+                                        });
+                                    </script>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- CONTENT -->
+
+</div>

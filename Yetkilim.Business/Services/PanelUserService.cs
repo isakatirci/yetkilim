@@ -58,23 +58,32 @@ namespace Yetkilim.Business.Services
 
         public async Task<Result<PanelUserDTO>> AddUserAsync(PanelUserDTO model)
         {
-            Result<PanelUserDTO> res = new Result<PanelUserDTO>();
-            EFRepository<PanelUser> repo = _unitOfWork.EntityRepository<PanelUser>();
-            if (await repo.GetExistsAsync((PanelUser w) => w.IsDeleted == false && w.Email == model.Email))
+            try
             {
-                return res.Fail("Bu mail (" + model.Email + ") ile kullanıcı tanımlanmış!");
+                Result<PanelUserDTO> res = new Result<PanelUserDTO>();
+                EFRepository<PanelUser> repo = _unitOfWork.EntityRepository<PanelUser>();
+                if (await repo.GetExistsAsync((PanelUser w) => w.IsDeleted == false && w.Email == model.Email))
+                {
+                    return res.Fail("Bu mail (" + model.Email + ") ile kullanıcı tanımlanmış!");
+                }
+                PanelUser panelUser = Mapper.Map<PanelUserDTO, PanelUser>(model);
+                string pass = PasswordHelper.GeneratePassword(6);
+                panelUser.Password = PasswordHelper.MD5Hash(pass);
+                panelUser.CreatedDate = DateTime.UtcNow;
+                PanelUser created = await repo.CreateAsync(panelUser);
+                await _unitOfWork.SaveChangesAsync();
+                await _emailSender.Send(new string[1]
+                {
+        model.Email
+                }, "Üyeliğiniz oluşturuldu!", "Yetkilim panele giriş şifreniz: " + pass);
+                return Result.Data(Mapper.Map<PanelUser, PanelUserDTO>(created));
             }
-            PanelUser panelUser = Mapper.Map<PanelUserDTO, PanelUser>(model);
-            string pass = PasswordHelper.GeneratePassword(6);
-            panelUser.Password = PasswordHelper.MD5Hash(pass);
-            panelUser.CreatedDate = DateTime.UtcNow;
-            PanelUser created = await repo.CreateAsync(panelUser);
-            await _unitOfWork.SaveChangesAsync();
-            await _emailSender.Send(new string[1]
+            catch (Exception ex)
             {
-            model.Email
-            }, "Üyeliğiniz oluşturuldu!", "Yetkilim panele giriş şifreniz: " + pass);
-            return Result.Data(Mapper.Map<PanelUser, PanelUserDTO>(created));
+
+                throw;
+            }
+          
         }
 
         public async Task<Result<List<PanelUserDTO>>> GetAllUserAsync(PanelUserSearchModel searchModel)

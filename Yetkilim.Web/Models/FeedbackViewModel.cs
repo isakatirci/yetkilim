@@ -50,6 +50,7 @@ namespace Yetkilim.Web.Models
     {
         public string Error { get; set; }
         public string FormId { get; set; }
+        public string PlaceName { get; set; }
     }
 
     public class FeedbackViewModel0 : FeedbacksViewModelBase

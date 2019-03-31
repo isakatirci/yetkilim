@@ -39,25 +39,24 @@ namespace Yetkilim.Business.Services
         public async Task<Result<CompanyDetailDTO>> AddCompanyAsync(CompanyDetailDTO company, PanelUserDTO manager)
         {
             Result<CompanyDetailDTO> res = new Result<CompanyDetailDTO>();
-               try
+            _unitOfWork.BeginTransaction(IsolationLevel.ReadCommitted);
+            try
             {
-                Company item = Mapper.Map<CompanyDetailDTO, Company>(company);
-                Company created = await _unitOfWork.EntityRepository<Company>().CreateAsync(item);
+                Company entity = Mapper.Map<CompanyDetailDTO, Company>(company);
+                Company created = await _unitOfWork.EntityRepository<Company>().CreateAsync(entity);
                 await _unitOfWork.SaveChangesAsync();
                 manager.CompanyId = created.Id;
-         _unitOfWork.BeginTransaction(IsolationLevel.ReadCommitted);
                 manager.Role = UserRole.Admin;
-                //Result<PanelUserDTO> userRes = await _panelUserService.AddUserAsync(manager);
-                //if (!userRes.IsSuccess)
-                //{
-                //    _unitOfWork.Rollback();
-                //    return res.Fail(userRes.Messages);
-                //}
+                Result<PanelUserDTO> result = await _panelUserService.AddUserAsync(manager);
+                if (!result.IsSuccess)
+                {
+                    _unitOfWork.Rollback();
+                    return res.Fail(result.Messages);
+                }
                 _unitOfWork.Commit();
-                CompanyDetailDTO mapItem = Mapper.Map<Company, CompanyDetailDTO>(created);
-                return Result.Data(mapItem);
+                return Result.Data(Mapper.Map<Company, CompanyDetailDTO>(created));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 _unitOfWork.Rollback();
                 throw;
@@ -66,20 +65,20 @@ namespace Yetkilim.Business.Services
 
         public IQueryable<Company> GetCompanyQueryable()
         {
-            return _unitOfWork.EntityRepository<Company>().GetQueryable(null, null);
+            return _unitOfWork.EntityRepository<Company>().GetQueryable((Company w) => w.IsDeleted == false, null);
         }
 
         public async Task<Result<List<CompanyInfoDTO>>> GetAllCompanyAsync(SearchModel searchModel)
         {
             searchModel.FixPageDefinations();
-            IQueryable<Company> query = _unitOfWork.EntityRepository<Company>().GetQueryable(null, null);
+            IQueryable<Company> source = _unitOfWork.EntityRepository<Company>().GetQueryable((Company w) => w.IsDeleted == false, null);
             if (!string.IsNullOrEmpty(searchModel.SearchText))
             {
-                query = from w in query
-                        where w.Name.Contains(searchModel.SearchText)
-                        select w;
+                source = from w in source
+                         where w.Name.Contains(searchModel.SearchText)
+                         select w;
             }
-            return Result.Data(await EntityFrameworkQueryableExtensions.ToListAsync<CompanyInfoDTO>(from s in (from o in query
+            return Result.Data(await EntityFrameworkQueryableExtensions.ToListAsync<CompanyInfoDTO>(from s in (from o in source
                                                                                                                orderby o.Name
                                                                                                                select o).Skip(searchModel.PageSize * searchModel.PageIndex).Take(searchModel.PageSize)
                                                                                                     select new CompanyInfoDTO
@@ -92,23 +91,22 @@ namespace Yetkilim.Business.Services
 
         public async Task<Result<CompanyDetailDTO>> GetCompanyAsync(int id)
         {
-            CompanyDetailDTO res = Mapper.Map<Company, CompanyDetailDTO>(await _unitOfWork.EntityRepository<Company>().GetFirstAsync((Company w) => w.Id == id, null));
-            return Result.Data(res);
+            return Result.Data(Mapper.Map<Company, CompanyDetailDTO>(await _unitOfWork.EntityRepository<Company>().GetFirstAsync((Company w) => w.IsDeleted == false && w.Id == id, null)));
         }
 
         public async Task<Result> UpdateCompanyAsync(int id, CompanyDetailDTO company)
         {
-            Company item = await _unitOfWork.EntityRepository<Company>().GetFirstAsync((Company w) => w.Id == id, null);
-            if (item == null)
+            Company company2 = await _unitOfWork.EntityRepository<Company>().GetFirstAsync((Company w) => w.IsDeleted == false && w.Id == id, null);
+            if (company2 == null)
             {
                 return Result.Fail("Firma bulunamadı!");
             }
-            item.Name = company.Name;
-            item.Address = company.Address;
-            item.CompanyTypeId = company.CompanyTypeId;
+            company2.Name = company.Name;
+            company2.Address = company.Address;
+            company2.CompanyTypeId = company.CompanyTypeId;
             if (!string.IsNullOrWhiteSpace(company.Image))
             {
-                item.Image = company.Image;
+                company2.Image = company.Image;
             }
             await _unitOfWork.SaveChangesAsync();
             return Result.Success();
@@ -116,18 +114,43 @@ namespace Yetkilim.Business.Services
 
         public async Task<Result> DeleteCompanyAsync(int id)
         {
-            Company item = await _unitOfWork.EntityRepository<Company>().GetFirstAsync((Company w) => w.Id == id, null);
-            if (item == null)
+            Company item = await _unitOfWork.EntityRepository<Company>().GetFirstAsync((Company w) => w.IsDeleted == false && w.Id == id, null);
+            if (item != null)
             {
-                return Result.Fail("Firma bulunamadı!");
+                List<PanelUser> list = _unitOfWork.EntityRepository<PanelUser>().GetQueryable((PanelUser w) => w.IsDeleted == false && w.CompanyId == id, null).ToList();
+                List<Place> places = ((IEnumerable<Place>)EntityFrameworkQueryableExtensions.Include<Place, ICollection<Feedback>>(_unitOfWork.EntityRepository<Place>().GetQueryable((Place w) => w.CompanyId == id, null), (Expression<Func<Place, ICollection<Feedback>>>)((Place i) => i.Feedbacks))).ToList();
+                _unitOfWork.BeginTransaction(IsolationLevel.ReadCommitted);
+                try
+                {
+                    foreach (PanelUser item2 in list)
+                    {
+                        item2.IsDeleted = true;
+                    }
+                    await _unitOfWork.SaveChangesAsync();
+                    foreach (Place item3 in places)
+                    {
+                        foreach (Feedback item4 in (from w in item3.Feedbacks
+                                                    where !w.IsDeleted
+                                                    select w).ToList())
+                        {
+                            item4.IsDeleted = true;
+                        }
+                        await _unitOfWork.SaveChangesAsync();
+                        item3.IsDeleted = true;
+                    }
+                    await _unitOfWork.SaveChangesAsync();
+                    item.IsDeleted = true;
+                    await _unitOfWork.SaveChangesAsync();
+                    _unitOfWork.Commit();
+                    return Result.Success();
+                }
+                catch (Exception)
+                {
+                    _unitOfWork.Rollback();
+                    return Result.Fail("İşlem sırasında transaction sorunu oluştu!");
+                }
             }
-            if (await _unitOfWork.EntityRepository<Place>().GetCountAsync((Place w) => w.CompanyId == id) > 0)
-            {
-                return Result.Fail("Firmaya ait mekan olduğu için silinmedi!");
-            }
-            _unitOfWork.EntityRepository<Company>().Delete(item);
-            await _unitOfWork.SaveChangesAsync();
-            return Result.Success();
+            return Result.Fail("Firma bulunamadı!");
         }
     }
 

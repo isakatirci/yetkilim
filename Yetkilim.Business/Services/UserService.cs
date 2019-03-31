@@ -43,8 +43,8 @@ namespace Yetkilim.Business.Services
             {
                 return res.Fail("E-posta / Şifre bilgisini kontrol ediniz.");
             }
-            UserDTO mapItem = Mapper.Map<User, UserDTO>(user);
-            return res.Success(mapItem);
+            UserDTO dataVal = Mapper.Map<User, UserDTO>(user);
+            return res.Success(dataVal);
         }
 
         public async Task<Result<UserDTO>> GetUserByIdAsync(int id)
@@ -55,15 +55,14 @@ namespace Yetkilim.Business.Services
             {
                 return res.Fail("User yok!");
             }
-            UserDTO mapItem = Mapper.Map<User, UserDTO>(user);
-            return res.Success(mapItem);
+            UserDTO dataVal = Mapper.Map<User, UserDTO>(user);
+            return res.Success(dataVal);
         }
 
         public async Task<Result<UserDTO>> GetExternalUserAsync(string provider, string nameIdendifier)
         {
             Result<UserDTO> res = new Result<UserDTO>();
-            ExternalUser externalUser = await _unitOfWork.EntityRepository<ExternalUser>().GetFirstAsync((ExternalUser w) => w.Provider == provider && w.NameIdentifier == nameIdendifier, null);
-            ExternalUser extarnalUser = externalUser;
+            ExternalUser extarnalUser = await _unitOfWork.EntityRepository<ExternalUser>().GetFirstAsync((ExternalUser w) => w.Provider == provider && w.NameIdentifier == nameIdendifier, null);
             if (extarnalUser == null)
             {
                 return res.Fail("ExternalUser yok!", null, "NOT_REGISTERED");
@@ -73,8 +72,8 @@ namespace Yetkilim.Business.Services
             {
                 return res.Fail("User yok!", null, "NOT_REGISTERED");
             }
-            UserDTO mapItem = Mapper.Map<User, UserDTO>(user);
-            return res.Success(mapItem);
+            UserDTO dataVal = Mapper.Map<User, UserDTO>(user);
+            return res.Success(dataVal);
         }
 
         public async Task<Result<UserDTO>> AddUserAsync(UserDTO model)
@@ -90,12 +89,13 @@ namespace Yetkilim.Business.Services
             {
                 return res.Fail("Bu telefon (" + model.Phone + ") ile kullanıcı tanımlanmış!");
             }
-            User item = Mapper.Map<UserDTO, User>(model);
+            User user = Mapper.Map<UserDTO, User>(model);
+            user.CreatedDate = DateTime.UtcNow;
             if (!string.IsNullOrWhiteSpace(model.Password))
             {
-                item.Password = PasswordHelper.MD5Hash(model.Password);
+                user.Password = PasswordHelper.MD5Hash(model.Password);
             }
-            User created = await repo.CreateAsync(item);
+            User created = await repo.CreateAsync(user);
             await _unitOfWork.SaveChangesAsync();
             if (hasEmail)
             {
@@ -104,38 +104,37 @@ namespace Yetkilim.Business.Services
                 model.Email
                 }, "Üyeliğiniz oluşturuldu!", "Yetkilim Üyeliğiniz oluşturuldu.");
             }
-            UserDTO mapItem = Mapper.Map<User, UserDTO>(created);
-            return Result.Data(mapItem);
+            return Result.Data(Mapper.Map<User, UserDTO>(created));
         }
 
         public async Task<Result<UserDTO>> AddExternalUserAsync(string provider, string nameIdendifier, UserDTO model)
         {
             Result<UserDTO> res = new Result<UserDTO>();
-            ExternalUser item = new ExternalUser
+            ExternalUser entity = new ExternalUser
             {
                 NameIdentifier = nameIdendifier,
                 Provider = provider
             };
-            ExternalUser externalUserRes = await _unitOfWork.EntityRepository<ExternalUser>().CreateAsync(item);
-            if (externalUserRes == null)
+            ExternalUser externalUser = await _unitOfWork.EntityRepository<ExternalUser>().CreateAsync(entity);
+            if (externalUser == null)
             {
                 return res.Fail("Kullanıcı oluşturulamadı!");
             }
             model.IsExternal = true;
-            model.ExternalUserId = externalUserRes.Id;
+            model.ExternalUserId = externalUser.Id;
             return await AddUserAsync(model);
         }
 
         public async Task<Result> UpdateUserAsync(int id, UserDTO model)
         {
-            EFRepository<User> repo = _unitOfWork.EntityRepository<User>();
+            EFRepository<User> eFRepository = _unitOfWork.EntityRepository<User>();
             string pass = (!string.IsNullOrWhiteSpace(model.Password)) ? PasswordHelper.MD5Hash(model.Password) : string.Empty;
-            User user = repo.GetFirst((User w) => w.Id == id && (w.IsExternal || w.Password == pass) && !w.IsDeleted, null);
+            User user = eFRepository.GetFirst((User w) => w.Id == id && (w.IsExternal || w.Password == pass) && !w.IsDeleted, null);
             if (user == null)
             {
                 return Result.Fail("Kullanıcı bilgileri geçersiz. Şifrenizi kontrol edin.");
             }
-            if (user.Email != model.Email && await repo.GetExistsAsync((User w) => w.Email == model.Email && !w.IsDeleted))
+            if (user.Email != model.Email && await eFRepository.GetExistsAsync((User w) => w.Email == model.Email && !w.IsDeleted))
             {
                 return Result.Fail("Bu mail (" + model.Email + ") ile kullanıcı tanımlanmış!");
             }
@@ -148,14 +147,14 @@ namespace Yetkilim.Business.Services
 
         public async Task<Result> ChangePasswordAsync(int id, string oldPassword, string newPassword)
         {
-            EFRepository<User> repo = _unitOfWork.EntityRepository<User>();
+            EFRepository<User> eFRepository = _unitOfWork.EntityRepository<User>();
             string pass = PasswordHelper.MD5Hash(oldPassword);
-            User user = repo.GetFirst((User w) => w.Id == id && w.Password == pass && !w.IsDeleted, null);
-            if (user == null)
+            User first = eFRepository.GetFirst((User w) => w.Id == id && w.Password == pass && !w.IsDeleted, null);
+            if (first == null)
             {
                 return Result.Fail("Şifrenizi kontrol ediniz.");
             }
-            user.Password = PasswordHelper.MD5Hash(newPassword);
+            first.Password = PasswordHelper.MD5Hash(newPassword);
             await _unitOfWork.SaveChangesAsync();
             return Result.Success("Güncellendi!");
         }

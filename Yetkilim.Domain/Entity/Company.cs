@@ -10,17 +10,49 @@ namespace Yetkilim.Domain.Entity
 {
     public class Company : TrackableEntity<int>
     {
-        public string Name { get; set; }
+        public string Name
+        {
+            get;
+            set;
+        }
 
-        public string Image { get; set; }
-
-        public string Address { get; set; }
-
-        public int CompanyTypeId { get; set; }
         public string Demo { get; set; }
 
-        public virtual CompanyType CompanyType { get; set; }
+        public string Image
+        {
+            get;
+            set;
+        }
 
-        public ICollection<Place> Places { get; set; }
+        public string Address
+        {
+            get;
+            set;
+        }
+
+        public bool IsDeleted
+        {
+            get;
+            set;
+        }
+
+        public int CompanyTypeId
+        {
+            get;
+            set;
+        }
+
+        public virtual CompanyType CompanyType
+        {
+            get;
+            set;
+        }
+
+        public ICollection<Place> Places
+        {
+            get;
+            set;
+        }
     }
+
 }
