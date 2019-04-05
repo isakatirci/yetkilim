@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yetkilim.Global", "Yetkilim
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yetkilim.Business", "Yetkilim.Business\Yetkilim.Business.csproj", "{2834290E-9727-41AB-A1E0-0D780FCB52EF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yetkilim.Business.Lite", "Yetkilim.Business.Lite\Yetkilim.Business.Lite.csproj", "{2368FA39-A736-46C5-A4C4-520BC838C397}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{2834290E-9727-41AB-A1E0-0D780FCB52EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2834290E-9727-41AB-A1E0-0D780FCB52EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2834290E-9727-41AB-A1E0-0D780FCB52EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2368FA39-A736-46C5-A4C4-520BC838C397}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2368FA39-A736-46C5-A4C4-520BC838C397}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2368FA39-A736-46C5-A4C4-520BC838C397}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2368FA39-A736-46C5-A4C4-520BC838C397}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -87,11 +87,16 @@ public class HomeController : BaseController
                 ViewBag.WarningDemo = "Dikkat bu işletme üyemiz değildir. Yine de değerlendirmenizi sorumlulara iletmeye çalışacağız. Dönüş geç yapılabilir ya da yapılmayabilir.";
             }
 
-
             using (yetkilimDBContext db = new yetkilimDBContext())
             {
-                var companyFeedback = db.CompanyFeedback.First(x => x.TypeId == place.CompanyId);
-                return View("~/Views/Feedback/Feedback" + companyFeedback.FeedbackId + ".cshtml");
+
+                var company = db.Companies.FirstOrDefault(x => x.Id == place.CompanyId);
+                var companyFeedback = db.CompanyFeedback.FirstOrDefault(x => x.TypeId == company.CompanyTypeId);
+                if (companyFeedback != null)
+                {
+                    return View("~/Views/Feedback/Feedback" + companyFeedback.FeedbackId + ".cshtml");
+                }
+                return View("~/Views/Feedback/Feedback" + 0 + ".cshtml");
             }
 
             //var companyFeedback = _companyFeedbackService.GetCompanyFeedbackQueryable().First(x => x.TypeId == company.CompanyTypeId);
