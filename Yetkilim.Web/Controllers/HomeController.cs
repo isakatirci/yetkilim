@@ -180,6 +180,10 @@ public class HomeController : BaseController
             using (yetkilimDBContext db = new yetkilimDBContext())
             {
                 feedback.CreatedDate = DateTime.Now;
+                if (base.CurrentUser != null)
+                {
+                    feedback.UserId = base.CurrentUser.UserId;
+                }
                 db.Feedback0.Add(feedback);
                 db.SaveChanges();
             }
@@ -197,7 +201,11 @@ public class HomeController : BaseController
             //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture); 
             using (yetkilimDBContext db = new yetkilimDBContext())
             {
-                feedback.CreatedDate = DateTime.Now;
+                feedback.CreatedDate = DateTime.Now;                
+                if (base.CurrentUser != null)
+                {
+                    feedback.UserId = base.CurrentUser.UserId;
+                }
                 db.Feedback1.Add(feedback);
                 db.SaveChanges();
             }
@@ -217,6 +225,10 @@ public class HomeController : BaseController
             using (yetkilimDBContext db = new yetkilimDBContext())
             {
                 feedback.CreatedDate = DateTime.Now;
+                if (base.CurrentUser != null)
+                {
+                    feedback.UserId = base.CurrentUser.UserId;
+                }
                 db.Feedback2.Add(feedback);
                 db.SaveChanges();
             }
@@ -236,6 +248,10 @@ public class HomeController : BaseController
             using (yetkilimDBContext db = new yetkilimDBContext())
             {
                 feedback.CreatedDate = DateTime.Now;
+                if (base.CurrentUser != null)
+                {
+                    feedback.UserId = base.CurrentUser.UserId;
+                }
                 db.Feedback3.Add(feedback);
                 db.SaveChanges();
             }
@@ -255,6 +271,10 @@ public class HomeController : BaseController
             using (yetkilimDBContext db = new yetkilimDBContext())
             {
                 feedback.CreatedDate = DateTime.Now;
+                if (base.CurrentUser != null)
+                {
+                    feedback.UserId = base.CurrentUser.UserId;
+                }
                 db.Feedback4.Add(feedback);
                 db.SaveChanges();
             }
@@ -274,6 +294,10 @@ public class HomeController : BaseController
             using (yetkilimDBContext db = new yetkilimDBContext())
             {
                 feedback.CreatedDate = DateTime.Now;
+                if (base.CurrentUser != null)
+                {
+                    feedback.UserId = base.CurrentUser.UserId;
+                }
                 db.Feedback5.Add(feedback);
                 db.SaveChanges();
             }
@@ -293,6 +317,10 @@ public class HomeController : BaseController
             using (yetkilimDBContext db = new yetkilimDBContext())
             {
                 feedback.CreatedDate = DateTime.Now;
+                if (base.CurrentUser != null)
+                {
+                    feedback.UserId = base.CurrentUser.UserId;
+                }
                 db.Feedback6.Add(feedback);
                 db.SaveChanges();
             }
@@ -312,6 +340,10 @@ public class HomeController : BaseController
             using (yetkilimDBContext db = new yetkilimDBContext())
             {
                 feedback.CreatedDate = DateTime.Now;
+                if (base.CurrentUser != null)
+                {
+                    feedback.UserId = base.CurrentUser.UserId;
+                }
                 db.Feedback7.Add(feedback);
                 db.SaveChanges();
             }
