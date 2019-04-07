@@ -91,9 +91,14 @@ namespace Yetkilim.Business.Services
             int? companyId = searchModel.CompanyId;
             int? placeId = searchModel.PlaceId;
             int? userId = searchModel.UserId;
-            //IQueryable<Feedback> source = _unitOfWork.EntityRepository<Feedback>().GetQueryable((Feedback w) => w.IsDeleted == false && ((object)placeId == null || (object)(int?)w.PlaceId == (object)placeId) && ((object)userId == null || (object)w.UserId == (object)userId) && ((object)companyId == null || (object)(int?)w.Place.CompanyId == (object)companyId), null);
-
-            IQueryable<Feedback> source = _unitOfWork.EntityRepository<Feedback>().GetQueryable((Feedback w) => w.IsDeleted == false, null);
+            IQueryable<Feedback> source = _unitOfWork.EntityRepository<Feedback>()
+                .GetQueryable((Feedback w) =>
+                w.IsDeleted == false 
+                && ((object)placeId == null || (object)(int?)w.PlaceId == (object)placeId) 
+                && ((object)userId == null || (object)w.UserId == (object)userId) 
+                && ((object)companyId == null || (object)(int?)w.Place.CompanyId == (object)companyId)
+                , null);
+            //IQueryable<Feedback> source = _unitOfWork.EntityRepository<Feedback>().GetQueryable((Feedback w) => w.IsDeleted == false, null);
             if (!string.IsNullOrEmpty(searchModel.SearchText))
             {
                 source = from w in source
