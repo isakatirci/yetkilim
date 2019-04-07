@@ -1,0 +1,65 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+
+<div class="page-content p-6">
+    <div class="content container">
+        <div class="row">
+            <div class="col-12">
+                <div class="example ">
+                    <div class="source-preview-wrapper">
+                        <div class="preview">
+                            <div class="preview-elements">
+                                <div class="animated fadeInUp">
+                                    @Html.Raw(ViewBag.Table)
+                                </div><!-- .animated fadeInUp -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+<script>
+        $(document).ready(function () {
+
+            @for (int i = 0; i < 8; i++)
+            {
+                <text>
+                    // Setup - add a text input to each footer cell
+                    $('#data-table-feedback@(i) thead tr').clone(true).appendTo('#data-table-feedback@(i) thead');
+                    $('#data-table-feedback@(i) thead tr:eq(1) th').each(function (i) {
+                        var title = $(this).text();
+                        $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+
+                        $('input', this).on('keyup change', function () {
+                            if (table.column(i).search() !== this.value) {
+                                table
+                                    .column(i)
+                                    .search(this.value)
+                                    .draw();
+                            }
+                        });
+                    });
+
+
+                    var table = $("#data-table-feedback@(i)").DataTable({
+                        orderCellsTop: true,
+                        fixedHeader: true,
+                        responsive: true,
+                        dom: 'rt<"dataTables_footer"ip>'
+
+                    });
+                </text>
+            }
+
+        });
+</script>
+}

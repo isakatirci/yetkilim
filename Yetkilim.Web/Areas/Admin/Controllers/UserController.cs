@@ -16,6 +16,7 @@ using Yetkilim.Domain.Entity;
 using Yetkilim.Domain.Enums;
 using Yetkilim.Global.Model;
 using Yetkilim.Web.Areas.Admin.Models;
+using Yetkilim.Web.Models.Ef;
 
 namespace Yetkilim.Web.Areas.Admin.Controllers
 {
@@ -111,13 +112,38 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
                     model.FormMessage = "Şube yetkilisi için mekan seçmeniz gerekmektedir.";
                     return this.View((object)model);
                 }
+
+                var companyId = 0;
+
+                //if (model.PlaceId.HasValue)
+                //{
+                //    try
+                //    {
+                //        using (yetkilimDBContext db = new yetkilimDBContext())
+                //        {
+                //            var place = db.Places.FirstOrDefault(x => x.Id == model.PlaceId);
+                //            companyId = place.CompanyId;
+                //        }
+                      
+                //    }
+                //    catch (Exception ex)
+                //    {
+
+                        
+                //    }                   
+                //}
+                //else
+                //{                    
+                //    companyId = base.CurrentUser.CompanyId;
+                //}
+
                 PanelUserDTO panelUserDTO = new PanelUserDTO
                 {
                     Name = model.Name,
                     Email = model.Email,
                     Role = model.Role,
                     CreatedDate = DateTime.UtcNow,
-                    CompanyId = base.CurrentUser.CompanyId,
+                    CompanyId = companyId = base.CurrentUser.CompanyId,
                     PlaceId = model.PlaceId
                 };
                 if (model.Role == UserRole.Dealer && base.CurrentUser.Role == UserRole.SuperAdmin)

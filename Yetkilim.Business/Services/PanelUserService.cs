@@ -70,7 +70,6 @@ namespace Yetkilim.Business.Services
                 string pass = PasswordHelper.GeneratePassword(6);
                 panelUser.Password = PasswordHelper.MD5Hash(pass);
                 panelUser.CreatedDate = DateTime.UtcNow;
-                panelUser.CompanyId = 1;
                 panelUser.Place = null;
                 panelUser.Company = null;
                 PanelUser created = await repo.CreateAsync(panelUser);

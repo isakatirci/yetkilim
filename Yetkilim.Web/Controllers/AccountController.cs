@@ -1,10 +1,12 @@
 ﻿// AccountController
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Yetkilim.Business.Services;
 using Yetkilim.Domain.DTO;
@@ -171,7 +173,7 @@ public class AccountController : BaseController
             int userId = base.CurrentUser.UserId;
             CompanyUserSearchModel val = new CompanyUserSearchModel();
             ((SearchModel)val).PageSize = 40;
-            val.UserId=(int?)userId;
+            val.UserId = (int?)userId;
             CompanyUserSearchModel val2 = val;
             Result<List<FeedbackDetailDTO>> result = await _feedbackService.GetAllFeedbackDetailAsync(val2);
             if (!result.IsSuccess)
@@ -198,6 +200,100 @@ public class AccountController : BaseController
             model.FormMessage = "İşleminiz gerçekleştirilemedi.";
             return this.View((object)model);
         }
+    }
+
+
+    private bool myEquals(string value, string other)
+    {
+        return string.Equals(value, other, StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    private string myTableMaker<T>(T[] list, string id)
+    {
+        PropertyInfo[] properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        //Array.Sort(properties, new ComparerPropertyInfo());
+        var table = "<table class=\"table\" id=\"data-table-feedback" + id + "\"><thead><tr>";
+        for (int j = 0; j < properties.Length; j++)
+        {
+            table += "<th class=\"secondary-text\"><div class=\"table-header\"><span class=\"column-title\">" + properties[j].Name + "</span></div></td>";
+        }
+        table += "</tr></thead><tbody>";
+        for (int i = 0; i < list.Length; i++)
+        {
+            table += "<tr>";
+            for (int j = 0; j < properties.Length; j++)
+            {
+                table += "<td>" + properties[j].GetValue(list[i], null) + "</td>";
+            }
+            table += "</tr>";
+        }
+        table += "</tbody></table>";
+
+        return table;
+    }
+
+    public IActionResult FeedbackIndex()
+    {
+        var table = string.Empty;
+        int? userId = (int?)base.CurrentUser.UserId;
+
+        if (!userId.HasValue)
+        {
+            return RedirectToAction(controllerName: "Account", actionName: "Profile");
+        }
+
+        using (Yetkilim.Web.Models.Ef.yetkilimDBContext db = new Yetkilim.Web.Models.Ef.yetkilimDBContext())
+        {
+            db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            db.ChangeTracker.AutoDetectChangesEnabled = false;
+            //db.ProxyCreationEnabled = false;            
+            if (db.Feedback0.Any(x => x.UserId == userId))
+            {
+                table += "<hr/>";
+                table = myTableMaker(db.Feedback0.AsNoTracking().Where(x => x.UserId == userId).ToArray(), "0");
+            }
+            else if (db.Feedback1.Any(x => x.UserId == userId))
+            {
+                table += "<hr/>";
+                table = myTableMaker(db.Feedback1.AsNoTracking().Where(x => x.UserId == userId).ToArray(), "1");
+            }
+            else if (db.Feedback2.Any(x => x.UserId == userId))
+            {
+                table += "<hr/>";
+                table = myTableMaker(db.Feedback2.AsNoTracking().Where(x => x.UserId == userId).ToArray(), "2");
+            }
+            else if (db.Feedback3.Any(x => x.UserId == userId))
+            {
+                table += "<hr/>";
+                table = myTableMaker(db.Feedback3.AsNoTracking().Where(x => x.UserId == userId).ToArray(), "3");
+            }
+            else if (db.Feedback4.Any(x => x.UserId == userId))
+            {
+                table += "<hr/>";
+                table = myTableMaker(db.Feedback4.AsNoTracking().Where(x => x.UserId == userId).ToArray(), "4");
+            }
+            else if (db.Feedback5.Any(x => x.UserId == userId))
+            {
+                table += "<hr/>";
+                table = myTableMaker(db.Feedback5.AsNoTracking().Where(x => x.UserId == userId).ToArray(), "5");
+            }
+            else if (db.Feedback6.Any(x => x.UserId == userId))
+            {
+                table += "<hr/>";
+                table = myTableMaker(db.Feedback6.AsNoTracking().Where(x => x.UserId == userId).ToArray(), "6");
+            }
+            else if (db.Feedback7.Any(x => x.UserId == userId))
+            {
+                table += "<hr/>";
+                table = myTableMaker(db.Feedback7.AsNoTracking().Where(x => x.UserId == userId).ToArray(), "7");
+            }
+        }
+
+        ViewBag.WarningDemo = "Hiç Değerlendirme Yapılmamış";
+
+        ViewBag.Table = table;
+
+        return View();
     }
 
     public async Task<ViewResult> MyPromotions()

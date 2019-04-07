@@ -72,23 +72,6 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
             return string.Equals(value, other, StringComparison.InvariantCultureIgnoreCase);
         }
 
-        //class ComparerPropertyInfo : IComparer<PropertyInfo>
-        //{
-        //    public int Compare(PropertyInfo x, PropertyInfo y)
-        //    {
-        //        return string.Compare(x.Name, y.Name, StringComparison.InvariantCultureIgnoreCase);
-        //    }
-        //}
-
-        // <th class="secondary-text">
-        //            <div class="table-header">
-        //                <span class="column-title">Name</span>
-        //            </div>
-        //        </th>
-
-
-        //id="sample-data-table" class="table"
-
         private string myTableMaker<T>(T[] list)
         {
             PropertyInfo[] properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
