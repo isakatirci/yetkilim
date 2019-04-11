@@ -47,12 +47,15 @@ namespace Yetkilim.Business.Services
                 await _unitOfWork.SaveChangesAsync();
                 manager.CompanyId = created.Id;
                 manager.Role = UserRole.Admin;
-                Result<PanelUserDTO> result = await _panelUserService.AddUserAsync(manager);
-                if (!result.IsSuccess)
+                if (!string.Equals(company.Demo,"Evet",StringComparison.InvariantCultureIgnoreCase))
                 {
-                    _unitOfWork.Rollback();
-                    return res.Fail(result.Messages);
-                }
+                    Result<PanelUserDTO> result = await _panelUserService.AddUserAsync(manager);
+                    if (!result.IsSuccess)
+                    {
+                        _unitOfWork.Rollback();
+                        return res.Fail(result.Messages);
+                    }
+                }             
                 _unitOfWork.Commit();
                 return Result.Data(Mapper.Map<Company, CompanyDetailDTO>(created));
             }

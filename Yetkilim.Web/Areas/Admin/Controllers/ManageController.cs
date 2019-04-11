@@ -86,7 +86,7 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
             AdminLoginViewModel adminLoginViewModel = new AdminLoginViewModel();
             return View((object)adminLoginViewModel);
         }
-
+        
         [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Login(AdminLoginViewModel model)
@@ -99,31 +99,40 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
                     if (!result.IsSuccess)
                     {
                         model.FormMessage = "E-Posta ya da Şifre bilgisi yanlış, lütfen bilgilerinizi kontrol edin.";
-                        return View((object)model);
+                        return this.View((object)model);
                     }
                     PanelUserDTO data = result.Data;
                     List<Claim> claims = new List<Claim>
-                {
-                    new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", data.Id.ToString()),
-                    new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", data.Name),
-                    new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", data.Email),
-                    new Claim("CompanyId", data.CompanyId.ToString()),
-                    new Claim("PlaceId", data.PlaceId.ToString()),
-                    new Claim("CompanyName", data.Company.Name),
-                    new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", data.Role.ToString())
-                };
+            {
+                new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", data.Id.ToString()),
+                new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", data.Name),
+                new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", data.Email),
+                new Claim("CompanyId", data.CompanyId.ToString()),
+                new Claim("PlaceId", data.PlaceId.ToString()),
+                new Claim("CompanyName", data.Company.Name),
+                new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", data.Role.ToString())
+            };
                     ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims, "ClaimIdentity"));
-                    await AuthenticationHttpContextExtensions.SignInAsync(this.HttpContext, "AdminAreaCookies", claimsPrincipal);
+                   var task = AuthenticationHttpContextExtensions.SignInAsync(this.HttpContext, "AdminAreaCookies", claimsPrincipal);
+                    task.Wait();
+                    if (task.IsCompletedSuccessfully)
+                    {
+                      var temp =  this.User.Claims;
+                    }
+                    else
+                    {
+
+                    }                      
                     return this.RedirectToAction("Index", "Manage");
                 }
                 catch (Exception ex)
                 {
                     LoggerExtensions.LogError(_logger, ex, "Panel Login Error", Array.Empty<object>());
                     model.FormMessage = "İşleminiz gerçekleştirilemedi.";
-                    return View((object)model);
+                    return this.View((object)model);
                 }
             }
-            return View((object)model);
+            return this.View((object)model);
         }
 
         [AllowAnonymous]
@@ -202,6 +211,6 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
         {
             await AuthenticationHttpContextExtensions.SignOutAsync(this.HttpContext, "AdminAreaCookies");
             return this.RedirectToAction("Login", "Manage");
-        }
+        }   
     }
 }

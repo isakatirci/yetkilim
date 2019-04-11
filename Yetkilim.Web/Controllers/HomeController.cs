@@ -71,16 +71,18 @@ public class HomeController : BaseController
     }
 
     public ViewResult Feedback(int id)
-    {
-        FeedbackViewModel feedbackViewModel = new FeedbackViewModel
-        {
-            IsLogged = (base.CurrentUser != null)
-        };
+    {   
+        FeedbacksViewModelBase feedbackViewModel = null;
+
         try
         {
+
+            
+
             var place = _placeService.GetPlaceAsync(id).Result.Data;
 
             ViewBag.PlaceName = place.Name;
+            ViewBag.PlaceId = place.Id;
 
             if (string.Equals(place.Guest,"Evet",StringComparison.InvariantCultureIgnoreCase))
             {
@@ -91,12 +93,42 @@ public class HomeController : BaseController
             {
 
                 var company = db.Companies.FirstOrDefault(x => x.Id == place.CompanyId);
-                var companyFeedback = db.CompanyFeedback.FirstOrDefault(x => x.TypeId == company.CompanyTypeId);
+                var companyFeedback = db.CompanyFeedback.FirstOrDefault(x => x.TypeId == company.CompanyTypeId);                
                 if (companyFeedback != null)
                 {
-                    return View("~/Views/Feedback/Feedback" + companyFeedback.FeedbackId + ".cshtml");
+                    var tempFeedbackId = companyFeedback.FeedbackId;
+                    switch (tempFeedbackId)
+                    {
+                        case 0:
+                            feedbackViewModel = new FeedbackViewModel0();
+                            break;
+                        case 1:
+                            feedbackViewModel = new FeedbackViewModel1();
+                            break;
+                        case 2:
+                            feedbackViewModel = new FeedbackViewModel2();
+                            break;
+                        case 3:
+                            feedbackViewModel = new FeedbackViewModel3();
+                            break;
+                        case 4:
+                            feedbackViewModel = new FeedbackViewModel4();
+                            break;
+                        case 5:
+                            feedbackViewModel = new FeedbackViewModel5();
+                            break;
+                        case 6:
+                            feedbackViewModel = new FeedbackViewModel6();
+                            break;
+                        case 7:
+                            feedbackViewModel = new FeedbackViewModel7();
+                            break;
+                    }
+                    feedbackViewModel.IsLogged = (base.CurrentUser != null);
+                    return View("~/Views/Feedback/Feedback" + companyFeedback.FeedbackId + ".cshtml", model: feedbackViewModel);
+
                 }
-                return View("~/Views/Feedback/Feedback" + 0 + ".cshtml");
+                return View("~/Views/Feedback/Feedback" + 0 + ".cshtml", model: feedbackViewModel);
             }
 
             //var companyFeedback = _companyFeedbackService.GetCompanyFeedbackQueryable().First(x => x.TypeId == company.CompanyTypeId);
@@ -109,9 +141,9 @@ public class HomeController : BaseController
             {
                 id
             });
-            feedbackViewModel.FormMessage = "İşleminiz gerçekleştirilemedi. Şirket tipine için Feedback sayfası eşleştirilemedi";
+            ViewBag.WarningDemo = "İşleminiz gerçekleştirilemedi. Şirket tipine için Feedback sayfası eşleştirilemedi";
         }
-        return this.View((object)feedbackViewModel);
+        return View("~/Views/Home/Index.cshtml");
     }
 
     [HttpPost]
@@ -179,14 +211,50 @@ public class HomeController : BaseController
             //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture); 
             using (yetkilimDBContext db = new yetkilimDBContext())
             {
-                feedback.CreatedDate = DateTime.Now;
+                var userId = 0;
                 if (base.CurrentUser != null)
                 {
-                    feedback.UserId = base.CurrentUser.UserId;
+                    userId = base.CurrentUser.UserId;
+                }
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(feedback.UserFullName)
+                         || !string.IsNullOrWhiteSpace(feedback.UserMail)
+                         || !string.IsNullOrWhiteSpace(feedback.UserPhone))
+                    {
+                        Users model2 = new Users
+                        {
+                            Name = feedback.UserFullName,
+                            Email = feedback.UserMail,
+                            Phone = feedback.UserPhone,                            
+                            Password = "",
+                        };
+                        db.Users.Add(model2);
+                        db.SaveChanges();
+                        userId = model2.Id;
+                    }                 
+                }
+                catch (Exception)
+                {
+
+                }
+                feedback.CreatedDate = DateTime.Now;
+              
+                try
+                {
+                    feedback.IpAddress = this.Request.HttpContext.Connection
+                        .RemoteIpAddress
+                        .ToString();
+                }
+                catch (Exception ex)
+                {
+                    LoggerExtensions.LogError(_logger, ex, "IP Address error", Array.Empty<object>());
                 }
                 db.Feedback0.Add(feedback);
                 db.SaveChanges();
             }
+
+     
         }
         catch (Exception ex)
         {

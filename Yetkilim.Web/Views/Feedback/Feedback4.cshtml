@@ -32,106 +32,159 @@
                     }
 
 
-                    <div class="entry-content feature_forms animated fadeInUp">
-                        <p>
-                            Aldığınız hizmetin kalitesini iyileştirmek için var gücümüzle çalışıyoruz.
-                            Bu değerlendirmenin, en alt sorumludan en üst sorumluya kadar ulaştığını hatırlatmak isteriz.
-                        </p>
+                        <div class="entry-content feature_forms animated fadeInUp">
+                            <p>
+                                Aldığınız hizmetin kalitesini iyileştirmek için var gücümüzle çalışıyoruz.
+                                Bu değerlendirmenin, en alt sorumludan en üst sorumluya kadar ulaştığını hatırlatmak isteriz.
+                            </p>
 
-                        <input id="formId" type="hidden" value="@Model?.FormId" />
-                        @*<div class="fb-render">
-                </div>*@
+                            <input id="formId" type="hidden" value="@Model?.FormId" />
+                            @*<div class="fb-render">
+        </div>*@
 
-                        <div class="home-widget pt-3">
-                            <div class="widget-title">
-                                Personel İlgisi
+                            <div class="home-widget pt-3">
+                                <div class="widget-title">
+                                    Personel İlgisi
+                                </div>
+                                <div class="rateInput" id="personelIlgisi"></div>
+                                <span class="helper-text" data-error="Lütfen seçim yapınız"></span>
                             </div>
-                            <div class="rateInput" id="personelIlgisi"></div>
-                            <span class="helper-text" data-error="Lütfen seçim yapınız"></span>
-                        </div>
 
-                        <div class="home-widget pt-3">
-                            <div class="widget-title">
-                                Güvenli Sürüş
+                            <div class="home-widget pt-3">
+                                <div class="widget-title">
+                                    Güvenli Sürüş
+                                </div>
+                                <div class="rateInput" id="safeDrive"></div>
+                                <span class="helper-text" data-error="Lütfen seçim yapınız"></span>
                             </div>
-                            <div class="rateInput" id="safeDrive"></div>
-                            <span class="helper-text" data-error="Lütfen seçim yapınız"></span>
-                        </div>
 
-                        <div class="home-widget pt-3">
-                            <div class="widget-title">
-                                Rötar
+                            <div class="home-widget pt-3">
+                                <div class="widget-title">
+                                    Rötar
+                                </div>
+                                <div class="rateInput" id="rotar"></div>
+                                <span class="helper-text" data-error="Lütfen seçim yapınız"></span>
                             </div>
-                            <div class="rateInput" id="rotar"></div>
-                            <span class="helper-text" data-error="Lütfen seçim yapınız"></span>
-                        </div>
 
-                        <div class="home-widget pt-3">
-                            <div class="widget-title">
-                                İkram
+                            <div class="home-widget pt-3">
+                                <div class="widget-title">
+                                    İkram
+                                </div>
+                                <div class="rateInput" id="ikram"></div>
+                                <span class="helper-text" data-error="Lütfen seçim yapınız"></span>
                             </div>
-                            <div class="rateInput" id="ikram"></div>
-                            <span class="helper-text" data-error="Lütfen seçim yapınız"></span>
-                        </div>
 
-                        <div class="home-widget pt-3">
-                            <div class="widget-title">
-                                Hijyen
+                            <div class="home-widget pt-3">
+                                <div class="widget-title">
+                                    Hijyen
+                                </div>
+                                <div class="rateInput" id="hijyen"></div>
+                                <span class="helper-text" data-error="Lütfen seçim yapınız"></span>
                             </div>
-                            <div class="rateInput" id="hijyen"></div>
-                            <span class="helper-text" data-error="Lütfen seçim yapınız"></span>
-                        </div>
 
-                        <div class="home-widget pt-3">
-                            <div class="widget-title">
-                                Tavsiye Eder misiniz?
+                            <div class="home-widget pt-3">
+                                <div class="widget-title">
+                                    Tavsiye Eder misiniz?
+                                </div>
+                                <div class="rateInput" id="tavsiye"></div>
+                                <span class="helper-text" data-error="Lütfen seçim yapınız"></span>
                             </div>
-                            <div class="rateInput" id="tavsiye"></div>
-                            <span class="helper-text" data-error="Lütfen seçim yapınız"></span>
-                        </div>
 
-                        <div class="home-widget pt-3">
-                            <div class="widget-title">
-                                Koltuk Numarası
-                            </div>
-                            <div class="row">
-                                <div class="input-field col s12 no-mb no-mt">
-                                    <input type="text" id="seatNo" class="no-mb" required="required" />
-                                    <span class="helper-text" data-error="Lütfen giriş yapınız"></span>
+                            <div class="home-widget pt-3">
+                                <div class="widget-title">
+                                    Koltuk Numarası
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12 no-mb no-mt">
+                                        <input type="text" id="seatNo" class="no-mb" required="required" />
+                                        <span class="helper-text" data-error="Lütfen giriş yapınız"></span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="home-widget" id="textarea">
-                            <div class="widget-title">
-                                İletmek istedikleriniz
-                            </div>
+                            <div class="home-widget" id="textarea">
+                                <div class="widget-title">
+                                    İletmek istedikleriniz
+                                </div>
 
-                            <div class="row">
-                                <div class="input-field col s12 no-mb no-mt">
-                                    <textarea id="description" class="materialize-textarea no-mb"></textarea>
-                                    <label for="description">İletmek istedikleriniz</label>
+                                <div class="row">
+                                    <div class="input-field col s12 no-mb no-mt">
+                                        <textarea id="description" class="materialize-textarea no-mb"></textarea>
+                                        <label for="description">İletmek istedikleriniz</label>
+                                    </div>
                                 </div>
                             </div>
+
+                            <div class="switch mb-4">
+                                Bilgilerimin firma ile paylaşılmasına <br />
+                                <label>
+                                    izin vermiyorum
+                                    <input id="chcShare" onchange="userFormHide(this)" type="checkbox" checked>
+                                    <span class="lever"></span>
+                                    izin veriyorum
+                                </label>
+                            </div>
+
+                            @if (!Model.IsLogged)
+                            {
+
+                                <div class="home-widget userFormField" id="textarea">
+                                    <div class="widget-title">
+                                        Adınız Soyadınız
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="input-field col s12 no-mb no-mt">
+                                            <textarea id="userFullName" class="materialize-textarea no-mb"></textarea>
+                                            <label for="userFullName">Adınız Soyadınız</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="home-widget userFormField" id="textarea">
+                                    <div class="widget-title">
+                                        Telefon Numaranız
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="input-field col s12 no-mb no-mt">
+                                            <textarea id="userPhone" class="materialize-textarea no-mb"></textarea>
+                                            <label for="userPhone">Telefon Numaranız</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="home-widget userFormField" id="textarea">
+                                    <div class="widget-title">
+                                        Mail Adresiniz
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="input-field col s12 no-mb no-mt">
+                                            <textarea id="userMail" class="materialize-textarea no-mb"></textarea>
+                                            <label for="userMail">
+                                                Mail Adresiniz
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="home-widget userFormField" id="textarea">
+                                    <div class="widget-title">
+                                        Adresiniz
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="input-field col s12 no-mb no-mt">
+                                            <textarea id="userAddress" class="materialize-textarea no-mb"></textarea>
+                                            <label for="userAddress">Adresiniz</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            }
+
+
+                            <a id="btnSend" href="#" class="btn orange block">GÖNDER</a>
+
                         </div>
-
-                        @*@if (Model.IsLogged)
-                {
-                    <div class="switch mb-4">
-                        Bilgilerimin firma ile paylaşılmasına <br />
-                        <label>
-                            izin vermiyorum
-                            <input id="chcShare" type="checkbox" checked>
-                            <span class="lever"></span>
-                            izin veriyorum
-                        </label>
-                    </div>
-                }*@
-
-
-                        <a id="btnSend" href="#" class="btn orange block">GÖNDER</a>
-
-                    </div>
                 }
             </div><!-- .content-container -->
 
@@ -291,7 +344,9 @@
             //});
 
             $(".rateInput").rateYo({
-                fullStar:true
+                fullStar: true,
+                numStars: 10,
+                rating: "50%",
             });
 
             $("#btnSend").click(function(e) {
@@ -342,7 +397,12 @@
                     Ikram: $("#ikram").rateYo("rating"),
                     CleaningRate: $("#hijyen").rateYo("rating"),
                     AdviseRate: $("#tavsiye").rateYo("rating"),
-                    IsUserShare: isShare
+                    IsUserShare: isShare,
+                     userFullName: $("#userFullName").val(),
+                    userPhone: $("#userPhone").val(),
+                    userAddress: $("#userAddress").val(),
+                    userMail: $("#userMail").val(),
+                     placeId:'@ViewBag.PlaceId'
                     //LikeRate: likeRate
                 }
                 console.log(data);

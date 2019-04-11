@@ -20,6 +20,8 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
         public AdminCookieUserModel CurrentUser
         {
             get
+
+
             {
                 if (this.User?.Identities == null || !this.User.Identities.Any())
                 {

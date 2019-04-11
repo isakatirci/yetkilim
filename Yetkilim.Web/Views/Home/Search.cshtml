@@ -72,15 +72,7 @@
 <div class="container">
     <div class="row no-mb">
         <div class="col s12">
-            <div class="searchbar show">
-                <div class="input-field">
-                    <input placeholder="Mekan adı..." id="search_text" type="text" value="@Model.SearchText" class="validate">
-                    <span class="helper-text" data-error="Lütfen en az 3 karakter giriniz."></span>
-                </div>
-                <div class="search-btn">
-                    <span class="ti-search"></span>
-                </div>
-            </div>
+            <!--Mekan ad.. search box-->
             <!-- Content container -->
             <div class="content-container no-padding-top">
                 @if (Model.Places != null)
@@ -101,7 +93,7 @@
                                 <li class="valign-wrapper">
                                     <div class="entry-thumb">
                                         <a href="#!">
-                                            <img src="http://placeimg.com/115/115/arch?v=@Guid.NewGuid()" alt="">
+                                            <img src="/@Yetkilim.Global.Consts.UploadFolders.AdminBaseFolder/@place.Company.Image" alt="">
                                         </a>
                                     </div>
                                     <div class="product-ctn">
@@ -151,24 +143,36 @@
                     </div>
 
                     <div class="row shop-category mt-4">
-                        <div class="col s6 m6 l2 location-search">
-                            <a href="#!" class="icon">
-                                <span class="ti-location-pin"></span>
-                            </a>
-                            <div class="caption truncate">
-                                <a href="#!">Konum ile Ara</a>
-                            </div>
-                        </div>
-                        <div class="col s6 m6 l2">
-                            <a href="#!" class="icon">
+                        <div class="col s12 m12 l12">
+                            <!--  <a href="#!" class="icon">
                                 <span class="ti-camera"></span>
                             </a>
                             <div class="caption">
                                 <a href="#!">QR ile Ara (Yakında!)</a>
+                                        </div> -->
+                            <div class="searchbar show">
+                                <div class="input-field">
+                                    <input placeholder="Mekan adı..." id="search_text" type="text" value="@Model.SearchText" class="validate">
+                                    <span class="helper-text" data-error="Lütfen en az 3 karakter giriniz."></span>
+                                </div>
+                                <div class="search-btn">
+                                    <span class="ti-search"></span>
+                                </div>
                             </div>
+                        </div>
+                        <div class="col s12 m12 l12 location-search">
+                            <button class="btn">
+                                Yakınımdaki İşletmeleri Göster
+                                <i class="material-icons left">location_on</i>
+                                <!--<span class="ti-location-pin"></span>-->
+                            </button>
+                            <!-- <div class="caption truncate">
+                                <a href="#!">Konum ile Ara</a>
+                            </div>  -->
                         </div>
                     </div>
                 }
+
             </div><!-- .content-container -->
             <!-- END CONTENT CONTAINER -->
         </div><!-- .col s12 -->

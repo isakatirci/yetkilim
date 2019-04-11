@@ -37,7 +37,7 @@
 
                         <input id="formId" type="hidden" value="@Model?.FormId" />
                         @*<div class="fb-render">
-                </div>*@
+        </div>*@
 
                         <div class="home-widget pt-3">
                             <div class="widget-title">
@@ -64,16 +64,16 @@
                         </div>
 
                         @*<div class="home-widget pt-3">
-                    <div class="widget-title">
-                        Masa Kodu
-                    </div>
-                    <div class="row">
-                        <div class="input-field col s12 no-mb no-mt">
-                            <input type="text" id="deskCode" class="no-mb"  required="required"/>
-                            <span class="helper-text" data-error="Lütfen giriş yapınız"></span>
-                        </div>
-                    </div>
-                </div>*@
+            <div class="widget-title">
+                Masa Kodu
+            </div>
+            <div class="row">
+                <div class="input-field col s12 no-mb no-mt">
+                    <input type="text" id="deskCode" class="no-mb"  required="required"/>
+                    <span class="helper-text" data-error="Lütfen giriş yapınız"></span>
+                </div>
+            </div>
+        </div>*@
 
                         <div class="home-widget" id="textarea">
                             <div class="widget-title">
@@ -88,19 +88,71 @@
                             </div>
                         </div>
 
-                        @*@if (Model.IsLogged)
-                {
-                    <div class="switch mb-4">
-                        Bilgilerimin firma ile paylaşılmasına <br />
-                        <label>
-                            izin vermiyorum
-                            <input id="chcShare" type="checkbox" checked>
-                            <span class="lever"></span>
-                            izin veriyorum
-                        </label>
-                    </div>
-                }*@
+                        <div class="switch mb-4">
+                            Bilgilerimin firma ile paylaşılmasına <br />
+                            <label>
+                                izin vermiyorum
+                                <input id="chcShare" onchange="userFormHide(this)" type="checkbox" checked>
+                                <span class="lever"></span>
+                                izin veriyorum
+                            </label>
+                        </div>
 
+                        @if (!Model.IsLogged)
+                        {
+
+                            <div class="home-widget userFormField" id="textarea">
+                                <div class="widget-title">
+                                    Adınız Soyadınız
+                                </div>
+
+                                <div class="row">
+                                    <div class="input-field col s12 no-mb no-mt">
+                                        <textarea id="userFullName" class="materialize-textarea no-mb"></textarea>
+                                        <label for="userFullName">Adınız Soyadınız</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="home-widget userFormField" id="textarea">
+                                <div class="widget-title">
+                                    Telefon Numaranız
+                                </div>
+
+                                <div class="row">
+                                    <div class="input-field col s12 no-mb no-mt">
+                                        <textarea id="userPhone" class="materialize-textarea no-mb"></textarea>
+                                        <label for="userPhone">Telefon Numaranız</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="home-widget userFormField" id="textarea">
+                                <div class="widget-title">
+                                    Mail Adresiniz
+                                </div>
+
+                                <div class="row">
+                                    <div class="input-field col s12 no-mb no-mt">
+                                        <textarea id="userMail" class="materialize-textarea no-mb"></textarea>
+                                        <label for="userMail">
+                                            Mail Adresiniz
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="home-widget userFormField" id="textarea">
+                                <div class="widget-title">
+                                    Adresiniz
+                                </div>
+
+                                <div class="row">
+                                    <div class="input-field col s12 no-mb no-mt">
+                                        <textarea id="userAddress" class="materialize-textarea no-mb"></textarea>
+                                        <label for="userAddress">Adresiniz</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        }
 
                         <a id="btnSend" href="#" class="btn orange block">GÖNDER</a>
 
@@ -264,7 +316,9 @@
             //});
 
             $(".rateInput").rateYo({
-                fullStar:true
+                fullStar: true,
+                numStars: 10,
+                rating: "50%",
             });
 
             $("#btnSend").click(function(e) {
@@ -312,7 +366,12 @@
                     EmployeeRate: $("#personelIlgisi").rateYo("rating"),
                     WCCleaningRate: $("#WCHijyen").rateYo("rating"),
                     AdviseRate: $("#tavsiye").rateYo("rating"),
-                    IsUserShare: isShare
+                    IsUserShare: isShare,
+                    userFullName: $("#userFullName").val(),
+                    userPhone: $("#userPhone").val(),
+                    userAddress: $("#userAddress").val(),
+                    userMail: $("#userMail").val(),
+                     placeId:'@ViewBag.PlaceId'
                     //LikeRate: likeRate
                 }
 

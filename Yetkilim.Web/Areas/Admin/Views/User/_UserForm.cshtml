@@ -40,8 +40,25 @@
                                 </div>
                                 <span asp-validation-for="Email" class="text-danger"></span>
                             </div>
-                            <div class="form-group row">
-                                <label for="selectPlace" class="col-sm-2 col-form-label">Mekan</label>
+                            @if (Model.IsProfile == false)
+                            {
+                                <div class="form-group row">
+                                    <label for="selectRole" class="col-sm-2 col-form-label">Rol</label>
+                                    <div class="col-sm-10">
+                                        <select class="form-control" id="selectRole" onchange="hidePlaceSelect(this)" name="Role" required="required">
+                                            <option value="@UserRole.Dealer" selected="@(Model.Role == UserRole.Dealer ? "selected" : null)">Şube Yetkilisi</option>
+                                            <option value="@UserRole.Admin" selected="@(Model.Role == UserRole.Admin ? "selected" : null)">Firma Yetkilisi</option>
+                                            @*@if (Model.IsSuperAdmin)
+                                            {
+                                                <option value="@UserRole.SuperAdmin" selected="@(Model.Role == UserRole.SuperAdmin ? "selected" : null)">Super Admin</option>
+                                            }*@
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="PlaceId" class="text-danger"></span>
+                                </div>
+                            }
+                            <div class="form-group row" id="mekanRow">
+                                <label for="selectPlace" class="col-sm-2 col-form-label">Şube</label>
                                 <div class="col-sm-10">
                                     <select class="form-control" id="selectPlace" name="PlaceId">
                                         <option disabled selected> Seçiniz </option>
@@ -53,23 +70,6 @@
                                 </div>
                                 <span asp-validation-for="PlaceId" class="text-danger"></span>
                             </div>
-                            @if (Model.IsProfile == false)
-                            {
-                                <div class="form-group row">
-                                    <label for="selectRole" class="col-sm-2 col-form-label">Rol</label>
-                                    <div class="col-sm-10">
-                                        <select class="form-control" id="selectRole" name="Role" required="required">
-                                            <option value="@UserRole.Dealer" selected="@(Model.Role == UserRole.Dealer ? "selected" : null)">Şube Yetkilisi</option>
-                                            <option value="@UserRole.Admin" selected="@(Model.Role == UserRole.Admin ? "selected" : null)">Firma Yetkilisi</option>
-                                            @if (Model.IsSuperAdmin)
-                                            {
-                                                <option value="@UserRole.SuperAdmin" selected="@(Model.Role == UserRole.SuperAdmin ? "selected" : null)">Super Admin</option>
-                                            }
-                                        </select>
-                                    </div>
-                                    <span asp-validation-for="PlaceId" class="text-danger"></span>
-                                </div>
-                            }
                             @if (Model.IsProfile)
                             {
                                 <div class="form-group row">
@@ -105,5 +105,14 @@
         $("#selectPlace").select2();
         $("#selectRole").select2();
     });
+
+    function hidePlaceSelect(slt) {
+        var hidePlaceSelectVal = $(slt).val();
+        if (hidePlaceSelectVal === "Dealer") {
+            $("#mekanRow").show();
+        } else {
+            $("#mekanRow").hide();
+        }
+    }
 
 </script>

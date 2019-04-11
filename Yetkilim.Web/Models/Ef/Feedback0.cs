@@ -27,5 +27,9 @@ namespace Yetkilim.Web.Models.Ef
         public string CreatedBy { get; set; }
         public string BrowserFp { get; set; }
         public bool IsDeleted { get; set; }
+        public string UserFullName { get; set; }
+        public string UserPhone { get; set; }
+        public string UserAddress { get; set; }
+        public string UserMail { get; set; }
     }
 }

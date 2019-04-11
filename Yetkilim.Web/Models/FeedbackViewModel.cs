@@ -51,6 +51,8 @@ namespace Yetkilim.Web.Models
         public string Error { get; set; }
         public string FormId { get; set; }
         public string PlaceName { get; set; }
+        public bool IsLogged { get; set; }
+        public string FormMessage { get; internal set; }
     }
 
     public class FeedbackViewModel0 : FeedbacksViewModelBase

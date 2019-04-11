@@ -100,12 +100,18 @@
                 <li class="subheader">
                     <span>FİRMA YÖNETİM</span>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link ripple " href="@Url.Action("Update", "Company", new {Id = currentUser.CompanyId})">
-                        <i class="icon s-4 icon-account"></i>
-                        <span>Profil</span>
-                    </a>
-                </li>
+                @if (currentUser.Role == UserRole.SuperAdmin)
+                {
+                    <text>
+                        <li class="nav-item">
+                            <a class="nav-link ripple " href="@Url.Action("Update", "Company", new {Id = currentUser.CompanyId})">
+                                <i class="icon s-4 icon-account"></i>
+                                <span>Profil</span>
+                            </a>
+                        </li>
+                    </text>
+                }
+
                 <li class="nav-item">
                     <a class="nav-link ripple " href="@Url.Action("Index", "User")">
                         <i class="icon s-4 icon-account-multiple"></i>
