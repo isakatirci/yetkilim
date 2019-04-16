@@ -2,16 +2,19 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Yetkilim.Business.Services;
 using Yetkilim.Domain.DTO;
 using Yetkilim.Domain.Entity;
 using Yetkilim.Global.Model;
+using Yetkilim.Infrastructure.Email;
 using Yetkilim.Web.Controllers;
 using Yetkilim.Web.Models;
 using Yetkilim.Web.Models.Ef;
@@ -27,9 +30,9 @@ public class HomeController : BaseController
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ICompanyService _companyService;
     private readonly ICompanyFeedbackService _companyFeedbackService;
-    
 
-    public HomeController(ILogger<HomeController> logger, IHostingEnvironment hostingEnvironment, IPlaceService placeService, IFeedbackService feedbackService, ICompanyService companyService, ICompanyFeedbackService companyFeedbackService)
+    private readonly IEmailSender _emailSender;
+    public HomeController(ILogger<HomeController> logger, IHostingEnvironment hostingEnvironment, IPlaceService placeService, IFeedbackService feedbackService, ICompanyService companyService, ICompanyFeedbackService companyFeedbackService, IEmailSender emailSender)
     {
         _logger = logger;
         _hostingEnvironment = hostingEnvironment;
@@ -37,6 +40,7 @@ public class HomeController : BaseController
         _feedbackService = feedbackService;
         _companyService = companyService;
         _companyFeedbackService = companyFeedbackService;
+        _emailSender = emailSender;
     }
 
     public IActionResult Index()
@@ -204,6 +208,112 @@ public class HomeController : BaseController
             RequestId = (Activity.Current?.Id ?? this.HttpContext.TraceIdentifier)
         });
     }
+
+    Dictionary<string, string> headers = new Dictionary<string, string>()
+    {
+
+{"Id",""                                       } ,
+{"CreatedDate","Tarih"                         } ,
+{"AdviseRate",   "Tavsiye"                     } ,
+{"EmployeeRate", "Personel"                    } ,
+{"CleaningRate", "Hijyen"                      } ,
+{"LikeRate", ""                    } ,
+{"Description",  "Değerlendirme"               } ,
+{"FlavorRate",   "Lezzet"                      } ,
+{"PriceRate",    "Fiyat"                       } ,
+{"DeskCode", "Masa Kodu"                       } ,
+{"IsUserShare",""                              } ,
+{"IpAddress",""                                } ,
+{"FormValue",""                                } ,
+{"FormId",""                                   } ,
+{"UserId",   ""                                } ,
+{"PlaceId",  "İşletme"                         } ,
+{"DetailId",""                                 } ,
+{"ModifiedDate",""                             } ,
+{"CreatedBy",""                                } ,
+{"ModifiedBy",""                               } ,
+{"BrowserFp",""                                } ,
+{"IsDeleted",    ""                            } ,
+{"UserFullName",""                             } ,
+{"UserMail",""                                 } ,
+{"UserPhone",    ""                            } ,
+{"UserAddress",""                              } ,
+{"WCCleaningRate",   "WC Hijyen"               } ,
+{"EmployeeSkill",    "Personel Yeteneği"       } ,
+{"Ikram",    "İkram"                           } ,
+{"Rotar",    "Rötar"                           } ,
+{"SafeDrive",    "Güvenli Sürüş"               } ,
+{"SeatNo",   "Koltuk"                          } ,
+{"DoktorUzmanligi",  "Dr. Uzamanlık"           } ,
+{"UzmanCesidi",  "Uzman Çeşidi"                } ,
+{"ReyonGorevlisi",   "Reyon Görevlisi"         } ,
+{"UrunCesidi",   "Ürün Çeşidi"                 } ,
+{"EtkinlikAdi",  "Etkinlik Adı"                } ,
+{"MekanYeterliligi", "Mekan Yeterliliği"       } ,
+{"PlanaUyum",    "Plana Uyum"                  } ,
+
+
+    };
+
+    private string GetPlaceName(object id)
+    {
+        try
+        {
+            using (Yetkilim.Web.Models.Ef.yetkilimDBContext db = new Yetkilim.Web.Models.Ef.yetkilimDBContext())
+            {
+                db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+                db.ChangeTracker.AutoDetectChangesEnabled = false;
+                var id1 = (int)id;
+                var name = db.Places.AsNoTracking().First(x => x.Id == id1).Name;
+                return name;
+            }
+        }
+        catch (Exception ex)
+        {
+            return "";
+        }
+    }
+
+    private string myTableMaker<T>(T[] list, string id)
+    {
+        PropertyInfo[] properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        //Array.Sort(properties, new ComparerPropertyInfo());
+        var table = "<table class=\"table\" id=\"data-table-feedback" + id + "\"><thead><tr>";
+        for (int j = 0; j < properties.Length; j++)
+        {
+            if (string.IsNullOrWhiteSpace(headers[properties[j].Name]))
+            {
+                continue;
+            }
+            table += "<th class=\"secondary-text\"><div class=\"table-header\"><span class=\"column-title\">" + headers[properties[j].Name] + "</span></div></td>";
+        }
+        table += "</tr></thead><tbody>";
+        for (int i = 0; i < list.Length; i++)
+        {
+            table += "<tr>";
+            for (int j = 0; j < properties.Length; j++)
+            {
+                if (string.IsNullOrWhiteSpace(headers[properties[j].Name]))
+                {
+                    continue;
+                }
+
+                if (string.Equals(properties[j].Name, "PlaceId", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    table += "<td style=\"vertical-align: top;\">" + GetPlaceName(properties[j].GetValue(list[i], null)) + "</td>";
+                    continue;
+                }
+
+                table += "<td style=\"vertical-align: top;\">" + properties[j].GetValue(list[i], null) + "</td>";
+            }
+            table += "</tr>";
+        }
+        table += "</tbody></table>";
+
+        return table;
+    }
+
+
     public IActionResult Feedback0(Feedback0 feedback)
     {
         try
@@ -218,28 +328,37 @@ public class HomeController : BaseController
                 }
                 try
                 {
-                    if (!string.IsNullOrWhiteSpace(feedback.UserFullName)
-                         || !string.IsNullOrWhiteSpace(feedback.UserMail)
-                         || !string.IsNullOrWhiteSpace(feedback.UserPhone))
+                    if (feedback.IsUserShare.HasValue && feedback.IsUserShare.Value)
                     {
-                        Users model2 = new Users
-                        {
-                            Name = feedback.UserFullName,
-                            Email = feedback.UserMail,
-                            Phone = feedback.UserPhone,                            
-                            Password = "",
-                        };
-                        db.Users.Add(model2);
-                        db.SaveChanges();
-                        userId = model2.Id;
-                    }                 
+                        var user = db.Users.AsNoTracking().FirstOrDefault(x => x.Id == userId);
+                        feedback.UserFullName = user.Name;
+                        feedback.UserMail = user.Email;
+                        feedback.UserPhone = user.Phone;
+                    }
+                
+                    //if (!string.IsNullOrWhiteSpace(feedback.UserFullName)
+                    //     || !string.IsNullOrWhiteSpace(feedback.UserMail)
+                    //     || !string.IsNullOrWhiteSpace(feedback.UserPhone))
+                    //{
+                    //    Users model2 = new Users
+                    //    {
+                    //        Name = feedback.UserFullName,
+                    //        Email = feedback.UserMail,
+                    //        Phone = feedback.UserPhone,                            
+                    //        Password = "",
+                    //    };
+                    //    db.Users.Add(model2);
+                    //    db.SaveChanges();
+                    //    userId = model2.Id;
+                    //}                 
                 }
                 catch (Exception)
                 {
 
                 }
                 feedback.CreatedDate = DateTime.Now;
-              
+                feedback.UserId = userId;
+
                 try
                 {
                     feedback.IpAddress = this.Request.HttpContext.Connection
@@ -252,6 +371,35 @@ public class HomeController : BaseController
                 }
                 db.Feedback0.Add(feedback);
                 db.SaveChanges();
+                try
+                {
+
+                    var listMail = new List<string>();
+
+                    var userPlaces = db.PanelUser.AsNoTracking().Where(x => x.PlaceId == feedback.PlaceId && !x.IsDeleted).ToList();
+                    if (userPlaces != null && userPlaces.Any())
+                    {
+                        listMail.AddRange(userPlaces.Where(x => !string.IsNullOrWhiteSpace(x.Email)).Select(x => x.Email));
+                    }
+
+                    var place = db.Places.First(x => x.Id == feedback.PlaceId);
+
+                    var userCompanies = db.PanelUser.AsNoTracking().Where(x => x.CompanyId == place.CompanyId && !x.IsDeleted).ToList();
+                    if (userCompanies != null && userCompanies.Any())
+                    {
+                        listMail.AddRange(userCompanies.Where(x => !string.IsNullOrWhiteSpace(x.Email)).Select(x => x.Email));
+                    }
+
+                    _emailSender.Send(
+                   listMail.ToArray()
+                    , "Müşteriniz işletmeniz için bir değerlendirme yaptı", myTableMaker(new Feedback0[] { feedback }, "0"));
+                }
+                catch (Exception)
+                {
+
+
+                }
+
             }
 
      
@@ -269,13 +417,68 @@ public class HomeController : BaseController
             //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture); 
             using (yetkilimDBContext db = new yetkilimDBContext())
             {
-                feedback.CreatedDate = DateTime.Now;                
+                var userId = 0;
                 if (base.CurrentUser != null)
                 {
-                    feedback.UserId = base.CurrentUser.UserId;
+                    userId = base.CurrentUser.UserId;
+                }
+                try
+                {
+                    if (feedback.IsUserShare.HasValue && feedback.IsUserShare.Value)
+                    {
+                        var user = db.Users.AsNoTracking().FirstOrDefault(x => x.Id == userId);
+                        feedback.UserFullName = user.Name;
+                        feedback.UserMail = user.Email;
+                        feedback.UserPhone = user.Phone;
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+                feedback.CreatedDate = DateTime.Now;
+                feedback.UserId = userId;
+                try
+                {
+                    feedback.IpAddress = this.Request.HttpContext.Connection
+                        .RemoteIpAddress
+                        .ToString();
+                }
+                catch (Exception ex)
+                {
+                    LoggerExtensions.LogError(_logger, ex, "IP Address error", Array.Empty<object>());
                 }
                 db.Feedback1.Add(feedback);
                 db.SaveChanges();
+
+                try
+                {
+                    var listMail = new List<string>();
+
+                    var userPlaces = db.PanelUser.AsNoTracking().Where(x => x.PlaceId == feedback.PlaceId && !x.IsDeleted).ToList();
+                    if (userPlaces != null && userPlaces.Any())
+                    {
+                        listMail.AddRange(userPlaces.Where(x=> !string.IsNullOrWhiteSpace(x.Email)).Select(x=>x.Email));
+                    }
+
+                    var place = db.Places.First(x => x.Id == feedback.PlaceId);
+
+                    var userCompanies = db.PanelUser.AsNoTracking().Where(x => x.CompanyId == place.CompanyId && !x.IsDeleted).ToList();
+                    if (userCompanies != null && userCompanies.Any())
+                    {
+                        listMail.AddRange(userCompanies.Where(x => !string.IsNullOrWhiteSpace(x.Email)).Select(x => x.Email));
+                    }
+
+                    _emailSender.Send(                    
+                   listMail.ToArray()
+                    , "Müşteriniz işletmeniz için bir değerlendirme yaptı", myTableMaker(new Feedback1[] { feedback }, "1"));
+                }
+                catch (Exception ex)
+                {
+
+
+                }
+
             }
 
         }
@@ -292,13 +495,67 @@ public class HomeController : BaseController
             //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture); 
             using (yetkilimDBContext db = new yetkilimDBContext())
             {
-                feedback.CreatedDate = DateTime.Now;
+                var userId = 0;
                 if (base.CurrentUser != null)
                 {
-                    feedback.UserId = base.CurrentUser.UserId;
+                    userId = base.CurrentUser.UserId;
+                }
+                try
+                {
+                    if (feedback.IsUserShare.HasValue && feedback.IsUserShare.Value)
+                    {
+                        var user = db.Users.AsNoTracking().FirstOrDefault(x => x.Id == userId);
+                        feedback.UserFullName = user.Name;
+                        feedback.UserMail = user.Email;
+                        feedback.UserPhone = user.Phone;
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+                feedback.CreatedDate = DateTime.Now;
+                feedback.UserId = userId;
+
+                try
+                {
+                    feedback.IpAddress = this.Request.HttpContext.Connection
+                        .RemoteIpAddress
+                        .ToString();
+                }
+                catch (Exception ex)
+                {
+                    LoggerExtensions.LogError(_logger, ex, "IP Address error", Array.Empty<object>());
                 }
                 db.Feedback2.Add(feedback);
                 db.SaveChanges();
+                try
+                {
+                    var listMail = new List<string>();
+
+                    var userPlaces = db.PanelUser.AsNoTracking().Where(x => x.PlaceId == feedback.PlaceId && !x.IsDeleted).ToList();
+                    if (userPlaces != null && userPlaces.Any())
+                    {
+                        listMail.AddRange(userPlaces.Where(x => !string.IsNullOrWhiteSpace(x.Email)).Select(x => x.Email));
+                    }
+
+                    var place = db.Places.First(x => x.Id == feedback.PlaceId);
+
+                    var userCompanies = db.PanelUser.AsNoTracking().Where(x => x.CompanyId == place.CompanyId && !x.IsDeleted).ToList();
+                    if (userCompanies != null && userCompanies.Any())
+                    {
+                        listMail.AddRange(userCompanies.Where(x => !string.IsNullOrWhiteSpace(x.Email)).Select(x => x.Email));
+                    }
+
+                    _emailSender.Send(
+                   listMail.ToArray()
+                    , "Müşteriniz işletmeniz için bir değerlendirme yaptı", myTableMaker(new Feedback2[] { feedback }, "2"));
+                }
+                catch (Exception)
+                {
+
+
+                }
             }
 
         }
@@ -312,16 +569,71 @@ public class HomeController : BaseController
     {
         try
         {
-            //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture);   
+            //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture); 
             using (yetkilimDBContext db = new yetkilimDBContext())
             {
-                feedback.CreatedDate = DateTime.Now;
+                var userId = 0;
                 if (base.CurrentUser != null)
                 {
-                    feedback.UserId = base.CurrentUser.UserId;
+                    userId = base.CurrentUser.UserId;
+                }
+                try
+                {
+                    if (feedback.IsUserShare.HasValue && feedback.IsUserShare.Value)
+                    {
+                        var user = db.Users.AsNoTracking().FirstOrDefault(x => x.Id == userId);
+                        feedback.UserFullName = user.Name;
+                        feedback.UserMail = user.Email;
+                        feedback.UserPhone = user.Phone;
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+                feedback.CreatedDate = DateTime.Now;
+                feedback.UserId = userId;
+
+                try
+                {
+                    feedback.IpAddress = this.Request.HttpContext.Connection
+                        .RemoteIpAddress
+                        .ToString();
+                }
+                catch (Exception ex)
+                {
+                    LoggerExtensions.LogError(_logger, ex, "IP Address error", Array.Empty<object>());
                 }
                 db.Feedback3.Add(feedback);
                 db.SaveChanges();
+
+                try
+                {
+                    var listMail = new List<string>();
+
+                    var userPlaces = db.PanelUser.AsNoTracking().Where(x => x.PlaceId == feedback.PlaceId && !x.IsDeleted).ToList();
+                    if (userPlaces != null && userPlaces.Any())
+                    {
+                        listMail.AddRange(userPlaces.Where(x => !string.IsNullOrWhiteSpace(x.Email)).Select(x => x.Email));
+                    }
+
+                    var place = db.Places.First(x => x.Id == feedback.PlaceId);
+
+                    var userCompanies = db.PanelUser.AsNoTracking().Where(x => x.CompanyId == place.CompanyId && !x.IsDeleted).ToList();
+                    if (userCompanies != null && userCompanies.Any())
+                    {
+                        listMail.AddRange(userCompanies.Where(x => !string.IsNullOrWhiteSpace(x.Email)).Select(x => x.Email));
+                    }
+
+                    _emailSender.Send(
+                   listMail.ToArray()
+                    , "Müşteriniz işletmeniz için bir değerlendirme yaptı", myTableMaker(new Feedback3[] { feedback }, "3"));
+                }
+                catch (Exception)
+                {
+
+
+                }
             }
 
         }
@@ -335,16 +647,71 @@ public class HomeController : BaseController
     {
         try
         {
-            //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture);  
+            //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture); 
             using (yetkilimDBContext db = new yetkilimDBContext())
             {
-                feedback.CreatedDate = DateTime.Now;
+                var userId = 0;
                 if (base.CurrentUser != null)
                 {
-                    feedback.UserId = base.CurrentUser.UserId;
+                    userId = base.CurrentUser.UserId;
+                }
+                try
+                {
+                    if (feedback.IsUserShare.HasValue && feedback.IsUserShare.Value)
+                    {
+                        var user = db.Users.AsNoTracking().FirstOrDefault(x => x.Id == userId);
+                        feedback.UserFullName = user.Name;
+                        feedback.UserMail = user.Email;
+                        feedback.UserPhone = user.Phone;
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+                feedback.CreatedDate = DateTime.Now;
+                feedback.UserId = userId;
+
+                try
+                {
+                    feedback.IpAddress = this.Request.HttpContext.Connection
+                        .RemoteIpAddress
+                        .ToString();
+                }
+                catch (Exception ex)
+                {
+                    LoggerExtensions.LogError(_logger, ex, "IP Address error", Array.Empty<object>());
                 }
                 db.Feedback4.Add(feedback);
                 db.SaveChanges();
+
+                try
+                {
+                    var listMail = new List<string>();
+
+                    var userPlaces = db.PanelUser.AsNoTracking().Where(x => x.PlaceId == feedback.PlaceId && !x.IsDeleted).ToList();
+                    if (userPlaces != null && userPlaces.Any())
+                    {
+                        listMail.AddRange(userPlaces.Where(x => !string.IsNullOrWhiteSpace(x.Email)).Select(x => x.Email));
+                    }
+
+                    var place = db.Places.First(x => x.Id == feedback.PlaceId);
+
+                    var userCompanies = db.PanelUser.AsNoTracking().Where(x => x.CompanyId == place.CompanyId && !x.IsDeleted).ToList();
+                    if (userCompanies != null && userCompanies.Any())
+                    {
+                        listMail.AddRange(userCompanies.Where(x => !string.IsNullOrWhiteSpace(x.Email)).Select(x => x.Email));
+                    }
+
+                    _emailSender.Send(
+                   listMail.ToArray()
+                    , "Müşteriniz işletmeniz için bir değerlendirme yaptı", myTableMaker(new Feedback4[] { feedback }, "4"));
+                }
+                catch (Exception)
+                {
+
+
+                }
             }
 
         }
@@ -358,16 +725,70 @@ public class HomeController : BaseController
     {
         try
         {
-            //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture);  
+            //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture); 
             using (yetkilimDBContext db = new yetkilimDBContext())
             {
-                feedback.CreatedDate = DateTime.Now;
+                var userId = 0;
                 if (base.CurrentUser != null)
                 {
-                    feedback.UserId = base.CurrentUser.UserId;
+                    userId = base.CurrentUser.UserId;
+                }
+                try
+                {
+                    if (feedback.IsUserShare.HasValue && feedback.IsUserShare.Value)
+                    {
+                        var user = db.Users.AsNoTracking().FirstOrDefault(x => x.Id == userId);
+                        feedback.UserFullName = user.Name;
+                        feedback.UserMail = user.Email;
+                        feedback.UserPhone = user.Phone;
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+                feedback.CreatedDate = DateTime.Now;
+                feedback.UserId = userId;
+
+                try
+                {
+                    feedback.IpAddress = this.Request.HttpContext.Connection
+                        .RemoteIpAddress
+                        .ToString();
+                }
+                catch (Exception ex)
+                {
+                    LoggerExtensions.LogError(_logger, ex, "IP Address error", Array.Empty<object>());
                 }
                 db.Feedback5.Add(feedback);
                 db.SaveChanges();
+                try
+                {
+                    var listMail = new List<string>();
+
+                    var userPlaces = db.PanelUser.AsNoTracking().Where(x => x.PlaceId == feedback.PlaceId && !x.IsDeleted).ToList();
+                    if (userPlaces != null && userPlaces.Any())
+                    {
+                        listMail.AddRange(userPlaces.Where(x => !string.IsNullOrWhiteSpace(x.Email)).Select(x => x.Email));
+                    }
+
+                    var place = db.Places.First(x => x.Id == feedback.PlaceId);
+
+                    var userCompanies = db.PanelUser.AsNoTracking().Where(x => x.CompanyId == place.CompanyId && !x.IsDeleted).ToList();
+                    if (userCompanies != null && userCompanies.Any())
+                    {
+                        listMail.AddRange(userCompanies.Where(x => !string.IsNullOrWhiteSpace(x.Email)).Select(x => x.Email));
+                    }
+
+                    _emailSender.Send(
+                   listMail.ToArray()
+                    , "Müşteriniz işletmeniz için bir değerlendirme yaptı", myTableMaker(new Feedback5[] { feedback }, "5"));
+                }
+                catch (Exception)
+                {
+
+
+                }
             }
 
         }
@@ -384,13 +805,68 @@ public class HomeController : BaseController
             //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture); 
             using (yetkilimDBContext db = new yetkilimDBContext())
             {
-                feedback.CreatedDate = DateTime.Now;
+                var userId = 0;
                 if (base.CurrentUser != null)
                 {
-                    feedback.UserId = base.CurrentUser.UserId;
+                    userId = base.CurrentUser.UserId;
+                }
+                try
+                {
+                    if (feedback.IsUserShare.HasValue && feedback.IsUserShare.Value)
+                    {
+                        var user = db.Users.AsNoTracking().FirstOrDefault(x => x.Id == userId);
+                        feedback.UserFullName = user.Name;
+                        feedback.UserMail = user.Email;
+                        feedback.UserPhone = user.Phone;
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+                feedback.CreatedDate = DateTime.Now;
+                feedback.UserId = userId;
+
+                try
+                {
+                    feedback.IpAddress = this.Request.HttpContext.Connection
+                        .RemoteIpAddress
+                        .ToString();
+                }
+                catch (Exception ex)
+                {
+                    LoggerExtensions.LogError(_logger, ex, "IP Address error", Array.Empty<object>());
                 }
                 db.Feedback6.Add(feedback);
                 db.SaveChanges();
+
+                try
+                {
+                    var listMail = new List<string>();
+
+                    var userPlaces = db.PanelUser.AsNoTracking().Where(x => x.PlaceId == feedback.PlaceId && !x.IsDeleted).ToList();
+                    if (userPlaces != null && userPlaces.Any())
+                    {
+                        listMail.AddRange(userPlaces.Where(x => !string.IsNullOrWhiteSpace(x.Email)).Select(x => x.Email));
+                    }
+
+                    var place = db.Places.First(x => x.Id == feedback.PlaceId);
+
+                    var userCompanies = db.PanelUser.AsNoTracking().Where(x => x.CompanyId == place.CompanyId && !x.IsDeleted).ToList();
+                    if (userCompanies != null && userCompanies.Any())
+                    {
+                        listMail.AddRange(userCompanies.Where(x => !string.IsNullOrWhiteSpace(x.Email)).Select(x => x.Email));
+                    }
+
+                    _emailSender.Send(
+                   listMail.ToArray()
+                    , "Müşteriniz işletmeniz için bir değerlendirme yaptı", myTableMaker(new Feedback6[] { feedback }, "6"));
+                }
+                catch (Exception)
+                {
+
+
+                }
             }
 
         }
@@ -404,16 +880,71 @@ public class HomeController : BaseController
     {
         try
         {
-            //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture);
+            //id = (int)Decimal.Parse(feedbackid, NumberStyles.Currency, CultureInfo.InvariantCulture); 
             using (yetkilimDBContext db = new yetkilimDBContext())
             {
-                feedback.CreatedDate = DateTime.Now;
+                var userId = 0;
                 if (base.CurrentUser != null)
                 {
-                    feedback.UserId = base.CurrentUser.UserId;
+                    userId = base.CurrentUser.UserId;
+                }
+                try
+                {
+                    if (feedback.IsUserShare.HasValue && feedback.IsUserShare.Value)
+                    {
+                        var user = db.Users.AsNoTracking().FirstOrDefault(x => x.Id == userId);
+                        feedback.UserFullName = user.Name;
+                        feedback.UserMail = user.Email;
+                        feedback.UserPhone = user.Phone;
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+                feedback.CreatedDate = DateTime.Now;
+                feedback.UserId = userId;
+                try
+                {
+                    feedback.IpAddress = this.Request.HttpContext.Connection
+                        .RemoteIpAddress
+                        .ToString();
+                }
+                catch (Exception ex)
+                {
+                    LoggerExtensions.LogError(_logger, ex, "IP Address error", Array.Empty<object>());
                 }
                 db.Feedback7.Add(feedback);
                 db.SaveChanges();
+
+
+                try
+                {
+                    var listMail = new List<string>();
+
+                    var userPlaces = db.PanelUser.AsNoTracking().Where(x => x.PlaceId == feedback.PlaceId && !x.IsDeleted).ToList();
+                    if (userPlaces != null && userPlaces.Any())
+                    {
+                        listMail.AddRange(userPlaces.Where(x => !string.IsNullOrWhiteSpace(x.Email)).Select(x => x.Email));
+                    }
+
+                    var place = db.Places.First(x => x.Id == feedback.PlaceId);
+
+                    var userCompanies = db.PanelUser.AsNoTracking().Where(x => x.CompanyId == place.CompanyId && !x.IsDeleted).ToList();
+                    if (userCompanies != null && userCompanies.Any())
+                    {
+                        listMail.AddRange(userCompanies.Where(x => !string.IsNullOrWhiteSpace(x.Email)).Select(x => x.Email));
+                    }
+
+                    _emailSender.Send(
+                   listMail.ToArray()
+                    , "Müşteriniz işletmeniz için bir değerlendirme yaptı", myTableMaker(new Feedback7[] { feedback }, "7"));
+                }
+                catch (Exception)
+                {
+
+
+                }
             }
 
         }

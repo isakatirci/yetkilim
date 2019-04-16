@@ -367,7 +367,8 @@
             $(".rateInput").rateYo({
                 fullStar: true,                
                 numStars: 10,
-                rating: "50%",
+                maxValue: 10
+
             });
 
             $("#btnSend").click(function(e) {
@@ -425,7 +426,7 @@
                     placeId:'@ViewBag.PlaceId'
                 }
 
-                $.post('@Url.Action(action:"Feedback0")', data, function (response) {
+                $.post('@Url.Action(action:"Feedback0",controller:"Home")', data, function (response) {
                     
                     if (response) {
                         console.log(response);

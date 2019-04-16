@@ -44,6 +44,8 @@ namespace Yetkilim.Web.Controllers
             }
         }
 
+
+
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             //IL_00ce: Unknown result type (might be due to invalid IL or missing references)

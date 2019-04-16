@@ -84,8 +84,8 @@
                 <div class="content custom-scrollbar">
                     <div id="login" class="p-8">
                         <div class="form-wrapper md-elevation-8 p-8">
-                            <div class="logo bg-secondary">
-                                <span>Y</span>
+                            <div class="logo">
+                                <img src="~/assets/images/yetkilim-logo.png" style="width:12.8rem;height:12.8rem" alt="">
                             </div>
                             <div class="title mt-4 mb-8">Hesabınıza giriş yapın</div>
                             <form method="post" name="loginForm" asp-action="Login" asp-controller="Manage" novalidate>
@@ -124,13 +124,13 @@
                     </div>
                     <div id="forgot-password" class="p-8">
                         <div class="form-wrapper md-elevation-8 p-8">
-                            <div class="logo bg-secondary">
-                                <span>Y</span>
+                            <div class="logo">
+                                <img src="~/assets/images/yetkilim-logo.png" style="width:12.8rem;height:12.8rem" alt="">
                             </div>
                             <div class="title mt-4 mb-8">Şifremi unuttum</div>
                             <form method="post" asp-action="ForgotPassword" asp-controller="Manage" name="forgotPasswordForm">
                                 <div class="form-group mb-4">
-                                    <input type="email" class="form-control"  name="email" id="forgotPasswordFormInputEmail" aria-describedby="emailHelp" placeholder=" " required="required">
+                                    <input type="email" class="form-control" name="email" id="forgotPasswordFormInputEmail" aria-describedby="emailHelp" placeholder=" " required="required">
                                     <label for="forgotPasswordFormInputEmail">E-posta adresi</label>
                                 </div>
                                 @*<span class="mt-4 mb-8 form-message"></span>*@

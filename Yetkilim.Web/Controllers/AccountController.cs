@@ -208,6 +208,72 @@ public class AccountController : BaseController
         return string.Equals(value, other, StringComparison.InvariantCultureIgnoreCase);
     }
 
+
+    Dictionary<string, string> headers = new Dictionary<string, string>()
+    {
+
+{"Id",""                                       } ,
+{"CreatedDate","Tarih"                         } ,
+{"AdviseRate",   "Tavsiye"                     } ,
+{"EmployeeRate", "Personel"                    } ,
+{"CleaningRate", "Hijyen"                      } ,
+{"LikeRate", "Beğeni Oranı"                    } ,
+{"Description",  "Değerlendirme"               } ,
+{"FlavorRate",   "Lezzet"                      } ,
+{"PriceRate",    "Fiyat"                       } ,
+{"DeskCode", "Masa Kodu"                       } ,
+{"IsUserShare",""                              } ,
+{"IpAddress",""                                } ,
+{"FormValue",""                                } ,
+{"FormId",""                                   } ,
+{"UserId",   ""                                } ,
+{"PlaceId",  "İşletme"                         } ,
+{"DetailId",""                                 } ,
+{"ModifiedDate",""                             } ,
+{"CreatedBy",""                                } ,
+{"ModifiedBy",""                               } ,
+{"BrowserFp",""                                } ,
+{"IsDeleted",    ""                            } ,
+{"UserFullName",""                             } ,
+{"UserMail",""                                 } ,
+{"UserPhone",    ""                            } ,
+{"UserAddress",""                              } ,
+{"WCCleaningRate",   "WC Hijyen"               } ,
+{"EmployeeSkill",    "Personel Yeteneği"       } ,
+{"Ikram",    "İkram"                           } ,
+{"Rotar",    "Rötar"                           } ,
+{"SafeDrive",    "Güvenli Sürüş"               } ,
+{"SeatNo",   "Koltuk"                          } ,
+{"DoktorUzmanligi",  "Dr. Uzamanlık"           } ,
+{"UzmanCesidi",  "Uzman Çeşidi"                } ,
+{"ReyonGorevlisi",   "Reyon Görevlisi"         } ,
+{"UrunCesidi",   "Ürün Çeşidi"                 } ,
+{"EtkinlikAdi",  "Etkinlik Adı"                } ,
+{"MekanYeterliligi", "Mekan Yeterliliği"       } ,
+{"PlanaUyum",    "Plana Uyum"                  } ,
+
+
+    };
+
+    private string GetPlaceName(object id)
+    {
+        try
+        {
+            using (Yetkilim.Web.Models.Ef.yetkilimDBContext db = new Yetkilim.Web.Models.Ef.yetkilimDBContext())
+            {
+                db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+                db.ChangeTracker.AutoDetectChangesEnabled = false;
+                var id1 = (int)id;
+                var name = db.Places.AsNoTracking().First(x => x.Id == id1).Name;
+                return name;
+            }
+        }
+        catch (Exception ex)
+        {
+            return "";
+        }
+    }
+
     private string myTableMaker<T>(T[] list, string id)
     {
         PropertyInfo[] properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -215,7 +281,11 @@ public class AccountController : BaseController
         var table = "<table class=\"table\" id=\"data-table-feedback" + id + "\"><thead><tr>";
         for (int j = 0; j < properties.Length; j++)
         {
-            table += "<th class=\"secondary-text\"><div class=\"table-header\"><span class=\"column-title\">" + properties[j].Name + "</span></div></td>";
+            if (string.IsNullOrWhiteSpace(headers[properties[j].Name]))
+            {
+                continue;
+            }
+            table += "<th class=\"secondary-text\"><div class=\"table-header\"><span class=\"column-title\">" + headers[properties[j].Name] + "</span></div></td>";
         }
         table += "</tr></thead><tbody>";
         for (int i = 0; i < list.Length; i++)
@@ -223,6 +293,17 @@ public class AccountController : BaseController
             table += "<tr>";
             for (int j = 0; j < properties.Length; j++)
             {
+                if (string.IsNullOrWhiteSpace(headers[properties[j].Name]))
+                {
+                    continue;
+                }
+
+                if (string.Equals(properties[j].Name, "PlaceId", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    table += "<td>" + GetPlaceName(properties[j].GetValue(list[i], null)) + "</td>";
+                    continue;
+                }
+               
                 table += "<td>" + properties[j].GetValue(list[i], null) + "</td>";
             }
             table += "</tr>";
@@ -252,44 +333,44 @@ public class AccountController : BaseController
                 table += "<hr/>";
                 table = myTableMaker(db.Feedback0.AsNoTracking().Where(x => x.UserId == userId).ToArray(), "0");
             }
-            else if (db.Feedback1.Any(x => x.UserId == userId))
+             if (db.Feedback1.Any(x => x.UserId == userId))
             {
                 table += "<hr/>";
                 table = myTableMaker(db.Feedback1.AsNoTracking().Where(x => x.UserId == userId).ToArray(), "1");
             }
-            else if (db.Feedback2.Any(x => x.UserId == userId))
+             if (db.Feedback2.Any(x => x.UserId == userId))
             {
                 table += "<hr/>";
                 table = myTableMaker(db.Feedback2.AsNoTracking().Where(x => x.UserId == userId).ToArray(), "2");
             }
-            else if (db.Feedback3.Any(x => x.UserId == userId))
+             if (db.Feedback3.Any(x => x.UserId == userId))
             {
                 table += "<hr/>";
                 table = myTableMaker(db.Feedback3.AsNoTracking().Where(x => x.UserId == userId).ToArray(), "3");
             }
-            else if (db.Feedback4.Any(x => x.UserId == userId))
+             if (db.Feedback4.Any(x => x.UserId == userId))
             {
                 table += "<hr/>";
                 table = myTableMaker(db.Feedback4.AsNoTracking().Where(x => x.UserId == userId).ToArray(), "4");
             }
-            else if (db.Feedback5.Any(x => x.UserId == userId))
+             if (db.Feedback5.Any(x => x.UserId == userId))
             {
                 table += "<hr/>";
                 table = myTableMaker(db.Feedback5.AsNoTracking().Where(x => x.UserId == userId).ToArray(), "5");
             }
-            else if (db.Feedback6.Any(x => x.UserId == userId))
+             if (db.Feedback6.Any(x => x.UserId == userId))
             {
                 table += "<hr/>";
                 table = myTableMaker(db.Feedback6.AsNoTracking().Where(x => x.UserId == userId).ToArray(), "6");
             }
-            else if (db.Feedback7.Any(x => x.UserId == userId))
+             if (db.Feedback7.Any(x => x.UserId == userId))
             {
                 table += "<hr/>";
                 table = myTableMaker(db.Feedback7.AsNoTracking().Where(x => x.UserId == userId).ToArray(), "7");
             }
         }
 
-        ViewBag.WarningDemo = "Hiç Değerlendirme Yapılmamış";
+        ViewBag.WarningDemo = string.IsNullOrWhiteSpace(table) ?  "Hiç Değerlendirme Yapılmamış" : null;
 
         ViewBag.Table = table;
 

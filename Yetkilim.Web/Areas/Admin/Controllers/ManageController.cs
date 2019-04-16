@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.CSharp.RuntimeBinder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -37,40 +39,242 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
             _panelUserService = panelUserService;
         }
 
+        
+
+        private string GetPlaceName(object id)
+        {
+            try
+            {
+                using (Yetkilim.Web.Models.Ef.yetkilimDBContext db = new Yetkilim.Web.Models.Ef.yetkilimDBContext())
+                {
+                    db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+                    db.ChangeTracker.AutoDetectChangesEnabled = false;
+                    var id1 = (int)id;
+                    var name = db.Places.AsNoTracking().First(x => x.Id == id1).Name;
+                    return name;
+                }
+            }
+            catch (Exception ex)
+            {
+                return "";
+            }
+        }
+
+        private string myTableMaker<T>(T[] list, string id)
+        {
+            if (list.Length == 0)
+            {
+                return "";
+            }
+            PropertyInfo[] properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+
+            var propertiesList = new List<PropertyInfo>();
+            var headers = Consts.Headers;
+            var keys = headers.Keys.ToArray();
+            for (int i = 0; i < keys.Length; i++)
+            {
+                var prop = properties.FirstOrDefault(x => string.Equals(keys[i], x.Name, StringComparison.InvariantCultureIgnoreCase));
+                if (prop != null)
+                {
+                    propertiesList.Add(prop);
+                }
+            }
+            properties = propertiesList.ToArray();
+
+
+            //Array.Sort(properties, new ComparerPropertyInfo());
+            var table = "<table class=\"table\" id=\"data-table-feedback" + id + "\"><thead><tr>";
+            for (int j = 0; j < properties.Length; j++)
+            {
+                if (string.IsNullOrWhiteSpace(headers[properties[j].Name]))
+                {
+                    continue;
+                }
+                table += "<th class=\"secondary-text\"><div class=\"table-header\"><span class=\"column-title\">" + headers[properties[j].Name] + "</span></div></td>";
+            }
+            table += "</tr></thead><tbody>";
+            for (int i = 0; i < list.Length; i++)
+            {
+                table += "<tr>";
+
+                var isUserShare = false;
+                var anonimMi = false;
+                try
+                {
+                    var isUserShareProp = properties.FirstOrDefault(x => string.Equals("IsUserShare", x.Name, StringComparison.InvariantCultureIgnoreCase));
+                    if (isUserShareProp != null)                    {
+
+                        var temp = (bool?)isUserShareProp.GetValue(list[i], null);
+                        isUserShare = temp.HasValue && temp.Value;
+                    }
+                }
+                catch (Exception)
+                {
+
+                    
+                }                
+                try
+                {
+                    var userIdProp = properties.FirstOrDefault(x => string.Equals("UserId", x.Name, StringComparison.InvariantCultureIgnoreCase));
+                    if (userIdProp != null)
+                    {
+                        var temp = (int?)(userIdProp.GetValue(list[i], null));
+                        anonimMi = temp.HasValue && temp < 1;
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+
+
+
+                for (int j = 0; j < properties.Length; j++)
+                {
+                    if (string.IsNullOrWhiteSpace(headers[properties[j].Name]))
+                    {
+                        continue;
+                    }
+
+                    if (string.Equals(properties[j].Name, "UserPhone", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        table += "<td>" + (anonimMi ? "Anonim" : (isUserShare ? properties[j].GetValue(list[i], null) : "Gizli") ) + "</td>";
+                        continue;
+                    }
+
+                    if (string.Equals(properties[j].Name, "UserFullName", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        table += "<td>" + (anonimMi ? "Anonim" : (isUserShare ? properties[j].GetValue(list[i], null) : "Gizli")) + "</td>";
+                        continue;
+                    }
+
+                    if (string.Equals(properties[j].Name, "UserMail", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        table += "<td>" + (anonimMi ? "Anonim" : (isUserShare ? properties[j].GetValue(list[i], null) : "Gizli")) + "</td>";
+                        continue;
+                    }                  
+
+
+                    if (string.Equals(properties[j].Name, "PlaceId", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        table += "<td>" + GetPlaceName(properties[j].GetValue(list[i], null)) + "</td>";
+                        continue;
+                    }
+
+                    table += "<td>" + properties[j].GetValue(list[i], null) + "</td>";
+                }
+                table += "</tr>";
+            }
+            table += "</tbody></table>";
+
+            return table;
+        }      
+     
+
         public async Task<IActionResult> Index()
         {
             try
             {
                 DashboardViewModel model = new DashboardViewModel();
-                int? companyId = base.CurrentUser.CompanyId;
-                int? num = base.CurrentUser.PlaceId;
-                if (base.CurrentUser.Role == UserRole.SuperAdmin)
+                var table = string.Empty;
+                var feedbackCount = 0;
+                //var feedbackCount = 0;
+                var isletmeAdi = string.Empty;
+
+                using (Yetkilim.Web.Models.Ef.yetkilimDBContext db = new Yetkilim.Web.Models.Ef.yetkilimDBContext())
                 {
-                    companyId = null;
-                    num = null;
+                    db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+                    db.ChangeTracker.AutoDetectChangesEnabled = false;
+
+                    var placesIds = new List<int?>();
+                    if (base.CurrentUser.Role == UserRole.Admin)
+                    {
+                        var currentUserCompanyId = base.CurrentUser.CompanyId;
+                        placesIds = db.Places.Where(x => x.CompanyId == currentUserCompanyId).Select(x => (int?)x.Id).ToList();
+                    }                    
+                    else if (base.CurrentUser.Role == UserRole.Dealer)
+                    {
+                        var currentPlaceId = base.CurrentUser.PlaceId;
+                        placesIds = db.Places.Where(x => x.Id == currentPlaceId).Select(x => (int?)x.Id).ToList();
+                        var place = db.Places.FirstOrDefault(x=>x.Id == currentPlaceId);
+                        if (place != null)
+                        {
+                            isletmeAdi += place.Name + " ";
+                        }
+
+                    }
+
+                    {
+                        table += "<br/>";
+                        var temp = db.Feedback0.AsNoTracking()
+                            .WhereIf(base.CurrentUser.Role != UserRole.SuperAdmin, x => placesIds.Contains(x.PlaceId)).ToArray().OrderByDescending(x => x.CreatedDate ?? DateTime.Now).ToArray();
+                        feedbackCount += temp.Length;
+                        table += myTableMaker(temp, "0");
+                    }
+
+                    {
+                        table += "<br/>";
+                        var temp = db.Feedback1.AsNoTracking()
+                            .WhereIf(base.CurrentUser.Role != UserRole.SuperAdmin, x => placesIds.Contains(x.PlaceId)).ToArray().OrderByDescending(x => x.CreatedDate ?? DateTime.Now).ToArray(); ;
+                        feedbackCount += temp.Length;
+                        table += myTableMaker(temp, "1");
+                    }
+
+                    {
+                        table += "<br/>";
+                        var temp = db.Feedback2.AsNoTracking()
+                             .WhereIf(base.CurrentUser.Role != UserRole.SuperAdmin, x => placesIds.Contains(x.PlaceId)).ToArray().OrderByDescending(x => x.CreatedDate ?? DateTime.Now).ToArray();
+                        feedbackCount += temp.Length;
+                        table += myTableMaker(temp, "2");
+                    }
+
+                    {
+                        table += "<br/>";
+                        var temp = db.Feedback3.AsNoTracking()
+                             .WhereIf(base.CurrentUser.Role != UserRole.SuperAdmin, x => placesIds.Contains(x.PlaceId)).ToArray().OrderByDescending(x => x.CreatedDate ?? DateTime.Now).ToArray();
+                        feedbackCount += temp.Length;
+                        table += myTableMaker(temp, "3");
+                    }
+
+                    {
+                        table += "<br/>";
+                        var temp = db.Feedback4.AsNoTracking()
+                            .WhereIf(base.CurrentUser.Role != UserRole.SuperAdmin, x => placesIds.Contains(x.PlaceId)).ToArray().OrderByDescending(x => x.CreatedDate ?? DateTime.Now).ToArray();
+                        feedbackCount += temp.Length;
+                        table += myTableMaker(temp, "4");
+                    }
+
+                    {
+                        table += "<br/>";
+                        var temp = db.Feedback5.AsNoTracking()
+                             .WhereIf(base.CurrentUser.Role != UserRole.SuperAdmin, x => placesIds.Contains(x.PlaceId)).ToArray().OrderByDescending(x => x.CreatedDate ?? DateTime.Now).ToArray();
+                        feedbackCount += temp.Length;
+                        table += myTableMaker(temp, "5");
+                    }
+
+                    {
+                        table += "<br/>";
+                        var temp = db.Feedback6.AsNoTracking()
+                            .WhereIf(base.CurrentUser.Role != UserRole.SuperAdmin, x => placesIds.Contains(x.PlaceId)).ToArray().OrderByDescending(x => x.CreatedDate ?? DateTime.Now).ToArray();
+                        feedbackCount += temp.Length;
+                        table += myTableMaker(temp, "6");
+                    }
+
+                    {
+                        table += "<br/>";
+                        var temp = db.Feedback7.AsNoTracking()
+                             .WhereIf(base.CurrentUser.Role != UserRole.SuperAdmin, x => placesIds.Contains(x.PlaceId)).ToArray().OrderByDescending(x => x.CreatedDate ?? DateTime.Now).ToArray();
+                        feedbackCount += temp.Length;
+                        table += myTableMaker(temp, "7");
+                    }
+                   model.PlaceCount = base.CurrentUser.Role != UserRole.SuperAdmin ? placesIds.Count : db.Places.Count(); 
+                   model.FeedbackCount = feedbackCount;
+
                 }
-                CompanyUserSearchModel feedbackSearchModel = new CompanyUserSearchModel
-                {
-                    CompanyId = companyId,
-                    PlaceId = num,
-                    Page = 1,
-                    PageSize = 10
-                };
-                Result<int> feedbackCount = await _feedbackService.GetAllFeedbackCountAsync(companyId, num);
-                Result<List<FeedbackDTO>> result = await _feedbackService.GetAllFeedbackAsync(feedbackSearchModel);
-                if (result.IsSuccess)
-                {
-                    model.Feedbacks = (from o in result.Data
-                                       orderby o.CreatedDate descending
-                                       select o).ToList();
-                    model.FeedbackCount = feedbackCount.Data;
-                }
-                Result<int> result2 = await _placeService.GetPlaceCountByCompanyIdAsync(companyId);
-                if (result2.IsSuccess)
-                {
-                    model.PlaceCount = result2.Data;
-                }
-                ((dynamic)ViewBag).CompanyName = base.CurrentUser.CompanyName;
+                
+                ViewBag.Table = table;
+                ((dynamic)ViewBag).CompanyName = isletmeAdi + base.CurrentUser.CompanyName;
                 return View((object)model);
             }
             catch (Exception ex)
@@ -82,11 +286,12 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
 
         [AllowAnonymous]
         public IActionResult Login()
+
         {
             AdminLoginViewModel adminLoginViewModel = new AdminLoginViewModel();
             return View((object)adminLoginViewModel);
         }
-        
+
         [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Login(AdminLoginViewModel model)
@@ -113,16 +318,16 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
                 new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", data.Role.ToString())
             };
                     ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims, "ClaimIdentity"));
-                   var task = AuthenticationHttpContextExtensions.SignInAsync(this.HttpContext, "AdminAreaCookies", claimsPrincipal);
+                    var task = AuthenticationHttpContextExtensions.SignInAsync(this.HttpContext, "AdminAreaCookies", claimsPrincipal);
                     task.Wait();
                     if (task.IsCompletedSuccessfully)
                     {
-                      var temp =  this.User.Claims;
+                        var temp = this.User.Claims;
                     }
                     else
                     {
 
-                    }                      
+                    }
                     return this.RedirectToAction("Index", "Manage");
                 }
                 catch (Exception ex)
@@ -211,6 +416,6 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
         {
             await AuthenticationHttpContextExtensions.SignOutAsync(this.HttpContext, "AdminAreaCookies");
             return this.RedirectToAction("Login", "Manage");
-        }   
+        }
     }
 }

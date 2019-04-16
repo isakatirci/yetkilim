@@ -1,5 +1,8 @@
 ﻿@using Yetkilim.Domain.DTO
 @model Yetkilim.Web.Areas.Admin.Models.DashboardViewModel
+
+
+
 <div id="project-dashboard" class="page-layout simple right-sidebar">
     <div class="page-content-wrapper custom-scrollbar">
         <!-- HEADER -->
@@ -9,8 +12,8 @@
                     @*<span class="h2">Welcome back, John!</span>*@
                 </div>
                 @*<button type="button" class="sidebar-toggle-button btn btn-icon d-block d-xl-none" data-fuse-bar-toggle="aside" aria-label="Toggle sidebar">
-                    <i class="icon icon-menu"></i>
-                </button>*@
+                        <i class="icon icon-menu"></i>
+                    </button>*@
             </div>
             <div class="row no-gutters align-items-center project-selection">
                 <div class="selected-project h6 px-4 py-2">@ViewBag.CompanyName</div>
@@ -98,62 +101,13 @@
                                 <div class="widget-header px-4 row no-gutters align-items-center justify-content-between">
 
                                     <div class="col">
-                                        <span class="h6">Son 10 Geri Bildirim</span>
+                                        <span class="h6">Son @Model.FeedbackCount Geri Bildirim</span>
                                     </div>
                                 </div>
 
-                                <div class="widget-content p-4">
+                                <div class="widget-content p-4 data-table-feedback-1">
 
-                                    <table id="last-feedback-table" class="table dataTable">
-                                        <thead>
-                                            <tr>
-                                                @*<th>
-                                                    <div class="table-header">
-                                                        <span class="column-title">ID</span>
-                                                    </div>
-                                                </th>*@
-                                                <th>
-                                                    <div class="table-header">
-                                                        <span class="column-title">Mekan</span>
-                                                    </div>
-                                                </th>
-                                                <th>
-                                                    <div class="table-header">
-                                                        <span class="column-title">Açıklama</span>
-                                                    </div>
-                                                </th>
-                                                <th>
-                                                    <div class="table-header">
-                                                        <span class="column-title">Değerlendiren</span>
-                                                    </div>
-                                                </th>
-                                                <th>
-                                                    <div class="table-header">
-                                                        <span class="column-title">Eklenme Tarihi</span>
-                                                    </div>
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var feedback in Model.Feedbacks ?? Enumerable.Empty<FeedbackDTO>())
-                                            {
-                                            <tr>
-                                                @*<td>@feedback.Id</td>*@
-                                                <td>@feedback.Place?.Name</td>
-                                                <td>@feedback.Description</td>
-                                                @if (feedback.User != null)
-                                                {
-                                                    <td>@feedback.User.Name @feedback.User.Surname</td>
-                                                }
-                                                else
-                                                {
-                                                    <td>Anonim</td>
-                                                }
-                                                <td>@feedback.CreatedDate.ToShortDateString()</td>
-                                            </tr>
-                                            }
-                                        </tbody>
-                                    </table>
+                                    @Html.Raw(ViewBag.Table)
                                 </div>
                             </div>
                         </div>
@@ -170,20 +124,49 @@
 
 @section Styles{
     @*<style>
-        .widget-content {
-            cursor: pointer;
+            .widget-content {
+                cursor: pointer;
+            }
+        </style>*@
+
+    <style>
+        .data-table-feedback-1 tr:nth-child(odd) {
+            background-color: whitesmoke !important;
         }
-    </style>*@
+
+        .data-table-feedback-1 tr td {
+            border-bottom: 1pt solid black !important;
+        }
+    </style>
+
 }
 @section Scripts{
     <script>
-        $('#last-feedback-table').DataTable( {
-            responsive: true,
-            dom: 'rt<"dataTables_footer"ip>',
-            "order": [],
-            "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Turkish.json"
-            }
-        } );
+
+        var dataTable = [
+              "data-table-feedback0"
+            , "data-table-feedback1"
+            , "data-table-feedback2"
+            , "data-table-feedback3"
+            , "data-table-feedback4"
+            , "data-table-feedback5"
+            , "data-table-feedback6"
+            , "data-table-feedback7"
+        ];
+
+        $.each(dataTable, function (index, value) {
+            $('#' + value).DataTable({
+                responsive: true,
+                dom: 'rt<"dataTables_footer"ip>',
+                "order": [],
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Turkish.json"
+                }
+            });
+        });
+
+     
+     
+
     </script>
 }

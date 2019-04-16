@@ -24,9 +24,9 @@
                     {
 
                         <!-- Page title -->
-                    <div class="page-title animated fadeInRight">
-                        Şube: @ViewBag.PlaceName
-                    </div><!-- .page-title -->
+                        <div class="page-title animated fadeInRight">
+                            Şube: @ViewBag.PlaceName
+                        </div><!-- .page-title -->
 
                     }
 
@@ -38,7 +38,7 @@
 
                         <input id="formId" type="hidden" value="@Model?.FormId" />
                         @*<div class="fb-render">
-        </div>*@
+                            </div>*@
 
                         <div class="home-widget pt-3">
                             <div class="widget-title">
@@ -301,7 +301,21 @@
     @*<script src="~/assets/plugins/formbuilder/control_plugins/starRating.js"></script>*@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js"></script>
     <script src="~/assets/plugins/fp2/fp2.js"></script>
+    <script>
 
+        function userFormHide(chck) {
+            if ($(chck).is(':checked')) {
+                $(".userFormField").each(function (index) {
+                    $(this).show();
+                });
+            } else {
+                $(".userFormField").each(function (index) {
+                    $(this).hide();
+                });
+            }
+        }
+
+    </script>
     <script>
         var comps = null;
         jQuery(function ($) {
@@ -336,12 +350,12 @@
             $(".rateInput").rateYo({
                 fullStar:true,
                 numStars: 10,
-                rating: "50%",
+                maxValue: 10
             });
 
             $("#btnSend").click(function(e) {
                 e.preventDefault();
-                
+
                 var hasInvalidRate = false;
                 $.each($(".rateInput"), function (idx, rateInput) {
                     var elm = $(rateInput);
@@ -367,7 +381,7 @@
                 //var formValue = JSON.stringify(renderInstance.userData);
                 var formId = $("#formId").val();
                 var description = $("#description").val();
-               
+
                 //var likeRate = $("#likeRate").val();
 
                 var isShare = false;
@@ -390,14 +404,14 @@
                     userFullName: $("#userFullName").val(),
                     userPhone: $("#userPhone").val(),
                     userAddress: $("#userAddress").val(),
-                    userMail: $("#userMail").val()  ;
+                    userMail: $("#userMail").val(), 
                      placeId:'@ViewBag.PlaceId'
                     //LikeRate: likeRate
                 }
 
                 console.log(data);
 
-                $.post('@Url.Action(action: "Feedback5")', data, function (response){
+                $.post('@Url.Action(action: "Feedback5", controller: "Home")', data, function (response){
                     if (response) {
                         console.log(response);
                         alert("İşlem Başarısız Oldu!");
@@ -420,7 +434,7 @@
                             //}
                         })
                        // window.location = "/Feedback/FeedbackIndex?feedbackid=1";
-                    }   
+                    }
 
                 }).fail(function(e, a, b, c) {
                     alert("İşleminiz gerçekleştirilemedi!");

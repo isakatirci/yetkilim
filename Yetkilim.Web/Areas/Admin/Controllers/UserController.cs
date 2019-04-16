@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -28,12 +29,14 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
         private readonly IPanelUserService _panelUserService;
 
         private readonly IPlaceService _placeService;
+        private readonly ICompanyService _companyService;
 
-        public UserController(ILogger<UserController> logger, IPanelUserService panelUserService, IPlaceService placeService)
+        public UserController(ILogger<UserController> logger, IPanelUserService panelUserService, IPlaceService placeService, ICompanyService companyService)
         {
             _logger = logger;
             _panelUserService = panelUserService;
             _placeService = placeService;
+            _companyService = companyService;
         }
 
         public async Task<ViewResult> Index()
@@ -106,36 +109,36 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
                 {
                     return this.View((object)model);
                 }
-                if (model.Role == UserRole.Dealer && !model.PlaceId.HasValue)
+
+                if (string.IsNullOrWhiteSpace(model.Email))
                 {
                     model.IsSuccess = false;
-                    model.FormMessage = "Şube yetkilisi için mekan seçmeniz gerekmektedir.";
+                    model.FormMessage = "E-posta adresi gerekmektedir";
                     return this.View((object)model);
                 }
 
-                var companyId = 0;
+                if (string.IsNullOrWhiteSpace(model.Name))
+                {
+                    model.IsSuccess = false;
+                    model.FormMessage = "Ad Soyad gerekmektedir";
+                    return this.View((object)model);
+                }
 
-                //if (model.PlaceId.HasValue)
-                //{
-                //    try
-                //    {
-                //        using (yetkilimDBContext db = new yetkilimDBContext())
-                //        {
-                //            var place = db.Places.FirstOrDefault(x => x.Id == model.PlaceId);
-                //            companyId = place.CompanyId;
-                //        }
-                      
-                //    }
-                //    catch (Exception ex)
-                //    {
+                if (model.Role == UserRole.Dealer && !model.PlaceId.HasValue)
+                {
+                    model.IsSuccess = false;
+                    model.FormMessage = "Şube yetkilisi eklemek için mekan seçmeniz gerekmektedir.";
+                    return this.View((object)model);
+                }
 
-                        
-                //    }                   
-                //}
-                //else
-                //{                    
-                //    companyId = base.CurrentUser.CompanyId;
-                //}
+                if (model.Role == UserRole.Admin && !model.CompanyId.HasValue)
+                {
+                    model.IsSuccess = false;
+                    model.FormMessage = "Firma yetkilisi eklemek için mekan seçmeniz gerekmektedir.";
+                    return this.View((object)model);
+                }
+
+                var companyId = 0;          
 
                 PanelUserDTO panelUserDTO = new PanelUserDTO
                 {
@@ -146,14 +149,24 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
                     CompanyId = companyId = base.CurrentUser.CompanyId,
                     PlaceId = model.PlaceId
                 };
-                if (model.Role == UserRole.Dealer && base.CurrentUser.Role == UserRole.SuperAdmin)
+                var misafirIsletmemi = false;
+                if (model.Role == UserRole.Dealer)
                 {
                     Place place = _placeService.GetPlaceQueryable().FirstOrDefault((Place w) => (object)(int?)w.Id == (object)model.PlaceId);
                     if (place != null)
                     {
                         panelUserDTO.CompanyId = place.CompanyId;
+                        misafirIsletmemi = string.Equals(place.Guest, "Evet", StringComparison.InvariantCultureIgnoreCase); 
                     }
                 }
+
+                if (model.Role == UserRole.Admin)
+                {
+                    panelUserDTO.CompanyId = model.CompanyId.Value;
+                    var company = _companyService.GetCompanyQueryable().AsNoTracking().First(x => x.Id == model.CompanyId);
+                    misafirIsletmemi = string.Equals(company.Demo, "Evet", StringComparison.InvariantCultureIgnoreCase);
+                }
+                panelUserDTO.SendMail = !misafirIsletmemi;
                 Result<PanelUserDTO> result = await _panelUserService.AddUserAsync(panelUserDTO);
                 model.FormMessage = result.FormMessage;
                 model.IsSuccess = result.IsSuccess;

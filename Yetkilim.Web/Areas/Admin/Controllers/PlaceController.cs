@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using System;
@@ -13,9 +14,12 @@ using Yetkilim.Business.Services;
 using Yetkilim.Domain.DTO;
 using Yetkilim.Domain.Entity;
 using Yetkilim.Domain.Enums;
+using Yetkilim.Global.Helpers;
 using Yetkilim.Global.Model;
+using Yetkilim.Infrastructure.Email;
 using Yetkilim.Web.Areas.Admin.Controllers;
 using Yetkilim.Web.Areas.Admin.Models;
+using Yetkilim.Web.Models.Ef;
 
 namespace Yetkilim.Web.Areas.Admin.Controllers
 {
@@ -28,11 +32,15 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
 
         private readonly IPlaceService _placeService;
 
-        public PlaceController(ILogger<PlaceController> logger, IHostingEnvironment hostingEnvironment, IPlaceService placeService)
+        private readonly IEmailSender _emailSender;
+
+
+        public PlaceController(ILogger<PlaceController> logger, IHostingEnvironment hostingEnvironment, IPlaceService placeService, IEmailSender emailSender)
         {
             _logger = logger;
             _placeService = placeService;
             _hostingEnvironment = hostingEnvironment;
+            _emailSender = emailSender;
         }
 
         public IActionResult Index()
@@ -213,6 +221,65 @@ namespace Yetkilim.Web.Areas.Admin.Controllers
                     {
                         model.FormMessage = "İşleminiz başarılı bir şekilde gerçekleştirildi.";
                     }
+
+
+                    if (result.Messages != null && result.Messages.Any())
+                    {
+                        var temp = result.Messages.FirstOrDefault(x => string.Equals(x, "Demo", StringComparison.InvariantCultureIgnoreCase));
+                        if (temp != null)
+                        {
+                            using (yetkilimDBContext db = new yetkilimDBContext())
+                            {
+                                var listMail = new List<string>();
+
+                                //var userPlaces = db.PanelUser.AsNoTracking().Where(x => x.PlaceId == feedback.PlaceId).ToList();
+                                //if (userPlaces != null && userPlaces.Any())
+                                //{
+                                //    listMail.AddRange(userPlaces.Where(x => !string.IsNullOrWhiteSpace(x.Email)).Select(x => x.Email));
+                                //}
+
+                                //var place = db.Places.First(x => x.Id == feedback.PlaceId);
+
+                                var placeUsers = db.PanelUser.Where(x => x.PlaceId == id && !x.IsDeleted).ToList();
+
+                                for (int i = 0; i < placeUsers.Count; i++)
+                                {
+                                    try
+                                    {
+                                        string pass = PasswordHelper.GeneratePassword(6);
+                                        placeUsers[i].Password = PasswordHelper.MD5Hash(pass);
+                                        db.Entry(placeUsers[i]).State = EntityState.Modified;
+                                        db.SaveChanges();
+                                        await _emailSender.Send(new string[] { placeUsers[i].Email }, "Yeni şireniz", pass);
+                                    }
+                                    catch (Exception ex)
+                                    {
+
+
+                                    }
+
+                                }
+
+
+                                // if (userCompanies != null && userCompanies.Any())
+                                // {
+                                //     listMail.AddRange(userCompanies.Where(x => !string.IsNullOrWhiteSpace(x.Email)).Select(x => x.Email));
+                                // }
+
+                                // foreach (var item in listMail)
+                                // {
+                                //     ;
+                                // }                                
+                            }
+                        }
+                    }
+
+
+
+
+
+
+
                     model.IsSuperAdmin = (base.CurrentUser.Role == UserRole.SuperAdmin);
                     return this.View((object)model);
                 }

@@ -32,3 +32,11 @@ namespace Yetkilim.Web.Models.Ef
         public string UserMail { get; set; }
     }
 }
+
+
+
+
+
+
+
+

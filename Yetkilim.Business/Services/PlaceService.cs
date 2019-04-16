@@ -50,9 +50,14 @@ namespace Yetkilim.Business.Services
         public async Task<Result<List<PlaceDTO>>> GetAllPlaceAsync(PlaceSearchModel searchModel)
         {
             searchModel.FixPageDefinations();
-            //int? companyId = searchModel.CompanyId;
-            //&& ((object)companyId == null || (object)(int?)w.CompanyId == (object)companyId)
-            IQueryable<Place> source = _unitOfWork.EntityRepository<Place>().GetQueryable((Place w) => w.IsDeleted == false, null);
+            ////int? companyId = searchModel.CompanyId;
+            ////&& ((object)companyId == null || (object)(int?)w.CompanyId == (object)companyId)
+            //IQueryable<Place> source = _unitOfWork.EntityRepository<Place>().GetQueryable((Place w) => w.IsDeleted == false, null);
+
+
+            int? companyId = searchModel.CompanyId;
+            IQueryable<Place> source = _unitOfWork.EntityRepository<Place>().GetQueryable((Place w) => w.IsDeleted == false && ((object)companyId == null || (object)(int?)w.CompanyId == (object)companyId), null);
+
             if (!string.IsNullOrEmpty(searchModel.SearchText))
             {
                 string[] searchTexts = searchModel.SearchText.ToLower().Split(' ');
@@ -173,6 +178,18 @@ namespace Yetkilim.Business.Services
             {
                 return Result.Fail("Mekan bulunamadı!");
             }
+
+            var demoMessage = "";
+            if (!string.IsNullOrWhiteSpace(place.Guest))
+            {
+                if ((!string.Equals("Hayir", place2.Guest, StringComparison.InvariantCultureIgnoreCase))
+                    && string.Equals("Hayir", place.Guest, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    demoMessage = "Demo";
+                }
+            }
+
+
             place2.Name = place.Name;
             place2.Guest = place.Guest;
             place2.Address = place.Address;
@@ -183,7 +200,7 @@ namespace Yetkilim.Business.Services
                 place2.Location = new XYPoint(place.Latitude.Value, place.Longitude.Value);
             }
             await _unitOfWork.SaveChangesAsync();
-            return Result.Success();
+            return Result.Success(message: demoMessage);
         }
 
         public async Task<Result> DeletePlaceAsync(int? companyId, int id)

@@ -76,6 +76,12 @@ namespace Yetkilim.Domain.DTO
             get;
             set;
         }
+
+        public bool SendMail
+        {
+            get;
+            set;
+        }
     }
 
 }

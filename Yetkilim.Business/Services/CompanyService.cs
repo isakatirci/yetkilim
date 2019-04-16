@@ -20,12 +20,13 @@ using Yetkilim.Domain.Enums;
 using Yetkilim.Global.Context;
 using Yetkilim.Global.Model;
 using Yetkilim.Infrastructure.Data.UnitOfWork;
+using Yetkilim.Infrastructure.Email;
 
 namespace Yetkilim.Business.Services
 {
     public class CompanyService : ServiceBase, ICompanyService
     {
-        private readonly IPanelUserService _panelUserService;
+        private readonly IPanelUserService _panelUserService;    
 
         private readonly IYetkilimUnitOfWork _unitOfWork;
 
@@ -107,12 +108,25 @@ namespace Yetkilim.Business.Services
             company2.Name = company.Name;
             company2.Address = company.Address;
             company2.CompanyTypeId = company.CompanyTypeId;
+            var demoMessage = "";
+            if (!string.IsNullOrWhiteSpace(company.Demo))
+            {
+                if ((!string.Equals("Hayir", company2.Demo, StringComparison.InvariantCultureIgnoreCase)) 
+                    && string.Equals("Hayir", company.Demo, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    demoMessage = "Demo";
+                }
+            }
+
+            company2.Demo = company.Demo;
+
+
             if (!string.IsNullOrWhiteSpace(company.Image))
             {
                 company2.Image = company.Image;
             }
             await _unitOfWork.SaveChangesAsync();
-            return Result.Success();
+            return Result.Success(message: demoMessage);
         }
 
         public async Task<Result> DeleteCompanyAsync(int id)

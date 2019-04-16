@@ -74,10 +74,15 @@ namespace Yetkilim.Business.Services
                 panelUser.Company = null;
                 PanelUser created = await repo.CreateAsync(panelUser);
                 await _unitOfWork.SaveChangesAsync();
-                await _emailSender.Send(new string[1]
+
+                if (model.SendMail)
                 {
+                    await _emailSender.Send(new string[1]
+                        {
         model.Email
-                }, "Üyeliğiniz oluşturuldu!", "Yetkilim panele giriş şifreniz: " + pass);
+                        }, "Üyeliğiniz oluşturuldu!", "Yetkilim panele giriş şifreniz: " + pass);
+                }
+    
                 return Result.Data(Mapper.Map<PanelUser, PanelUserDTO>(created));
             }
             catch (Exception ex)

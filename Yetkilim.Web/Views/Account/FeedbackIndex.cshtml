@@ -37,7 +37,7 @@
                     $('#data-table-feedback@(i) thead tr').clone(true).appendTo('#data-table-feedback@(i) thead');
                     $('#data-table-feedback@(i) thead tr:eq(1) th').each(function (i) {
                         var title = $(this).text();
-                        $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+                        $(this).html('<input type="text" placeholder="' + title + ' Arama" />');
 
                         $('input', this).on('keyup change', function () {
                             if (table.column(i).search() !== this.value) {

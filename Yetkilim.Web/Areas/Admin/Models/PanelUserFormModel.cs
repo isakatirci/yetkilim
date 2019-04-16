@@ -9,7 +9,7 @@ namespace Yetkilim.Web.Areas.Admin.Models
 {
 	public class PanelUserFormModel
 	{
-		public int CompanyId
+		public int? CompanyId
 		{
 			get;
 			set;
@@ -64,6 +64,13 @@ namespace Yetkilim.Web.Areas.Admin.Models
 			get;
 			set;
 		}
+
+		public List<CompanyInfoDTO> Companies
+		{
+			get;
+			set;
+		}
+
 
 		public int? PlaceId
 		{

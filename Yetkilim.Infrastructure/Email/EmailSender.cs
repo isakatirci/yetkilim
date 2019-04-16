@@ -8,8 +8,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Yetkilim.Global.Configuration;
 using Yetkilim.Global.Model;
@@ -48,13 +50,20 @@ namespace Yetkilim.Infrastructure.Email
           IsBodyHtml = true,
           From = new MailAddress(this._options.Username, this._options.SenderName)
         };
-        foreach (string toAddress in toAddresses)
+
+                toAddresses = toAddresses.Where(x => isEmail(x)).Select(x => x.Trim());
+
+
+                foreach (string toAddress in toAddresses)
         {
           string to = toAddress;
           mailMessage.To.Add(to);
           to = (string) null;
         }
-        await client.SendMailAsync(mailMessage);
+
+
+
+                await client.SendMailAsync(mailMessage);
         this._logger.LogInformation("Mail gönderildi", (object) toAddresses, (object) subject);
         return Result.Success("Mail gönderildi!");
       }
@@ -64,5 +73,13 @@ namespace Yetkilim.Infrastructure.Email
         return Result.Fail("Mail gönderilemedi!", (Exception) null, (string) null);
       }
     }
+
+
+         bool isEmail(string emailString)
+        {
+            return Regex.IsMatch(emailString, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", RegexOptions.IgnoreCase);
+        }
+
+
   }
 }
